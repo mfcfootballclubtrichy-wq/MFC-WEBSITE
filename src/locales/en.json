@@ -1,0 +1,107 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "vision": "Vision",
+    "coaches": "Coaches",
+    "teamAchievements": "Team Achievements",
+    "individualAchievements": "Individual Achievements",
+    "schoolProgram": "School Program",
+    "contact": "Contact"
+  },
+  "hero": {
+    "tagline": "#OneClubOneDream",
+    "headline1": "Developing",
+    "headline2": "Champions",
+    "headline3": "From Trichy",
+    "sub": "Grassroots football excellence in Mutharasanallur",
+    "cta": "Explore the Academy"
+  },
+  "about": {
+    "title": "About MFC Football Academy",
+    "body": "Mutharasanallur football club is a professional football training center committed to developing young players through structured coaching programs. We aim to promote football at the grassroots level and nurture student-athletes with discipline, teamwork, and sporting excellence.",
+    "whyTitle": "Why Partner With Us"
+  },
+  "vision": {
+    "title": "Our Vision",
+    "body": "To be the leading grassroots football development centre in Tamil Nadu — building the next generation of Indian footballers with discipline, skill, and sporting values.",
+    "mission": "Mission",
+    "missionBody": "To provide structured, age-appropriate coaching that develops every player's technical, tactical, physical, and mental abilities.",
+    "values": "Values",
+    "valuesList": {
+      "discipline": "Discipline",
+      "teamwork": "Teamwork",
+      "excellence": "Excellence",
+      "integrity": "Integrity",
+      "development": "Holistic Development"
+    }
+  },
+  "coaches": {
+    "title": "Our Coaches",
+    "licenceLabel": "AIFF Licence",
+    "placeholder": "[CONFIRM: Coach profiles to be added by club]"
+  },
+  "teamAchievements": {
+    "title": "Team Achievements",
+    "description": "Our teams have represented MFC Football Academy across regional and state-level competitions.",
+    "placeholder": "[CONFIRM: Team achievements to be confirmed by club]"
+  },
+  "individualAchievements": {
+    "title": "Individual Achievements",
+    "description": "Our players have participated in competitions across Tamil Nadu and Karnataka.",
+    "competition": "Competition",
+    "team": "Team / Club",
+    "players": "Players"
+  },
+  "schoolProgram": {
+    "title": "School Program",
+    "description": "Technical, tactical, and physical development through progressive modules.",
+    "highlightsTitle": "Program Highlights",
+    "benefitsTitle": "Benefits for Schools",
+    "ctaTitle": "Partner With Us",
+    "ctaBody": "Bring professional football coaching to your school. Contact us to discuss a customised program.",
+    "ctaButton": "Get in Touch"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "phone": "Phone",
+    "email": "Email",
+    "instagram": "Instagram",
+    "location": "Location",
+    "formTitle": "Send a Message",
+    "nameLabel": "Your Name",
+    "emailLabel": "Your Email",
+    "messageLabel": "Message",
+    "submitButton": "Send Message",
+    "successMessage": "Thank you! We'll be in touch soon.",
+    "errorMessage": "Something went wrong. Please try again or call us directly."
+  },
+  "stats": {
+    "founded": "Established",
+    "players": "Athletes Trained",
+    "podiums": "Tournament Honors",
+    "scholarships": "Higher Ed Scholarships"
+  },
+  "common": {
+    "confirmBadge": "CONFIRM",
+    "learnMore": "Learn More",
+    "backToHome": "Back to Home",
+    "loading": "Loading…",
+    "close": "Close",
+    "menu": "Menu",
+    "skipToContent": "Skip to main content"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "builtBy": "Built with passion for football."
+  },
+  "ageGroups": {
+    "title": "Age Groups",
+    "superSeniors": "Super Seniors",
+    "seniors": "Seniors",
+    "juniors": "Juniors",
+    "kids": "Kids & Young Lions",
+    "bornLabel": "Born"
+  }
+}

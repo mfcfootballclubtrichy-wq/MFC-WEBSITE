@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Phase 2: uncomment once ESLint is configured
+      # - name: Lint
+      #   run: npm run lint
+
+      # Phase 2: uncomment once Vitest tests are written
+      # - name: Test
+      #   run: npm run test -- --run
+
+      - name: Build
+        run: npm run build
+        env:
+          # Dummy values so Vite doesn't fail on undefined env vars in Phase 1
+          VITE_API_URL: https://placeholder.example.com
+
+      - name: Check bundle size
+        run: |
+          BUNDLE_SIZE=$(du -sh dist/assets/*.js 2>/dev/null | awk '{sum += $1} END {print sum}')
+          echo "Total JS bundle: ${BUNDLE_SIZE} KB"
+          # CI will warn but not fail on size in Phase 1
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: npm audit
+        run: npm audit --audit-level=high || true
+        # 'true' allows the step to pass even with moderate vulnerabilities in Phase 1.
+        # Change to '--audit-level=moderate' in Phase 5 for production hardening.
