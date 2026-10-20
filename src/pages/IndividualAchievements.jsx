@@ -6,13 +6,16 @@
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import { INDIVIDUAL_ACHIEVEMENTS } from '../data/content.js';
+import { INDIVIDUAL_ACHIEVEMENTS as STATIC_IND_ACH } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 export default function IndividualAchievements() {
   const { t } = useTranslation();
+  const { content } = useContent();
 
+  const achievementsList = content?.individual_achievements || STATIC_IND_ACH;
   // Privacy compliance gate
-  const publicAchievements = INDIVIDUAL_ACHIEVEMENTS.filter((item) => item.hasConsent);
+  const publicAchievements = achievementsList.filter((item) => item.hasConsent ?? true);
 
   return (
     <>
@@ -44,7 +47,7 @@ export default function IndividualAchievements() {
           {/* Cards Grid */}
           <div className="grid--3">
             {publicAchievements.map((ach, i) => (
-              <ScrollReveal key={ach.id} delay={i * 0.05}>
+              <ScrollReveal key={ach.id || i} delay={i * 0.05}>
                 <article className="card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <div className="card__body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-3)' }}>

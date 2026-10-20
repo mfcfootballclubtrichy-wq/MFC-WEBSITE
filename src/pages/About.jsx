@@ -5,10 +5,16 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import { ABOUT_TEXT, PARTNERSHIP_POINTS, CLUB } from '../data/content.js';
+import { ABOUT_TEXT as STATIC_ABOUT, PARTNERSHIP_POINTS, CLUB } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 export default function About() {
   const { t } = useTranslation();
+  const { content } = useContent();
+
+  const aboutData = content?.about || {};
+  const aboutText = aboutData.body || STATIC_ABOUT;
+  const aboutImage = aboutData.image || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80";
 
   return (
     <>
@@ -16,7 +22,7 @@ export default function About() {
       <section className="page-hero">
         <div className="container">
           <span className="section__eyebrow">{t('nav.about')}</span>
-          <h1 className="page-hero__title">About MFC</h1>
+          <h1 className="page-hero__title">{aboutData.title || "About MFC"}</h1>
           <p className="page-hero__sub">
             Grassroots football training and student-athlete development founded in 2020 in Mutharasanallur, Trichy.
           </p>
@@ -33,7 +39,7 @@ export default function About() {
                   Our Foundation & Roots
                 </h2>
                 <p className="lead" style={{ marginBottom: 'var(--space-6)' }}>
-                  {ABOUT_TEXT}
+                  {aboutText}
                 </p>
                 <p style={{ color: 'var(--muted)', marginBottom: 'var(--space-6)', lineHeight: 1.7 }}>
                   From village pitches in Mutharasanallur to state championships, MFC was built to bridge the gap between rural athletic passion and structured football pathways. We believe every child deserves access to professional coaching, competitive exposure, and educational advancement opportunities.
@@ -52,7 +58,7 @@ export default function About() {
             <ScrollReveal delay={0.15}>
               <div className="about-image-wrapper">
                 <img
-                  src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80"
+                  src={aboutImage}
                   alt="Mutharasanallur Football Club training ground"
                   loading="lazy"
                 />

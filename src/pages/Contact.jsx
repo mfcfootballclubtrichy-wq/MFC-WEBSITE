@@ -11,7 +11,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
 import ConfirmBadge  from '../components/ConfirmBadge.jsx';
-import { CLUB } from '../data/content.js';
+import { CLUB as STATIC_CLUB } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 const FORM_STATES = {
   IDLE:     'idle',
@@ -22,6 +23,12 @@ const FORM_STATES = {
 
 export default function Contact() {
   const { t } = useTranslation();
+  const { content } = useContent();
+
+  const clubContact = {
+    ...STATIC_CLUB,
+    ...(content?.contact || {}),
+  };
 
   const [formState, setFormState] = useState(FORM_STATES.IDLE);
   const [fields, setFields]       = useState({ name: '', email: '', message: '' });
@@ -96,7 +103,7 @@ export default function Contact() {
                         <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-1)' }}>
                           {t('contact.phone')}
                         </p>
-                        <a href={`tel:${CLUB.phone}`}>{CLUB.phone}</a>
+                        <a href={`tel:${clubContact.phone}`}>{clubContact.phone}</a>
                       </div>
                     </li>
 
@@ -106,7 +113,7 @@ export default function Contact() {
                         <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-1)' }}>
                           {t('contact.email')}
                         </p>
-                        <a href={`mailto:${CLUB.email}`}>{CLUB.email}</a>
+                        <a href={`mailto:${clubContact.email}`}>{clubContact.email}</a>
                       </div>
                     </li>
 
@@ -116,8 +123,8 @@ export default function Contact() {
                         <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-1)' }}>
                           {t('contact.instagram')}
                         </p>
-                        <a href={CLUB.instagram} target="_blank" rel="noopener noreferrer">
-                          {CLUB.instagramHandle}
+                        <a href={clubContact.instagram} target="_blank" rel="noopener noreferrer">
+                          {clubContact.instagramHandle}
                         </a>
                       </div>
                     </li>
@@ -129,8 +136,7 @@ export default function Contact() {
                           {t('contact.location')}
                         </p>
                         <span>
-                          {CLUB.location}{' '}
-                          <ConfirmBadge label="Confirm full address" />
+                          {clubContact.address || clubContact.location}
                         </span>
                       </div>
                     </li>

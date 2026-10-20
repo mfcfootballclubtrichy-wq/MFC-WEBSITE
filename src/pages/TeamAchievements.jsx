@@ -6,13 +6,16 @@
 import { useTranslation } from 'react-i18next';
 import ScrollReveal from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import { TEAM_ACHIEVEMENTS } from '../data/content.js';
+import { TEAM_ACHIEVEMENTS as STATIC_TEAM_ACHIEVEMENTS } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 export default function TeamAchievements() {
   const { t } = useTranslation();
+  const { content } = useContent();
 
-  const runnerUps = TEAM_ACHIEVEMENTS.filter((t) => t.place.toLowerCase().includes('runner'));
-  const thirdPlaces = TEAM_ACHIEVEMENTS.filter((t) => t.place.toLowerCase().includes('3rd'));
+  const achievementsList = content?.team_achievements || STATIC_TEAM_ACHIEVEMENTS;
+  const runnerUps = achievementsList.filter((t) => (t.place || '').toLowerCase().includes('runner'));
+  const thirdPlaces = achievementsList.filter((t) => (t.place || '').toLowerCase().includes('3rd'));
 
   return (
     <>
@@ -83,10 +86,10 @@ export default function TeamAchievements() {
                   </tr>
                 </thead>
                 <tbody>
-                  {TEAM_ACHIEVEMENTS.map((item) => {
-                    const isRunnerUp = item.place.toLowerCase().includes('runner');
+                  {achievementsList.map((item, idx) => {
+                    const isRunnerUp = (item.place || '').toLowerCase().includes('runner');
                     return (
-                      <tr key={item.id}>
+                      <tr key={item.id || idx}>
                         <td style={{ color: 'var(--muted)', fontWeight: 500 }}>{item.season}</td>
                         <td>
                           <span

@@ -11,6 +11,9 @@ import { useEffect } from 'react';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollProgress from './components/ScrollProgress.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
+import { ContentProvider } from './context/ContentContext.jsx';
 
 // Pages
 import Home                   from './pages/Home.jsx';
@@ -22,6 +25,8 @@ import IndividualAchievements from './pages/IndividualAchievements.jsx';
 import SchoolProgram          from './pages/SchoolProgram.jsx';
 import Contact                from './pages/Contact.jsx';
 import NotFound               from './pages/NotFound.jsx';
+import Login                  from './pages/admin/Login.jsx';
+import Dashboard              from './pages/admin/Dashboard.jsx';
 
 // Red wipe overlay: slides left → right on exit, right → left on enter.
 const pageVariants = {
@@ -63,35 +68,45 @@ export default function App() {
   const location = useLocation();
 
   return (
-    <>
-      <ScrollProgress />
-      <a href="#main-content" className="skip-link">
-        Skip to main content
-      </a>
+    <AuthProvider>
+      <ContentProvider>
+        <ScrollProgress />
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
 
-      <RouteMetaUpdater />
-      <Header />
+        <RouteMetaUpdater />
+        <Header />
 
-      <main id="main-content">
-        <AnimatePresence mode="wait">
-          {/* RedWipe sits above routes; key changes on route */}
-          <RedWipe key={`wipe-${location.pathname}`} />
+        <main id="main-content">
+          <AnimatePresence mode="wait">
+            {/* RedWipe sits above routes; key changes on route */}
+            <RedWipe key={`wipe-${location.pathname}`} />
 
-          <Routes location={location} key={location.pathname}>
-            <Route path="/"                         element={<Home />} />
-            <Route path="/about"                    element={<About />} />
-            <Route path="/vision"                   element={<Vision />} />
-            <Route path="/coaches"                  element={<Coaches />} />
-            <Route path="/team-achievements"        element={<TeamAchievements />} />
-            <Route path="/individual-achievements"  element={<IndividualAchievements />} />
-            <Route path="/school-program"           element={<SchoolProgram />} />
-            <Route path="/contact"                  element={<Contact />} />
-            <Route path="*"                         element={<NotFound />} />
-          </Routes>
-        </AnimatePresence>
-      </main>
-
-      <Footer />
-    </>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/"                         element={<Home />} />
+              <Route path="/about"                    element={<About />} />
+              <Route path="/vision"                   element={<Vision />} />
+              <Route path="/coaches"                  element={<Coaches />} />
+              <Route path="/team-achievements"        element={<TeamAchievements />} />
+              <Route path="/individual-achievements"  element={<IndividualAchievements />} />
+              <Route path="/school-program"           element={<SchoolProgram />} />
+              <Route path="/contact"                  element={<Contact />} />
+              <Route path="/admin/login"              element={<Login />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'content_editor', 'coach']}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*"                         element={<NotFound />} />
+            </Routes>
+          </AnimatePresence>
+        </main>
+        <Footer />
+      </ContentProvider>
+    </AuthProvider>
   );
 }

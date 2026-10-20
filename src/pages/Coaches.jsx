@@ -6,10 +6,14 @@
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import { COACHES } from '../data/content.js';
+import { COACHES as STATIC_COACHES } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 export default function Coaches() {
   const { t } = useTranslation();
+  const { content } = useContent();
+
+  const coachesList = content?.coaches || STATIC_COACHES;
 
   return (
     <>
@@ -39,29 +43,44 @@ export default function Coaches() {
           </ScrollReveal>
 
           <div className="grid--3">
-            {COACHES.map((coach, i) => (
-              <ScrollReveal key={coach.id} delay={i * 0.1}>
+            {coachesList.map((coach, i) => (
+              <ScrollReveal key={coach.id || i} delay={i * 0.1}>
                 <article className="card" style={{ padding: 'var(--space-8)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Avatar badge */}
-                  <div
-                    style={{
-                      width: 72,
-                      height: 72,
-                      borderRadius: '50%',
-                      background: 'var(--accent-glow)',
-                      color: 'var(--accent-dark)',
-                      border: '2px solid var(--accent)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '2rem',
-                      fontWeight: 700,
-                      marginBottom: 'var(--space-5)',
-                    }}
-                    aria-hidden="true"
-                  >
-                    {coach.name.charAt(0)}
-                  </div>
+                  {/* Avatar badge or custom photo */}
+                  {coach.photo ? (
+                    <div
+                      style={{
+                        width: 72,
+                        height: 72,
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        border: '2px solid var(--accent)',
+                        marginBottom: 'var(--space-5)',
+                      }}
+                    >
+                      <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        width: 72,
+                        height: 72,
+                        borderRadius: '50%',
+                        background: 'var(--accent-glow)',
+                        color: 'var(--accent-dark)',
+                        border: '2px solid var(--accent)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '2rem',
+                        fontWeight: 700,
+                        marginBottom: 'var(--space-5)',
+                      }}
+                      aria-hidden="true"
+                    >
+                      {coach.name?.charAt(0) || 'C'}
+                    </div>
+                  )}
 
                   <span className="card__tag">{coach.role}</span>
                   <h3 className="card__title">{coach.name}</h3>

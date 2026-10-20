@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 import { CLUB, NAV_ITEMS } from '../data/content.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const SCROLL_THRESHOLD = 30;
 
@@ -33,6 +34,7 @@ const linkItemVariants = {
 
 export default function Header() {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -109,7 +111,7 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* ── Right side: lang toggle + mobile button ── */}
+          {/* ── Right side: lang toggle + Admin/Login button + mobile hamburger ── */}
           <div className="flex" style={{ gap: 'var(--space-3)', alignItems: 'center' }}>
             {/* Language toggle */}
             <div
@@ -134,6 +136,25 @@ export default function Header() {
                 த
               </button>
             </div>
+
+            {/* Admin / Login Button */}
+            {user ? (
+              <Link
+                to="/admin"
+                className="btn btn--outline"
+                style={{ padding: '0.45rem 1rem', fontSize: 'var(--fs-xs)', borderRadius: 'var(--radius-full)' }}
+              >
+                Admin Panel
+              </Link>
+            ) : (
+              <Link
+                to="/admin/login"
+                className="btn btn-primary"
+                style={{ padding: '0.45rem 1.1rem', fontSize: 'var(--fs-xs)', borderRadius: 'var(--radius-full)' }}
+              >
+                Sign In
+              </Link>
+            )}
 
             {/* Mobile hamburger */}
             <button
@@ -204,6 +225,28 @@ export default function Header() {
               >
                 தமிழ்
               </button>
+            </div>
+
+            <div style={{ marginTop: 'var(--space-6)', width: '100%' }}>
+              {user ? (
+                <Link
+                  to="/admin"
+                  className="btn btn--outline"
+                  onClick={closeMenu}
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Admin Panel
+                </Link>
+              ) : (
+                <Link
+                  to="/admin/login"
+                  className="btn btn-primary"
+                  onClick={closeMenu}
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </motion.nav>
         )}

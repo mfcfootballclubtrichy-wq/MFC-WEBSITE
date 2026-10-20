@@ -4,10 +4,14 @@
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import { VISION_TEXT } from '../data/content.js';
+import { VISION_TEXT as STATIC_VISION_TEXT } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 export default function Vision() {
   const { t } = useTranslation();
+  const { content } = useContent();
+
+  const visionData = content?.vision || STATIC_VISION_TEXT;
 
   const values = [
     { title: 'Discipline', desc: 'Punctuality, consistency, and respect on and off the pitch.', icon: '🛡️' },
@@ -21,9 +25,9 @@ export default function Vision() {
       <section className="page-hero">
         <div className="container">
           <span className="section__eyebrow">Guiding Purpose</span>
-          <h1 className="page-hero__title">{VISION_TEXT.title}</h1>
+          <h1 className="page-hero__title">{visionData.title || STATIC_VISION_TEXT.title}</h1>
           <p className="page-hero__sub">
-            {VISION_TEXT.body}
+            {visionData.body || STATIC_VISION_TEXT.body}
           </p>
         </div>
       </section>

@@ -11,13 +11,18 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollReveal from '../components/ScrollReveal.jsx';
-import { SCHOOL_PROGRAM } from '../data/content.js';
+import { SCHOOL_PROGRAM as STATIC_SCHOOL_PROGRAM } from '../data/content.js';
+import { useContent } from '../context/ContentContext.jsx';
 
 const HIGHLIGHT_ICONS = ['📚', '📊', '🏆', '🗺️'];
 const BENEFIT_ICONS   = ['🎖️', '🔍', '💪', '🤝', '📜'];
 
 export default function SchoolProgram() {
   const { t } = useTranslation();
+  const { content } = useContent();
+
+  const schoolData = content?.school_program || STATIC_SCHOOL_PROGRAM;
+  const schoolImage = schoolData.image || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80";
 
   return (
     <>
@@ -26,7 +31,7 @@ export default function SchoolProgram() {
         <div className="container">
           <span className="section__eyebrow">{t('nav.schoolProgram')}</span>
           <h1 className="page-hero__title">{t('schoolProgram.title')}</h1>
-          <p className="page-hero__sub">{t('schoolProgram.description')}</p>
+          <p className="page-hero__sub">{schoolData.description || t('schoolProgram.description')}</p>
         </div>
       </section>
 
@@ -41,11 +46,11 @@ export default function SchoolProgram() {
                 </h2>
                 <div className="divider--accent" />
                 <p style={{ color: 'var(--muted)', marginTop: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
-                  {SCHOOL_PROGRAM.description}
+                  {schoolData.description || STATIC_SCHOOL_PROGRAM.description}
                 </p>
 
                 <div className="feature-list">
-                  {SCHOOL_PROGRAM.highlights.map((h, i) => (
+                  {(schoolData.highlights || STATIC_SCHOOL_PROGRAM.highlights).map((h, i) => (
                     <div key={h} className="feature-item">
                       <div className="feature-item__icon" aria-hidden="true">
                         {HIGHLIGHT_ICONS[i] ?? '✓'}
@@ -57,24 +62,23 @@ export default function SchoolProgram() {
               </div>
             </ScrollReveal>
 
-            {/* Photo placeholder */}
+            {/* Dynamic School Training Photo */}
             <ScrollReveal delay={0.15}>
               <div
                 style={{
                   width: '100%',
                   height: 440,
-                  background: 'linear-gradient(135deg, var(--surface-2), var(--surface))',
                   borderRadius: 'var(--radius)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '5rem',
+                  overflow: 'hidden',
                   border: '1px solid var(--border)',
                 }}
-                role="img"
-                aria-label="[CONFIRM: School program photo]"
               >
-                🏫
+                <img
+                  src={schoolImage}
+                  alt="MFC School Football Training Program"
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
               </div>
             </ScrollReveal>
           </div>
