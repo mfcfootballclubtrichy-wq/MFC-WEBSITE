@@ -42,51 +42,55 @@ export default function Coaches() {
             </div>
           </ScrollReveal>
 
-          <div className="grid--3">
+          <div className="grid--3 coaches-grid">
             {coachesList.map((coach, i) => (
               <ScrollReveal key={coach.id || i} delay={i * 0.1}>
-                <article className="card" style={{ padding: 'var(--space-8)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <article className="card coach-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   {/* Avatar badge or custom photo */}
-                  {coach.photo ? (
-                    <div
-                      style={{
-                        width: 72,
-                        height: 72,
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '2px solid var(--accent)',
-                        marginBottom: 'var(--space-5)',
-                      }}
-                    >
-                      <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        width: 72,
-                        height: 72,
-                        borderRadius: '50%',
-                        background: 'var(--accent-glow)',
-                        color: 'var(--accent-dark)',
-                        border: '2px solid var(--accent)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '2rem',
-                        fontWeight: 700,
-                        marginBottom: 'var(--space-5)',
-                      }}
-                      aria-hidden="true"
-                    >
-                      {coach.name?.charAt(0) || 'C'}
-                    </div>
-                  )}
+                  <div style={{ marginBottom: 'var(--space-5)', display: 'flex', alignItems: 'center' }}>
+                    {coach.photo ? (
+                      <div
+                        style={{
+                          width: '120px',
+                          height: '120px',
+                          borderRadius: '16px',
+                          overflow: 'hidden',
+                          border: '2px solid var(--accent)',
+                          boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          width: '120px',
+                          height: '120px',
+                          borderRadius: '16px',
+                          background: 'var(--accent-glow)',
+                          color: 'var(--accent-dark)',
+                          border: '2px solid var(--accent)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '3rem',
+                          fontWeight: 700,
+                          boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                          flexShrink: 0,
+                        }}
+                        aria-hidden="true"
+                      >
+                        {coach.name?.charAt(0) || 'C'}
+                      </div>
+                    )}
+                  </div>
 
                   <span className="card__tag">{coach.role}</span>
                   <h3 className="card__title">{coach.name}</h3>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
-                    {coach.licence.map((lic) => (
+                    {(Array.isArray(coach.licence) ? coach.licence : [coach.licence]).filter(Boolean).map((lic) => (
                       <span key={lic} className="badge--confirm">
                         {lic}
                       </span>

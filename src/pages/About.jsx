@@ -7,6 +7,7 @@ import ScrollReveal  from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
 import { ABOUT_TEXT as STATIC_ABOUT, PARTNERSHIP_POINTS, CLUB } from '../data/content.js';
 import { useContent } from '../context/ContentContext.jsx';
+import aboutFreestyleImg from '../assets/about-freestyle.png';
 
 export default function About() {
   const { t } = useTranslation();
@@ -14,7 +15,10 @@ export default function About() {
 
   const aboutData = content?.about || {};
   const aboutText = aboutData.body || STATIC_ABOUT;
-  const aboutImage = aboutData.image || "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80";
+  const aboutImage =
+    aboutData.image && !aboutData.image.includes('unsplash')
+      ? aboutData.image
+      : aboutFreestyleImg;
 
   return (
     <>

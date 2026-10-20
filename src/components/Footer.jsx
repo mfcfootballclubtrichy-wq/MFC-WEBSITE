@@ -85,19 +85,33 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <span className="footer__link">
-                  📍 {CLUB.address}
-                </span>
+                <a
+                  href={CLUB.mapsUrl || "https://www.google.com/maps?ftid=0x3baa5f1fbab6b02f:0x640fe554b7a67e15"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer__link"
+                  title="View Tamilan Nagar Ground on Google Maps"
+                >
+                  📍 {CLUB.address} ↗
+                </a>
               </li>
             </ul>
           </div>
         </div>
 
         {/* ── Bottom bar ── */}
-        <div className="footer__bottom">
+        <div className="footer__bottom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
           <p className="footer__copy">
             {CLUB.footerNote}
           </p>
+          <div style={{ display: 'flex', gap: 'var(--space-4)', fontSize: 'var(--fs-xs)' }}>
+            <Link to="/privacy-policy" style={{ color: 'var(--muted)', textDecoration: 'underline' }}>
+              Privacy Policy
+            </Link>
+            <Link to="/terms" style={{ color: 'var(--muted)', textDecoration: 'underline' }}>
+              Terms of Use
+            </Link>
+          </div>
           <p className="footer__copy">{t('footer.builtBy')}</p>
         </div>
       </div>

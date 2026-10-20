@@ -414,6 +414,10 @@ p {
   box-shadow: 0 10px 30px rgba(134, 239, 172, 0.45);
 }
 
+.coach-card {
+  padding: var(--space-8);
+}
+
 .card__image {
   overflow: hidden;
   position: relative;
@@ -1083,37 +1087,61 @@ p {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Mobile drawer: white panel with black links and light green hover backgrounds */
+/* Mobile drawer: solid white full-viewport panel with clean navigation links */
 .mobile-nav {
   position: fixed;
-  inset: 0;
   top: var(--header-height);
-  background: var(--bg);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: calc(100dvh - var(--header-height));
+  background: #FFFFFF !important;
   border-top: 1px solid var(--border);
-  z-index: var(--z-overlay);
+  z-index: 99999 !important;
   display: flex;
   flex-direction: column;
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-6) var(--space-6) var(--space-12);
   gap: var(--space-3);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.mobile-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.mobile-nav li {
+  list-style: none;
+  width: 100%;
 }
 
 .mobile-nav__link {
   font-family: var(--font-display);
-  font-size: var(--fs-2xl);
+  font-size: var(--fs-xl);
   text-transform: uppercase;
   color: var(--text);
   letter-spacing: 0.04em;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  display: block;
+  width: 100%;
+  background: #FFFFFF;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .mobile-nav__link:hover,
 .mobile-nav__link.active {
-  background: var(--accent-glow);
-  color: var(--accent-dark);
+  background: var(--accent-glow) !important;
+  color: var(--accent-dark) !important;
 }
 
 @media (max-width: 900px) {
@@ -1245,15 +1273,17 @@ p {
 
 .about-image-wrapper {
   position: relative;
+  max-width: 440px;
+  margin: 0 auto;
 }
 
 .about-image-wrapper::before {
   content: '';
   position: absolute;
-  inset: var(--space-4);
-  border: 2px solid var(--accent-light);
-  border-radius: var(--radius);
-  transform: translate(var(--space-4), var(--space-4));
+  inset: var(--space-2);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-lg);
+  transform: translate(var(--space-3), var(--space-3));
   z-index: 0;
 }
 
@@ -1261,10 +1291,14 @@ p {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 440px;
-  object-fit: cover;
-  border-radius: var(--radius);
+  height: auto;
+  aspect-ratio: 742 / 1024;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  background: #06090e;
 }
 
 /* ── Page Hero (sub-pages) ── */
@@ -1460,3 +1494,137 @@ p {
   background: var(--accent-light);
   color: var(--text);
 }
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE DEVICE PORTABILITY & MOBILE RATIO FIXES
+══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .player-profile-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-6) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-hero {
+    padding-block: var(--space-8) var(--space-6) !important;
+  }
+
+  .page-hero__title {
+    font-size: 2rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .player-profile-grid {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-5) !important;
+  }
+
+  /* Make admin card form rows portable on mobile */
+  .template-item-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Tighten excessive mobile spacing in sections & cards */
+  .section {
+    padding-block: var(--space-8) !important;
+  }
+
+  .section__header {
+    margin-bottom: var(--space-6) !important;
+  }
+
+  .coaches-grid,
+  .grid--3,
+  .grid--2 {
+    gap: var(--space-4) !important;
+  }
+
+  .coach-card {
+    padding: var(--space-5) !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   ADMIN / SUPER ADMIN RESPONSIVE MENU & TABS
+══════════════════════════════════════════════════ */
+.admin-tabs-bar {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 2px solid var(--border);
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-2);
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-template-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 300px) 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .admin-template-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-template-sidebar {
+    position: static !important;
+    top: auto !important;
+    margin-bottom: var(--space-6);
+  }
+
+  .admin-template-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: var(--space-2) !important;
+    padding-bottom: var(--space-2);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-template-nav button {
+    flex-shrink: 0;
+    min-width: 220px;
+  }
+}
+
+/* ── Mobile Form & Ratio Fixes for Admin / Super Admin ── */
+@media (max-width: 768px) {
+  /* Prevent any element from forcing horizontal page breakout */
+  .admin-template-layout,
+  .admin-template-layout * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Make admin card content container compact */
+  .admin-template-layout .card {
+    padding: var(--space-4) !important;
+  }
+
+  /* Stack all grid items inside template manager to 1 column on mobile */
+  .admin-template-layout div[style*="display: grid"],
+  .admin-template-layout div[style*="display:grid"] {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-4) !important;
+  }
+
+  /* Ensure text inputs, textareas, and selects don't overflow */
+  .admin-template-layout input,
+  .admin-template-layout textarea,
+  .admin-template-layout select {
+    max-width: 100% !important;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+  }
+
+  /* Admin tabs button formatting */
+  .admin-tabs-bar .btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+}
+

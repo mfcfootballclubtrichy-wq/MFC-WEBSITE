@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useContent } from '../context/ContentContext.jsx';
+import aboutFreestyleImg from '../assets/about-freestyle.png';
 
 import ScrollReveal   from '../components/ScrollReveal.jsx';
 import StatCounter    from '../components/StatCounter.jsx';
@@ -151,44 +152,259 @@ export default function Home() {
             </ScrollReveal>
 
             <div className="grid--3">
-              {updatesList.map((item, idx) => (
-                <ScrollReveal key={item.id || idx} delay={idx * 0.1}>
-                  <article className="card" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    {item.image && (
-                      <div style={{ height: '200px', width: '100%', overflow: 'hidden' }}>
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          loading="lazy"
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
-                          onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
-                          onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
-                        />
-                      </div>
-                    )}
-                    <div className="card__body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-                        <span className="card__tag">{item.tag || 'Update'}</span>
-                        {item.date && (
-                          <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
-                            {new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
+              {updatesList.map((item, idx) => {
+                const articleId = item.id || encodeURIComponent((item.title || `update-${idx}`).toLowerCase().replace(/\s+/g, '-'));
+
+                return (
+                  <ScrollReveal key={item.id || idx} delay={idx * 0.1}>
+                    <Link
+                      to={`/news/${articleId}`}
+                      style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}
+                      title={`Read full update: ${item.title}`}
+                    >
+                      <article
+                        className="card"
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-4px)';
+                          e.currentTarget.style.borderColor = 'var(--accent)';
+                          e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'none';
+                          e.currentTarget.style.borderColor = 'var(--border)';
+                          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                      >
+                        {item.image && (
+                          <div style={{ height: '200px', width: '100%', overflow: 'hidden', position: 'relative' }}>
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              loading="lazy"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                            />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                bottom: 'var(--space-2)',
+                                right: 'var(--space-2)',
+                                background: 'rgba(0,0,0,0.7)',
+                                backdropFilter: 'blur(4px)',
+                                color: '#fff',
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                padding: '3px 8px',
+                                borderRadius: 'var(--radius-sm)',
+                              }}
+                            >
+                              Read Article →
+                            </div>
+                          </div>
                         )}
-                      </div>
-                      <h3 className="card__title" style={{ fontSize: '1.25rem', marginBottom: 'var(--space-3)' }}>
-                        {item.title}
-                      </h3>
-                      <p className="card__text" style={{ flex: 1, color: 'var(--muted)', lineHeight: 1.6 }}>
-                        {item.description}
-                      </p>
-                    </div>
-                  </article>
-                </ScrollReveal>
-              ))}
+                        <div className="card__body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+                            <span className="card__tag">{item.tag || 'Update'}</span>
+                            {item.date && (
+                              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                                {new Date(item.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="card__title" style={{ fontSize: '1.25rem', marginBottom: 'var(--space-3)' }}>
+                            {item.title}
+                          </h3>
+                          <p className="card__text" style={{ flex: 1, color: 'var(--muted)', lineHeight: 1.6 }}>
+                            {item.description}
+                          </p>
+                        </div>
+                      </article>
+                    </Link>
+                  </ScrollReveal>
+                );
+              })}
             </div>
           </div>
         </section>
       )}
+
+      {/* ══════════════════════════════════════════════════
+          2.8. OFFICIAL YOUTUBE VIDEO & SHORTS REEL SHOWCASE
+      ══════════════════════════════════════════════════ */}
+      <section id="mfc-media" className="section" style={{ background: 'var(--surface-2)', scrollMarginTop: '80px' }} aria-labelledby="media-heading">
+        <div className="container">
+          <SectionDivider />
+          <ScrollReveal>
+            <div className="section__header" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section__eyebrow">Match Action & Training</span>
+              <h2 id="media-heading" className="section__title">
+                Watch MFC in Action
+              </h2>
+              <p className="section__subtitle" style={{ maxWidth: '680px', margin: '0 auto' }}>
+                Experience our official tournament highlights, training drills, and viral skills reels directly from our YouTube channel.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: 'var(--space-8)',
+              alignItems: 'start',
+            }}
+          >
+            {/* 16:9 Landscape Video */}
+            <ScrollReveal delay={0.1}>
+              <div
+                className="card"
+                style={{
+                  padding: 'var(--space-5)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: 'var(--shadow-glow)',
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                  <span className="card__tag" style={{ background: 'var(--accent-dark)', color: '#FFF' }}>
+                    Feature Match Video
+                  </span>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>16:9 HD</span>
+                </div>
+
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    paddingTop: '56.25%',
+                    borderRadius: '16px',
+                    overflow: 'hidden',
+                    background: '#000',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                  }}
+                >
+                  <iframe
+                    src="https://www.youtube.com/embed/AB9QMbrBq5g?si=RCbJALNNCkxoExzq"
+                    title="Mutharasanallur Football Club Official Video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      border: 'none',
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginTop: 'var(--space-4)' }}>
+                  <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-2)' }}>
+                    MFC Football Academy — Tournament & Training Documentary
+                  </h3>
+                  <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>
+                    Follow our young football players as they train at Tamilan Nagar Ground, compete in regional invitationals, and prepare for state leagues.
+                  </p>
+                  <a
+                    href="https://www.youtube.com/watch?v=AB9QMbrBq5g"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn--outline"
+                    style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 1rem' }}
+                  >
+                    Watch on YouTube ↗
+                  </a>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* 9:16 Vertical Reel Player */}
+            <ScrollReveal delay={0.2}>
+              <div
+                className="card"
+                style={{
+                  padding: 'var(--space-5)',
+                  borderRadius: 'var(--radius-lg)',
+                  boxShadow: 'var(--shadow-glow)',
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                  <span className="card__tag" style={{ background: 'var(--accent)', color: '#FFF' }}>
+                    Academy Shorts
+                  </span>
+                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>9:16 Reel</span>
+                </div>
+
+                <div
+                  style={{
+                    maxWidth: '280px',
+                    margin: '0 auto',
+                    borderRadius: '22px',
+                    overflow: 'hidden',
+                    border: '3px solid #1E293B',
+                    boxShadow: '0 12px 30px rgba(0,0,0,0.22)',
+                    background: '#000',
+                  }}
+                >
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      paddingTop: '177.77%',
+                    }}
+                  >
+                    <iframe
+                      src="https://www.youtube.com/embed/Gis6rlwzR5U"
+                      title="MFC Academy YouTube Shorts"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: 'var(--space-4)', textAlign: 'center' }}>
+                  <h3 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-2)' }}>
+                    Ball Mastery & Skills Highlight Reel
+                  </h3>
+                  <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', lineHeight: 1.5, marginBottom: 'var(--space-4)' }}>
+                    Fast-paced footwork, agility drills, and technical shooting practice from our youth squad.
+                  </p>
+                  <a
+                    href="https://youtube.com/shorts/Gis6rlwzR5U"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn--outline"
+                    style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 1rem' }}
+                  >
+                    Open Shorts Reel ↗
+                  </a>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
 
       {/* ══════════════════════════════════════════════════
           3. ABOUT MFC
@@ -220,7 +436,7 @@ export default function Home() {
             <ScrollReveal delay={0.15}>
               <div className="about-image-wrapper">
                 <img
-                  src={homeData.aboutImage || content?.about?.image || "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80"}
+                  src={aboutFreestyleImg}
                   alt="MFC Youth Football Training in Trichy"
                   loading="lazy"
                 />
@@ -252,39 +468,44 @@ export default function Home() {
               <ScrollReveal key={coach.id || i} delay={i * 0.1}>
                 <article className="card" style={{ height: '100%' }}>
                   <div className="card__body">
-                    {coach.photo ? (
-                      <div
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: '50%',
-                          overflow: 'hidden',
-                          border: '2px solid var(--accent)',
-                          marginBottom: 'var(--space-4)',
-                        }}
-                      >
-                        <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          width: 60,
-                          height: 60,
-                          borderRadius: '50%',
-                          background: 'var(--accent-glow)',
-                          color: 'var(--accent-dark)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '1.75rem',
-                          marginBottom: 'var(--space-4)',
-                          fontWeight: 700,
-                        }}
-                        aria-hidden="true"
-                      >
-                        {coach.name?.charAt(0) || 'C'}
-                      </div>
-                    )}
+                    <div style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center' }}>
+                      {coach.photo ? (
+                        <div
+                          style={{
+                            width: 110,
+                            height: 110,
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            border: '2px solid var(--accent)',
+                            boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            width: 110,
+                            height: 110,
+                            borderRadius: '16px',
+                            background: 'var(--accent-glow)',
+                            color: 'var(--accent-dark)',
+                            border: '2px solid var(--accent)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '2.5rem',
+                            fontWeight: 700,
+                            boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                            flexShrink: 0,
+                          }}
+                          aria-hidden="true"
+                        >
+                          {coach.name?.charAt(0) || 'C'}
+                        </div>
+                      )}
+                    </div>
                     <span className="card__tag">{coach.role}</span>
                     <h3 className="card__title">{coach.name}</h3>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
@@ -392,11 +613,21 @@ export default function Home() {
           <div className="grid--3">
             {topIndividual.map((item, i) => (
               <ScrollReveal key={item.id || i} delay={i * 0.1}>
-                <article className="card" style={{ height: '100%' }}>
-                  <div className="card__body">
+                <article className="card" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  {(item.image || item.photo) && (
+                    <div style={{ height: '180px', width: '100%', overflow: 'hidden', background: 'var(--surface-2)' }}>
+                      <img
+                        src={item.image || item.photo}
+                        alt={item.player}
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </div>
+                  )}
+                  <div className="card__body" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                     <span className="card__tag">{item.category}</span>
                     <h3 className="card__title">{item.player}</h3>
-                    <p className="card__text" style={{ color: 'var(--text)' }}>
+                    <p className="card__text" style={{ color: 'var(--text)', marginTop: 'auto', paddingTop: 'var(--space-2)' }}>
                       {item.highlight}
                     </p>
                   </div>
@@ -470,8 +701,8 @@ export default function Home() {
               <Link to="/contact" className="btn btn-primary">
                 Contact Club Management
               </Link>
-              <a href={`tel:${CLUB.phone}`} className="btn btn--outline">
-                📞 Call {CLUB.phone}
+              <a href={`tel:${content?.contact?.phone || STATIC_CLUB.phone}`} className="btn btn--outline">
+                📞 Call {content?.contact?.phone || STATIC_CLUB.phone}
               </a>
             </div>
           </ScrollReveal>

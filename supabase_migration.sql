@@ -28,16 +28,21 @@ create table if not exists user_roles (
 
 alter table user_roles enable row level security;
 
-create policy "Users can view their own roles"
-  on user_roles for select
-  using (auth.uid() = user_id);
+drop policy if exists "Users can view their own roles" on user_roles;
+drop policy if exists "Super admins can manage all roles" on user_roles;
+drop policy if exists "Users read own roles" on user_roles;
+drop policy if exists "Super admins manage roles" on user_roles;
 
-create policy "Super admins can manage all roles"
+create policy "Users read own roles"
+  on user_roles for select
+  to authenticated
+  using (auth.uid() = user_id or (auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com');
+
+create policy "Super admins manage roles"
   on user_roles for all
-  using (exists (
-    select 1 from user_roles ur
-    where ur.user_id = auth.uid() and ur.role = 'super_admin'
-  ));
+  to authenticated
+  using ((auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com')
+  with check ((auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com');
 
 -- 3. Site Content Table (Draft vs Published Workflow)
 create table if not exists site_content (
@@ -227,26 +232,22 @@ values
 (
   'individual_achievements',
   '[
-    { "player": "Pragadeesh D", "highlight": "Represented Tamil Nadu state team at the Santosh Trophy (2023)", "consent_received": true },
-    { "player": "Pragadeesh D", "highlight": "Represented SRM University in the South Zone Inter-University tournament (2023)", "consent_received": true },
-    { "player": "Pragadeesh D", "highlight": "Champions, Chennai Senior Division League (2022), with Viva Chennai", "consent_received": true },
-    { "player": "Rajesh S", "highlight": "Sports-quota selection, Hindustan University (100% scholarship, MBA Sports Management)", "consent_received": true },
-    { "player": "Gnanam A", "highlight": "Sports-quota selection, Presidency College, Chennai (100% scholarship, MSW)", "consent_received": true },
-    { "player": "Ajith K", "highlight": "Sports-quota selection, Bishop Heber College, Trichy (100% scholarship, MBA)", "consent_received": true },
-    { "player": "Bala Subramaiyan and Arun Kumar", "highlight": "Sports-quota selection, Jeppiaar University (100% scholarship, MBA)", "consent_received": true },
-    { "player": "Santhosh", "highlight": "Sports-quota selection, Vinayaga University, Salem (70% scholarship, B.P.Ed)", "consent_received": true },
-    { "player": "Sukesan and Harish", "highlight": "Sukesan: sports-quota selection, Megna College, Chennai (100% scholarship, BBA). Harish: represented Pondicherry state team at the Junior Nationals", "consent_received": true }
+    { "player": "Pragadeesh D", "category": "State Representation", "highlight": "Represented Tamil Nadu state team at the Santosh Trophy (2023)", "image": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Rajesh S", "category": "Scholarship", "highlight": "Sports-quota selection, Hindustan University (100% scholarship, MBA Sports Management)", "image": "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Gnanam A", "category": "Scholarship", "highlight": "Sports-quota selection, Presidency College, Chennai (100% scholarship, MSW)", "image": "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Ajith K", "category": "Scholarship", "highlight": "Sports-quota selection, Bishop Heber College, Trichy (100% scholarship, MBA)", "image": "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Bala Subramaiyan and Arun Kumar", "category": "Scholarship", "highlight": "Sports-quota selection, Jeppiaar University (100% scholarship, MBA)", "image": "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Santhosh", "category": "Scholarship", "highlight": "Sports-quota selection, Vinayaga University, Salem (70% scholarship, B.P.Ed)", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Sukesan and Harish", "category": "Scholarship & State", "highlight": "Sukesan: sports-quota selection, Megna College, Chennai (100% scholarship, BBA). Harish: represented Pondicherry state team at the Junior Nationals", "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true }
   ]'::jsonb,
   '[
-    { "player": "Pragadeesh D", "highlight": "Represented Tamil Nadu state team at the Santosh Trophy (2023)", "consent_received": true },
-    { "player": "Pragadeesh D", "highlight": "Represented SRM University in the South Zone Inter-University tournament (2023)", "consent_received": true },
-    { "player": "Pragadeesh D", "highlight": "Champions, Chennai Senior Division League (2022), with Viva Chennai", "consent_received": true },
-    { "player": "Rajesh S", "highlight": "Sports-quota selection, Hindustan University (100% scholarship, MBA Sports Management)", "consent_received": true },
-    { "player": "Gnanam A", "highlight": "Sports-quota selection, Presidency College, Chennai (100% scholarship, MSW)", "consent_received": true },
-    { "player": "Ajith K", "highlight": "Sports-quota selection, Bishop Heber College, Trichy (100% scholarship, MBA)", "consent_received": true },
-    { "player": "Bala Subramaiyan and Arun Kumar", "highlight": "Sports-quota selection, Jeppiaar University (100% scholarship, MBA)", "consent_received": true },
-    { "player": "Santhosh", "highlight": "Sports-quota selection, Vinayaga University, Salem (70% scholarship, B.P.Ed)", "consent_received": true },
-    { "player": "Sukesan and Harish", "highlight": "Sukesan: sports-quota selection, Megna College, Chennai (100% scholarship, BBA). Harish: represented Pondicherry state team at the Junior Nationals", "consent_received": true }
+    { "player": "Pragadeesh D", "category": "State Representation", "highlight": "Represented Tamil Nadu state team at the Santosh Trophy (2023)", "image": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Rajesh S", "category": "Scholarship", "highlight": "Sports-quota selection, Hindustan University (100% scholarship, MBA Sports Management)", "image": "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Gnanam A", "category": "Scholarship", "highlight": "Sports-quota selection, Presidency College, Chennai (100% scholarship, MSW)", "image": "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Ajith K", "category": "Scholarship", "highlight": "Sports-quota selection, Bishop Heber College, Trichy (100% scholarship, MBA)", "image": "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Bala Subramaiyan and Arun Kumar", "category": "Scholarship", "highlight": "Sports-quota selection, Jeppiaar University (100% scholarship, MBA)", "image": "https://images.unsplash.com/photo-1543326727-cf6c39e8f84c?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Santhosh", "category": "Scholarship", "highlight": "Sports-quota selection, Vinayaga University, Salem (70% scholarship, B.P.Ed)", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true },
+    { "player": "Sukesan and Harish", "category": "Scholarship & State", "highlight": "Sukesan: sports-quota selection, Megna College, Chennai (100% scholarship, BBA). Harish: represented Pondicherry state team at the Junior Nationals", "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80", "hasConsent": true, "consent_received": true }
   ]'::jsonb,
   'published'
 ),

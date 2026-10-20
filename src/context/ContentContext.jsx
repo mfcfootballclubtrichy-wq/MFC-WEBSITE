@@ -14,6 +14,7 @@ import {
   COACHES as INITIAL_COACHES,
   TEAM_ACHIEVEMENTS as INITIAL_TEAM_ACH,
   INDIVIDUAL_ACHIEVEMENTS as INITIAL_IND_ACH,
+  DEFAULT_SQUAD as INITIAL_SQUAD,
   SCHOOL_PROGRAM as INITIAL_SCHOOL,
   STATS as INITIAL_STATS,
 } from '../data/content.js';
@@ -27,7 +28,7 @@ const defaultContentState = {
     ctaPrimary: INITIAL_HOME.ctaPrimary,
     ctaSecondary: INITIAL_HOME.ctaSecondary,
     heroImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80',
-    aboutImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+    aboutImage: '/about-mfc-freestyle.png',
   },
   updates: [
     {
@@ -66,6 +67,7 @@ const defaultContentState = {
     communityText: 'Our vision extends beyond the field. We measure MFC\'s success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities.',
   },
   coaches: INITIAL_COACHES,
+  squad: INITIAL_SQUAD,
   team_achievements: INITIAL_TEAM_ACH,
   individual_achievements: INITIAL_IND_ACH,
   school_program: {
@@ -168,10 +170,23 @@ export function ContentProvider({ children }) {
       console.warn('Realtime subscription not established:', err);
     }
 
+    const handleLocalUpdate = () => {
+      try {
+        const cached = localStorage.getItem('mfc_site_content_cache');
+        if (cached) {
+          setContent((prev) => ({ ...prev, ...JSON.parse(cached) }));
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('mfc_content_updated', handleLocalUpdate);
+
     return () => {
       if (channel) {
         supabase.removeChannel(channel);
       }
+      window.removeEventListener('mfc_content_updated', handleLocalUpdate);
     };
   }, [fetchLiveContent]);
 

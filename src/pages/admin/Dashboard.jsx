@@ -50,7 +50,7 @@ export default function Dashboard() {
     try {
       const { data, error } = await supabase
         .from('user_roles')
-        .select('id, user_id, role, coach_id, created_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (!error && data) {
@@ -61,9 +61,32 @@ export default function Dashboard() {
     }
   };
 
+  // Contact form submissions state & loader
+  const [submissions, setSubmissions] = useState([]);
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+
+  const loadSubmissions = async () => {
+    setLoadingSubmissions(true);
+    try {
+      const { data, error } = await supabase
+        .from('contact_submissions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setSubmissions(data);
+      }
+    } catch (err) {
+      console.warn('Failed to load contact submissions:', err);
+    } finally {
+      setLoadingSubmissions(false);
+    }
+  };
+
   useEffect(() => {
     loadContent();
     loadUsers();
+    loadSubmissions();
   }, []);
 
   const handleSignOut = async () => {
@@ -224,38 +247,227 @@ export default function Dashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: 'var(--space-3)',
-        borderBottom: '2px solid var(--border)',
-        marginBottom: 'var(--space-8)',
-        paddingBottom: 'var(--space-2)'
-      }}>
+      <div className="admin-tabs-bar">
         <button
           className={`btn ${activeTab === 'templates' ? 'btn-primary' : 'btn--outline'}`}
           onClick={() => setActiveTab('templates')}
+          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
         >
-          🎨 Page Templates & Updates
+          Page Templates & Content
+        </button>
+        <button
+          className={`btn ${activeTab === 'media' ? 'btn-primary' : 'btn--outline'}`}
+          onClick={() => setActiveTab('media')}
+          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+        >
+          Club Media & Video
         </button>
         <button
           className={`btn ${activeTab === 'content' ? 'btn-primary' : 'btn--outline'}`}
           onClick={() => setActiveTab('content')}
+          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
         >
-          📝 Advanced JSON Editor
+          Advanced Payload Editor
+        </button>
+        <button
+          className={`btn ${activeTab === 'enquiries' ? 'btn-primary' : 'btn--outline'}`}
+          onClick={() => setActiveTab('enquiries')}
+          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+        >
+          Enquiries & Messages ({submissions.length})
         </button>
         <button
           className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn--outline'}`}
           onClick={() => setActiveTab('users')}
+          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
         >
-          👥 User & Role Manager
+          Role Management
         </button>
         <button
           className={`btn ${activeTab === 'new_user' ? 'btn-primary' : 'btn--outline'}`}
           onClick={() => setActiveTab('new_user')}
+          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
         >
-          ➕ Create Staff/Coach Account
+          Provision Staff Account
         </button>
       </div>
+
+      {/* ── Official Club YouTube Video & Shorts Showcase (Active on Media tab) ── */}
+      {activeTab === 'media' && (
+        <div
+          className="card"
+          style={{
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow)',
+            background: 'var(--surface)',
+            padding: 'var(--space-6)',
+            marginBottom: 'var(--space-8)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              gap: 'var(--space-3)',
+              marginBottom: 'var(--space-6)',
+              paddingBottom: 'var(--space-4)',
+              borderBottom: '1px solid var(--border)',
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span
+                  style={{
+                    background: 'var(--accent-dark)',
+                    color: '#FFFFFF',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-full)',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  OFFICIAL YOUTUBE
+                </span>
+                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                  Mutharasanallur Football Club
+                </span>
+              </div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: 'var(--text)' }}>
+                MFC Matchday & Academy Video Showcase
+              </h2>
+              <p style={{ margin: '4px 0 0 0', fontSize: 'var(--fs-sm)', color: 'var(--muted)' }}>
+                Matchday documentary video and academy training reels configured for the public site.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <a
+                href="https://www.youtube.com/watch?v=AB9QMbrBq5g"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn--outline"
+                style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 0.85rem' }}
+              >
+                Open Feature Video ↗
+              </a>
+              <a
+                href="https://youtube.com/shorts/Gis6rlwzR5U"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn--outline"
+                style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 0.85rem' }}
+              >
+                Open Shorts Reel ↗
+              </a>
+            </div>
+          </div>
+
+        {/* Video Grid with Professional Double-Bordered Containers */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
+            gap: 'var(--space-6)',
+            alignItems: 'start',
+          }}
+        >
+          {/* Main Landscape Video */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+              <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>
+                🎥 Official Match & Training Documentary
+              </h4>
+              <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600 }}>16:9 Landscape</span>
+            </div>
+
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                paddingTop: '56.25%',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: '2px solid var(--border)',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                background: '#0A0A0A',
+              }}
+            >
+              <iframe
+                src="https://www.youtube.com/embed/AB9QMbrBq5g?si=RCbJALNNCkxoExzq"
+                title="MFC Official YouTube Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                }}
+              />
+            </div>
+            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>
+              Featured club documentary celebrating tournament finishes, training routines, and player development in Trichy.
+            </p>
+          </div>
+
+          {/* YouTube Shorts Vertical Player */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+              <h4 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>
+                ⚡ Academy Viral Shorts Reel
+              </h4>
+              <span style={{ fontSize: '0.75rem', color: 'var(--muted)', fontWeight: 600 }}>9:16 Vertical Reel</span>
+            </div>
+
+            <div
+              style={{
+                maxWidth: '280px',
+                margin: '0 auto',
+                borderRadius: '22px',
+                overflow: 'hidden',
+                border: '3px solid #1E293B',
+                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.2)',
+                background: '#0A0A0A',
+              }}
+            >
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  paddingTop: '177.77%', // 9:16 aspect ratio
+                }}
+              >
+                <iframe
+                  src="https://www.youtube.com/embed/Gis6rlwzR5U"
+                  title="MFC Academy YouTube Shorts"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                  }}
+                />
+              </div>
+            </div>
+            <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)', textAlign: 'center' }}>
+              Fast-paced skill showcase and ball mastery drill from MFC academy youth players.
+            </p>
+          </div>
+        </div>
+      </div>
+      )}
 
       {/* TAB 0: VISUAL TEMPLATE MANAGER */}
       {activeTab === 'templates' && (
@@ -353,10 +565,10 @@ export default function Dashboard() {
 
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
             <button onClick={handleSaveDraft} className="btn btn--outline">
-              💾 Save Draft
+              Save Draft
             </button>
             <button onClick={handlePublish} className="btn btn-primary">
-              🚀 Publish Live to Website
+              Publish Live to Website
             </button>
           </div>
         </div>
@@ -381,25 +593,69 @@ export default function Dashboard() {
                 }}
               >
                 <div>
-                  <strong>User ID:</strong> <code style={{ fontSize: 'var(--fs-xs)' }}>{u.user_id}</code>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-1)' }}>
-                    Registered: {new Date(u.created_at).toLocaleDateString()}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                    <strong style={{ fontSize: '1rem', color: 'var(--text)' }}>
+                      {u.email || u.user_metadata?.full_name || 'Registered Account'}
+                    </strong>
+                    {u.phone && (
+                      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent-dark)', fontWeight: 600 }}>
+                        📞 {u.phone}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: '2px' }}>
+                    UID: <code>{u.user_id}</code> &bull; Registered: {new Date(u.created_at).toLocaleDateString()}
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  <span style={{
-                    padding: '0.25rem 0.75rem',
-                    borderRadius: 'var(--radius-full)',
-                    fontSize: 'var(--fs-xs)',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    background: u.role === 'super_admin' ? '#FEF3C7' : 'var(--surface-2)',
-                    color: u.role === 'super_admin' ? '#92400E' : 'var(--text)',
-                    border: '1px solid var(--border)'
-                  }}>
-                    {u.role}
-                  </span>
+                  {effectiveRole === 'super_admin' ? (
+                    <select
+                      value={u.role}
+                      onChange={async (e) => {
+                        const targetRole = e.target.value;
+                        try {
+                          const { error } = await supabase
+                            .from('user_roles')
+                            .update({ role: targetRole })
+                            .eq('id', u.id);
+                          if (error) throw error;
+                          loadUsers();
+                        } catch (err) {
+                          alert('Failed to update role: ' + err.message);
+                        }
+                      }}
+                      style={{
+                        padding: '0.35rem 0.65rem',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: 'var(--fs-xs)',
+                        fontWeight: 600,
+                        border: '1px solid var(--border)',
+                        background: 'var(--bg)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <option value="super_admin">super_admin</option>
+                      <option value="admin">admin</option>
+                      <option value="coach">coach</option>
+                      <option value="content_editor">content_editor</option>
+                      <option value="volunteer">volunteer</option>
+                      <option value="member">member</option>
+                    </select>
+                  ) : (
+                    <span style={{
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: 'var(--fs-xs)',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      background: u.role === 'super_admin' ? '#FEF3C7' : 'var(--surface-2)',
+                      color: u.role === 'super_admin' ? '#92400E' : 'var(--text)',
+                      border: '1px solid var(--border)'
+                    }}>
+                      {u.role}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
@@ -488,17 +744,109 @@ export default function Dashboard() {
                   cursor: 'pointer',
                 }}
               >
+                <option value="admin">Admin (Manage site content, media & database)</option>
+                <option value="super_admin">Super Admin (Full system control & role manager)</option>
                 <option value="coach">Coach (Manage match reports & players)</option>
                 <option value="content_editor">Content Editor (Draft & write articles)</option>
                 <option value="volunteer">Volunteer (View schedules)</option>
-                <option value="super_admin">Super Admin (Full system control)</option>
+                <option value="member">General Member</option>
               </select>
             </div>
 
             <button type="submit" className="btn btn-primary" style={{ marginTop: 'var(--space-3)' }}>
-              Create Account
+              Provision Account
             </button>
           </form>
+        </div>
+      )}
+
+      {/* TAB 5: PUBLIC CONTACT SUBMISSIONS & MESSAGES */}
+      {activeTab === 'enquiries' && (
+        <div className="card" style={{ padding: 'var(--space-8)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+            <div>
+              <span className="section__eyebrow">Contact Desk</span>
+              <h2 style={{ fontSize: '1.6rem', marginTop: 'var(--space-1)' }}>
+                Website Enquiries & Form Messages
+              </h2>
+              <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+                Messages submitted via the public Contact page (automatically emailed to <code>mfcfootballclubtrichy@gmail.com</code> and stored in database).
+              </p>
+            </div>
+            <button
+              onClick={loadSubmissions}
+              disabled={loadingSubmissions}
+              className="btn btn--outline"
+              style={{ fontSize: 'var(--fs-xs)' }}
+            >
+              {loadingSubmissions ? 'Refreshing...' : '🔄 Refresh Messages'}
+            </button>
+          </div>
+
+          {submissions.length === 0 ? (
+            <div style={{ padding: 'var(--space-8)', textAlign: 'center', background: 'var(--surface-2)', borderRadius: 'var(--radius)' }}>
+              <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-base)', marginBottom: 'var(--space-2)' }}>
+                No messages submitted yet.
+              </p>
+              <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)' }}>
+                When users fill out the contact form on <code>/contact</code>, their messages will appear here and are dispatched to your email.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {submissions.map((msg) => (
+                <div
+                  key={msg.id}
+                  style={{
+                    padding: 'var(--space-5)',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-2)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                    <div>
+                      <strong style={{ fontSize: '1.05rem', color: 'var(--text)' }}>{msg.name}</strong>
+                      <span style={{ marginInline: 'var(--space-2)', color: 'var(--muted)' }}>&bull;</span>
+                      <a href={`mailto:${msg.email}`} style={{ color: 'var(--accent-dark)', fontWeight: 600 }}>
+                        {msg.email}
+                      </a>
+                    </div>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>
+                      {new Date(msg.created_at).toLocaleString()}
+                    </span>
+                  </div>
+
+                  <div style={{
+                    background: 'var(--bg)',
+                    padding: 'var(--space-3) var(--space-4)',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border)',
+                    fontSize: 'var(--fs-sm)',
+                    lineHeight: 1.6,
+                    color: 'var(--text)',
+                    whiteSpace: 'pre-wrap',
+                    marginTop: 'var(--space-2)',
+                  }}>
+                    {msg.message}
+                  </div>
+
+                  <div style={{ alignSelf: 'flex-start', marginTop: 'var(--space-2)' }}>
+                    <a
+                      href={`mailto:${msg.email}?subject=MFC Club Response to your enquiry&body=Hi ${msg.name},%0D%0A%0D%0AThank you for reaching out to Mutharasanallur Football Club.`}
+                      className="btn btn--outline"
+                      style={{ fontSize: 'var(--fs-xs)', padding: '0.35rem 0.8rem' }}
+                    >
+                      ✉️ Reply via Email
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   // Fetch role from user_roles table for current authenticated user
-  const fetchUserRole = async (userId) => {
+  const fetchUserRole = async (userId, userEmail) => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -28,7 +28,8 @@ export function AuthProvider({ children }) {
         .eq('user_id', userId);
 
       if (error) {
-        console.error('Error fetching role from user_roles:', error);
+        console.warn('Notice from user_roles query:', error.message);
+        if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
         return null;
       }
 
@@ -42,9 +43,11 @@ export function AuthProvider({ children }) {
         return roles[0];
       }
 
+      if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
       return null;
     } catch (err) {
-      console.error('Failed to get user role:', err);
+      console.warn('Failed to get user role:', err);
+      if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
       return null;
     }
   };
@@ -55,7 +58,7 @@ export function AuthProvider({ children }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        const userRole = await fetchUserRole(session.user.id);
+        const userRole = await fetchUserRole(session.user.id, session.user.email);
         setRole(userRole);
       }
       setLoading(false);
@@ -66,7 +69,7 @@ export function AuthProvider({ children }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        const userRole = await fetchUserRole(session.user.id);
+        const userRole = await fetchUserRole(session.user.id, session.user.email);
         setRole(userRole);
       } else {
         setRole(null);
@@ -81,7 +84,7 @@ export function AuthProvider({ children }) {
 
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
     if (error) throw error;
@@ -89,21 +92,54 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       setSession(data.session);
       const userRole = await fetchUserRole(data.user.id);
-      setRole(userRole);
+      setRole(userRole || data.user.user_metadata?.role || (email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'admin'));
+    }
+    return data;
+  };
+
+  const signUp = async ({ name, phone, email, password }) => {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: {
+          full_name: name.trim(),
+          phone: phone.trim(),
+          role: 'member',
+        },
+      },
+    });
+    if (error) throw error;
+    if (data?.user) {
+      setUser(data.user);
+      setSession(data.session);
+      // Auto-assign volunteer role in user_roles (matching database enum)
+      try {
+        await supabase.from('user_roles').insert([
+          {
+            user_id: data.user.id,
+            role: 'volunteer',
+          },
+        ]);
+        setRole('volunteer');
+      } catch (roleErr) {
+        console.warn('Initial role record note:', roleErr);
+        setRole('member');
+      }
     }
     return data;
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) console.error('Sign out error:', error);
     setUser(null);
     setRole(null);
     setSession(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, role, session, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, role, session, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

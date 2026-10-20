@@ -55,8 +55,13 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     );
   }
 
+  // If user is not logged in, redirect to login page
+  if (!user) {
+    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+  }
+
   // Check role: check state role or user_metadata role
-  const effectiveRole = role || user.user_metadata?.role || (user.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : null);
+  const effectiveRole = role || user?.user_metadata?.role || (user?.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : null);
 
   // Role validation if specified
   if (allowedRoles.length > 0 && !allowedRoles.includes(effectiveRole)) {
