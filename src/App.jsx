@@ -13,6 +13,7 @@ import Footer from './components/Footer.jsx';
 import ScrollProgress from './components/ScrollProgress.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import ChatbotWidget from './components/ChatbotWidget.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ContentProvider } from './context/ContentContext.jsx';
 
@@ -104,11 +105,21 @@ export default function App() {
               <Route path="/contact"                  element={<Contact />} />
               <Route path="/privacy-policy"           element={<PrivacyPolicy />} />
               <Route path="/terms"                    element={<TermsOfUse />} />
-              <Route path="/admin/login"              element={<Login />} />
+              <Route path="/login"                    element={<Login defaultMode="login" />} />
+              <Route path="/register"                 element={<Login defaultMode="register" />} />
+              <Route path="/admin/login"              element={<Login defaultMode="login" />} />
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'content_editor', 'coach']}>
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'coach', 'editor', 'content_editor', 'volunteer', 'member']}>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/portal"
+                element={
+                  <ProtectedRoute allowedRoles={['super_admin', 'admin', 'coach', 'editor', 'content_editor', 'volunteer', 'member']}>
                     <Dashboard />
                   </ProtectedRoute>
                 }
@@ -118,6 +129,7 @@ export default function App() {
           </AnimatePresence>
         </main>
         <Footer />
+        <ChatbotWidget />
       </ContentProvider>
     </AuthProvider>
   );

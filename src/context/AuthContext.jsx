@@ -22,6 +22,8 @@ export function AuthProvider({ children }) {
   // Fetch role from user_roles table for current authenticated user
   const fetchUserRole = async (userId, userEmail) => {
     try {
+      if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
+
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -29,26 +31,25 @@ export function AuthProvider({ children }) {
 
       if (error) {
         console.warn('Notice from user_roles query:', error.message);
-        if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
-        return null;
+        return 'member';
       }
 
       if (data && data.length > 0) {
-        // Return highest privilege role or matching role
         const roles = data.map((r) => r.role?.toLowerCase());
         if (roles.includes('super_admin')) return 'super_admin';
         if (roles.includes('admin')) return 'admin';
-        if (roles.includes('content_editor')) return 'content_editor';
         if (roles.includes('coach')) return 'coach';
+        if (roles.includes('editor') || roles.includes('content_editor')) return 'editor';
+        if (roles.includes('volunteer')) return 'volunteer';
+        if (roles.includes('member')) return 'member';
         return roles[0];
       }
 
-      if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
-      return null;
+      return 'member';
     } catch (err) {
       console.warn('Failed to get user role:', err);
       if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
-      return null;
+      return 'member';
     }
   };
 
@@ -83,29 +84,31 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signIn = async (email, password) => {
+    const cleanEmail = email.trim();
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: cleanEmail,
       password,
     });
     if (error) throw error;
     if (data?.user) {
       setUser(data.user);
       setSession(data.session);
-      const userRole = await fetchUserRole(data.user.id);
-      setRole(userRole || data.user.user_metadata?.role || (email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'admin'));
+      const userRole = await fetchUserRole(data.user.id, data.user.email);
+      setRole(userRole || data.user.user_metadata?.role || (cleanEmail === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member'));
     }
     return data;
   };
 
-  const signUp = async ({ name, phone, email, password }) => {
+  const signUp = async ({ name, phone, email, password, role = 'member' }) => {
+    const cleanEmail = email.trim();
     const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
+      email: cleanEmail,
       password,
       options: {
         data: {
           full_name: name.trim(),
           phone: phone.trim(),
-          role: 'member',
+          role: role,
         },
       },
     });
@@ -113,18 +116,25 @@ export function AuthProvider({ children }) {
     if (data?.user) {
       setUser(data.user);
       setSession(data.session);
-      // Auto-assign volunteer role in user_roles (matching database enum)
+
+      // Determine DB role enum match
+      const dbRole = (role === 'editor' || role === 'content_editor') ? 'editor'
+        : (role === 'coach') ? 'coach'
+        : (role === 'admin') ? 'admin'
+        : (role === 'volunteer') ? 'volunteer'
+        : 'volunteer'; // safe enum default for public signups
+
       try {
         await supabase.from('user_roles').insert([
           {
             user_id: data.user.id,
-            role: 'volunteer',
+            role: dbRole,
           },
         ]);
-        setRole('volunteer');
+        setRole(role);
       } catch (roleErr) {
         console.warn('Initial role record note:', roleErr);
-        setRole('member');
+        setRole(role);
       }
     }
     return data;

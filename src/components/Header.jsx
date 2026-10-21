@@ -34,7 +34,7 @@ const linkItemVariants = {
 
 export default function Header() {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, role, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -106,27 +106,76 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* ── Right side: Admin/Login button + mobile hamburger ── */}
-          <div className="flex" style={{ gap: 'var(--space-3)', alignItems: 'center' }}>
-            {/* Admin / Login Button */}
-
-            {/* Admin / Login Button */}
+          {/* ── Right side: Register / Sign In / Portal buttons + mobile hamburger ── */}
+          <div className="flex" style={{ gap: 'var(--space-2)', alignItems: 'center' }}>
             {user ? (
-              <Link
-                to="/admin"
-                className="btn btn--outline"
-                style={{ padding: '0.45rem 1rem', fontSize: 'var(--fs-xs)', borderRadius: 'var(--radius-full)' }}
-              >
-                Admin Panel
-              </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <Link
+                  to="/portal"
+                  className="btn btn-primary"
+                  style={{
+                    padding: '0.42rem 0.9rem',
+                    fontSize: 'var(--fs-xs)',
+                    borderRadius: 'var(--radius-full)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span>MFC Portal</span>
+                  <span style={{
+                    background: 'rgba(255, 255, 255, 0.28)',
+                    padding: '1px 6px',
+                    borderRadius: '999px',
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                  }}>
+                    {role || 'Member'}
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="btn btn--outline"
+                  title="Sign Out"
+                  style={{
+                    padding: '0.42rem 0.65rem',
+                    fontSize: 'var(--fs-xs)',
+                    borderRadius: 'var(--radius-full)',
+                    color: '#991B1B',
+                    borderColor: '#FCA5A5',
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
             ) : (
-              <Link
-                to="/admin/login"
-                className="btn btn-primary"
-                style={{ padding: '0.45rem 1.1rem', fontSize: 'var(--fs-xs)', borderRadius: 'var(--radius-full)' }}
-              >
-                Sign In
-              </Link>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <Link
+                  to="/register"
+                  className="btn btn--outline"
+                  style={{
+                    padding: '0.42rem 0.85rem',
+                    fontSize: 'var(--fs-xs)',
+                    borderRadius: 'var(--radius-full)',
+                    fontWeight: 600,
+                  }}
+                >
+                  Register
+                </Link>
+                <Link
+                  to="/login"
+                  className="btn btn-primary"
+                  style={{
+                    padding: '0.42rem 0.95rem',
+                    fontSize: 'var(--fs-xs)',
+                    borderRadius: 'var(--radius-full)',
+                  }}
+                >
+                  Sign In
+                </Link>
+              </div>
             )}
 
             {/* Mobile hamburger */}
@@ -180,25 +229,45 @@ export default function Header() {
 
 
 
-            <div style={{ marginTop: 'var(--space-6)', width: '100%' }}>
+            <div style={{ marginTop: 'var(--space-6)', width: '100%', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               {user ? (
-                <Link
-                  to="/admin"
-                  className="btn btn--outline"
-                  onClick={closeMenu}
-                  style={{ width: '100%', justifyContent: 'center' }}
-                >
-                  Admin Panel
-                </Link>
+                <>
+                  <Link
+                    to="/portal"
+                    className="btn btn-primary"
+                    onClick={closeMenu}
+                    style={{ width: '100%', justifyContent: 'center' }}
+                  >
+                    MFC Portal ({role?.toUpperCase() || 'MEMBER'})
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => { signOut(); closeMenu(); }}
+                    className="btn btn--outline"
+                    style={{ width: '100%', justifyContent: 'center', color: '#991B1B', borderColor: '#FCA5A5' }}
+                  >
+                    Sign Out
+                  </button>
+                </>
               ) : (
-                <Link
-                  to="/admin/login"
-                  className="btn btn-primary"
-                  onClick={closeMenu}
-                  style={{ width: '100%', justifyContent: 'center' }}
-                >
-                  Sign In
-                </Link>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)', width: '100%' }}>
+                  <Link
+                    to="/register"
+                    className="btn btn--outline"
+                    onClick={closeMenu}
+                    style={{ justifyContent: 'center' }}
+                  >
+                    Register
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="btn btn-primary"
+                    onClick={closeMenu}
+                    style={{ justifyContent: 'center' }}
+                  >
+                    Sign In
+                  </Link>
+                </div>
               )}
             </div>
           </motion.nav>

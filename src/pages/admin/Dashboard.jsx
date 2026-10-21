@@ -12,13 +12,21 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('templates'); // 'templates' | 'content' | 'users' | 'new_user' | 'editor'
+  const effectiveRole = role || user?.user_metadata?.role || (user?.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member');
+
+  // Determine initial tab based on role
+  const getInitialTab = () => {
+    if (effectiveRole === 'member') return 'member_hub';
+    if (effectiveRole === 'volunteer') return 'volunteer_hub';
+    if (effectiveRole === 'coach') return 'coach_deck';
+    return 'templates';
+  };
+
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [selectedSection, setSelectedSection] = useState(null);
   const [editJson, setEditJson] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
   const [saveError, setSaveError] = useState('');
-
-  const effectiveRole = role || user?.user_metadata?.role || (user?.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member');
 
   // User Management State
   const [usersList, setUsersList] = useState([]);
@@ -26,6 +34,14 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('coach');
   const [userActionMsg, setUserActionMsg] = useState('');
+
+  useEffect(() => {
+    if (effectiveRole === 'member' && ['templates', 'content', 'users', 'new_user'].includes(activeTab)) {
+      setActiveTab('member_hub');
+    } else if (effectiveRole === 'volunteer' && ['templates', 'content', 'users', 'new_user'].includes(activeTab)) {
+      setActiveTab('volunteer_hub');
+    }
+  }, [effectiveRole]);
 
   // Load Content Sections
   const loadContent = async () => {
@@ -214,7 +230,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Metrics Row */}
+      {/* Metrics Row tailored to Role */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -226,70 +242,139 @@ export default function Dashboard() {
           <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--accent-dark)', marginTop: 'var(--space-1)' }}>
             {effectiveRole?.toUpperCase()}
           </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>Full Master Access</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>
+            {effectiveRole === 'super_admin' ? 'Master Full Access'
+              : effectiveRole === 'admin' ? 'Content & Club Operations'
+              : effectiveRole === 'coach' ? 'Technical & Squads'
+              : effectiveRole === 'editor' ? 'Media & News Studio'
+              : effectiveRole === 'volunteer' ? 'Matchday Coordination'
+              : 'Verified Academy Member'}
+          </div>
         </div>
 
         <div className="card" style={{ padding: 'var(--space-6)' }}>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Website Sections</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+            {effectiveRole === 'member' ? 'Academy Trainee ID' : 'Website Sections'}
+          </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: 'var(--space-1)' }}>
-            {sections.length || 8}
+            {effectiveRole === 'member' ? `MFC-${user?.id?.slice(0, 6)?.toUpperCase() || 'PLAYER'}` : (sections.length || 8)}
           </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>Live & Draft content</div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>
+            {effectiveRole === 'member' ? 'Official Club Membership' : 'Live & Draft sections'}
+          </div>
         </div>
 
         <div className="card" style={{ padding: 'var(--space-6)' }}>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>Registered Roles</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--accent)', marginTop: 'var(--space-1)' }}>
-            {usersList.length || 1}
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+            {effectiveRole === 'member' ? 'Academy Ground' : 'Registered Roles'}
           </div>
-          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>Admins & Coaches</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--accent)', marginTop: 'var(--space-1)' }}>
+            {effectiveRole === 'member' ? 'Trichy Ground' : (usersList.length || 1)}
+          </div>
+          <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-2)' }}>
+            {effectiveRole === 'member' ? 'Mutharasanallur, TN' : 'Admins, Coaches & Volunteers'}
+          </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="admin-tabs-bar">
-        <button
-          className={`btn ${activeTab === 'templates' ? 'btn-primary' : 'btn--outline'}`}
-          onClick={() => setActiveTab('templates')}
-          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
-        >
-          Page Templates & Content
-        </button>
+      {/* Navigation Tabs based on Role */}
+      <div className="admin-tabs-bar" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-8)' }}>
+        {/* Member Hub (available to member, admin, super_admin) */}
+        {(effectiveRole === 'member' || effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+          <button
+            className={`btn ${activeTab === 'member_hub' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('member_hub')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            🌟 Academy Member Hub
+          </button>
+        )}
+
+        {/* Coach Tactical Deck (for coach, admin, super_admin) */}
+        {(effectiveRole === 'coach' || effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+          <button
+            className={`btn ${activeTab === 'coach_deck' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('coach_deck')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            ⚽ Coach Tactical Deck
+          </button>
+        )}
+
+        {/* Volunteer Hub (for volunteer, admin, super_admin) */}
+        {(effectiveRole === 'volunteer' || effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+          <button
+            className={`btn ${activeTab === 'volunteer_hub' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('volunteer_hub')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            🤝 Volunteer & Matchday Desk
+          </button>
+        )}
+
+        {/* Templates & Content (for super_admin, admin, coach, editor) */}
+        {(effectiveRole === 'super_admin' || effectiveRole === 'admin' || effectiveRole === 'editor' || effectiveRole === 'coach') && (
+          <button
+            className={`btn ${activeTab === 'templates' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('templates')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            📄 Page Templates & Content
+          </button>
+        )}
+
+        {/* Club Media & Video Showcase (for all roles) */}
         <button
           className={`btn ${activeTab === 'media' ? 'btn-primary' : 'btn--outline'}`}
           onClick={() => setActiveTab('media')}
           style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
         >
-          Club Media & Video
+          🎥 Club Media & Video
         </button>
-        <button
-          className={`btn ${activeTab === 'content' ? 'btn-primary' : 'btn--outline'}`}
-          onClick={() => setActiveTab('content')}
-          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
-        >
-          Advanced Payload Editor
-        </button>
-        <button
-          className={`btn ${activeTab === 'enquiries' ? 'btn-primary' : 'btn--outline'}`}
-          onClick={() => setActiveTab('enquiries')}
-          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
-        >
-          Enquiries & Messages ({submissions.length})
-        </button>
-        <button
-          className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn--outline'}`}
-          onClick={() => setActiveTab('users')}
-          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
-        >
-          Role Management
-        </button>
-        <button
-          className={`btn ${activeTab === 'new_user' ? 'btn-primary' : 'btn--outline'}`}
-          onClick={() => setActiveTab('new_user')}
-          style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
-        >
-          Provision Staff Account
-        </button>
+
+        {/* Advanced Payload Editor (super_admin, admin) */}
+        {(effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+          <button
+            className={`btn ${activeTab === 'content' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('content')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            ⚙️ Advanced Payload
+          </button>
+        )}
+
+        {/* Contact Enquiries (super_admin, admin) */}
+        {(effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+          <button
+            className={`btn ${activeTab === 'enquiries' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('enquiries')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            💬 Enquiries ({submissions.length})
+          </button>
+        )}
+
+        {/* Role Management (super_admin, admin) */}
+        {(effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+          <button
+            className={`btn ${activeTab === 'users' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('users')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            👑 Role Management
+          </button>
+        )}
+
+        {/* Provision Staff (super_admin only) */}
+        {effectiveRole === 'super_admin' && (
+          <button
+            className={`btn ${activeTab === 'new_user' ? 'btn-primary' : 'btn--outline'}`}
+            onClick={() => setActiveTab('new_user')}
+            style={{ fontSize: 'var(--fs-sm)', padding: '0.6rem 1.25rem' }}
+          >
+            ➕ Provision Account
+          </button>
+        )}
       </div>
 
       {/* ── Official Club YouTube Video & Shorts Showcase (Active on Media tab) ── */}
@@ -635,12 +720,12 @@ export default function Dashboard() {
                         cursor: 'pointer',
                       }}
                     >
-                      <option value="super_admin">super_admin</option>
-                      <option value="admin">admin</option>
-                      <option value="coach">coach</option>
-                      <option value="content_editor">content_editor</option>
-                      <option value="volunteer">volunteer</option>
-                      <option value="member">member</option>
+                      <option value="super_admin">👑 super_admin (Master Owner)</option>
+                      <option value="admin">🛡️ admin (Club Operations)</option>
+                      <option value="coach">⚽ coach (Tactical & Squads)</option>
+                      <option value="editor">✍️ editor (Media & News)</option>
+                      <option value="volunteer">🤝 volunteer (Matchday)</option>
+                      <option value="member">🌟 member (Public Trainee)</option>
                     </select>
                   ) : (
                     <span style={{
@@ -744,12 +829,12 @@ export default function Dashboard() {
                   cursor: 'pointer',
                 }}
               >
-                <option value="admin">Admin (Manage site content, media & database)</option>
-                <option value="super_admin">Super Admin (Full system control & role manager)</option>
-                <option value="coach">Coach (Manage match reports & players)</option>
-                <option value="content_editor">Content Editor (Draft & write articles)</option>
-                <option value="volunteer">Volunteer (View schedules)</option>
-                <option value="member">General Member</option>
+                <option value="super_admin">👑 Super Admin (Full system control & role manager)</option>
+                <option value="admin">🛡️ Admin (Manage site content, media & database)</option>
+                <option value="coach">⚽ Coach (Manage match reports & players)</option>
+                <option value="editor">✍️ Media Editor (Draft & write articles)</option>
+                <option value="volunteer">🤝 Volunteer (Matchday operations)</option>
+                <option value="member">🌟 General Member / Academy Trainee</option>
               </select>
             </div>
 
@@ -847,6 +932,210 @@ export default function Dashboard() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 6: ACADEMY MEMBER HUB */}
+      {activeTab === 'member_hub' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {/* Digital Player Card */}
+          <div
+            className="card"
+            style={{
+              background: 'linear-gradient(135deg, #14532D 0%, #166534 50%, #15803D 100%)',
+              color: '#FFFFFF',
+              borderRadius: '20px',
+              padding: 'var(--space-8)',
+              boxShadow: '0 12px 30px rgba(22, 101, 52, 0.25)',
+              position: 'relative',
+              overflow: 'hidden',
+              border: '2px solid rgba(255, 255, 255, 0.2)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                <img
+                  src="/mfc-logo.png"
+                  alt="MFC Crest"
+                  style={{ width: '72px', height: '72px', objectFit: 'contain', background: 'rgba(255,255,255,0.15)', borderRadius: '50%', padding: '6px' }}
+                />
+                <div>
+                  <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.85, fontWeight: 700 }}>
+                    Mutharasanallur Football Club
+                  </span>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: '2px 0 0 0', color: '#FFFFFF' }}>
+                    {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'MFC Academy Trainee'}
+                  </h2>
+                  <p style={{ margin: '4px 0 0 0', opacity: 0.9, fontSize: 'var(--fs-sm)' }}>
+                    Membership ID: <strong style={{ letterSpacing: '1px', color: '#86EFAC' }}>MFC-{user?.id?.slice(0, 8)?.toUpperCase()}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <span style={{
+                background: '#86EFAC',
+                color: '#14532D',
+                padding: '6px 14px',
+                borderRadius: '999px',
+                fontWeight: 800,
+                fontSize: 'var(--fs-xs)',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                alignSelf: 'flex-start',
+              }}>
+                🟢 ACTIVE MEMBER
+              </span>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+              gap: 'var(--space-4)',
+              marginTop: 'var(--space-6)',
+              paddingTop: 'var(--space-6)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Registered Email</span>
+                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{user?.email}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Mobile Phone</span>
+                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>{user?.user_metadata?.phone || '+91 8072694818'}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Primary Academy Ground</span>
+                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>Mutharasanallur Ground, Trichy</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Training Category</span>
+                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: '#86EFAC' }}>Grassroots & Youth Development</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Support & Training Schedule */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'var(--space-6)' }}>
+            <div className="card" style={{ padding: 'var(--space-6)' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-3)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>⚽</span> Academy Training Schedule
+              </h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <li style={{ padding: '10px', background: 'var(--surface-2)', borderRadius: 'var(--radius)' }}>
+                  <strong>Under-10 / Grassroots:</strong> Mon to Fri &bull; 6:00 AM – 7:30 AM
+                </li>
+                <li style={{ padding: '10px', background: 'var(--surface-2)', borderRadius: 'var(--radius)' }}>
+                  <strong>Under-14 / Under-17 Youth:</strong> Mon to Sat &bull; 4:30 PM – 6:30 PM
+                </li>
+                <li style={{ padding: '10px', background: 'var(--surface-2)', borderRadius: 'var(--radius)' }}>
+                  <strong>Weekend Tactical & Match Play:</strong> Sunday &bull; 7:00 AM – 10:00 AM
+                </li>
+              </ul>
+            </div>
+
+            <div className="card" style={{ padding: 'var(--space-6)' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-3)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🤖</span> Club Support & AI Assistant
+              </h3>
+              <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', marginBottom: 'var(--space-4)' }}>
+                Have questions about enrollments, coaching fees, tournament dates, or ground directions? Use our 24/7 Botpress AI Assistant or contact our staff directly.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                <a
+                  href="https://wa.me/918072694818?text=Hi%20MFC%20Academy%20Team%2C%20I%20am%20a%20registered%20member."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                  style={{ justifyContent: 'center' }}
+                >
+                  💬 Chat on WhatsApp (+91 8072694818)
+                </a>
+                <Link to="/contact" className="btn btn--outline" style={{ justifyContent: 'center' }}>
+                  ✉️ Submit Official Academy Query
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 7: COACH TACTICAL DECK */}
+      {activeTab === 'coach_deck' && (
+        <div className="card" style={{ padding: 'var(--space-8)' }}>
+          <span className="section__eyebrow">Technical Team</span>
+          <h2 style={{ fontSize: '1.6rem', marginTop: 'var(--space-1)', marginBottom: 'var(--space-2)' }}>
+            ⚽ Coach Tactical & Squad Operations
+          </h2>
+          <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', marginBottom: 'var(--space-6)' }}>
+            Coaching portal for age-group training logs, player rosters, and match day lineup strategies.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 'var(--space-6)' }}>
+            <div style={{ padding: 'var(--space-5)', background: 'var(--surface-2)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h4 style={{ margin: '0 0 var(--space-2) 0', fontSize: '1.1rem' }}>🏆 Squad Roster Management</h4>
+              <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 'var(--space-4)' }}>
+                View and update players, jersey numbers, and age-group rosters across U10, U14, U17, and Senior.
+              </p>
+              <button onClick={() => setActiveTab('templates')} className="btn btn-primary" style={{ fontSize: 'var(--fs-xs)' }}>
+                Open Squad Template Editor ↗
+              </button>
+            </div>
+
+            <div style={{ padding: 'var(--space-5)', background: 'var(--surface-2)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h4 style={{ margin: '0 0 var(--space-2) 0', fontSize: '1.1rem' }}>🎥 Video Review & Analysis</h4>
+              <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 'var(--space-4)' }}>
+                Review matchday footage and training drill recordings to evaluate player technique.
+              </p>
+              <button onClick={() => setActiveTab('media')} className="btn btn--outline" style={{ fontSize: 'var(--fs-xs)' }}>
+                Open Club Media Deck ↗
+              </button>
+            </div>
+
+            <div style={{ padding: 'var(--space-5)', background: 'var(--surface-2)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h4 style={{ margin: '0 0 var(--space-2) 0', fontSize: '1.1rem' }}>📞 Head Coach Direct Line</h4>
+              <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 'var(--space-4)' }}>
+                Direct coordinator hotline for match logistics, emergency injuries, and tournament passes.
+              </p>
+              <a href="tel:8072694818" className="btn btn--outline" style={{ fontSize: 'var(--fs-xs)' }}>
+                Call +91 8072694818
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 8: VOLUNTEER & MATCHDAY DESK */}
+      {activeTab === 'volunteer_hub' && (
+        <div className="card" style={{ padding: 'var(--space-8)' }}>
+          <span className="section__eyebrow">Matchday Operations</span>
+          <h2 style={{ fontSize: '1.6rem', marginTop: 'var(--space-1)', marginBottom: 'var(--space-2)' }}>
+            🤝 Volunteer & Community Operations Hub
+          </h2>
+          <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', marginBottom: 'var(--space-6)' }}>
+            Thank you for supporting Mutharasanallur Football Club! Here are your matchday instructions and coordination tools.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-6)' }}>
+            <div style={{ padding: 'var(--space-5)', background: 'var(--surface-2)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h4 style={{ margin: '0 0 var(--space-2) 0' }}>📋 Matchday Checklist</h4>
+              <ul style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', paddingLeft: '1.2rem', lineHeight: 1.8 }}>
+                <li>Pitch boundary lines & corner flag inspection</li>
+                <li>Water distribution station & medical first aid kit setup</li>
+                <li>Spectator guidance & tournament entry pass checks</li>
+                <li>Match ball pressure verification & warm-up area safety</li>
+              </ul>
+            </div>
+
+            <div style={{ padding: 'var(--space-5)', background: 'var(--surface-2)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h4 style={{ margin: '0 0 var(--space-2) 0' }}>📸 Community Media Submissions</h4>
+              <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginBottom: 'var(--space-4)' }}>
+                Captured great photos or videos of the match? Send them directly to our media team for publication on the official MFC website.
+              </p>
+              <a href="mailto:mfcfootballclubtrichy@gmail.com?subject=Matchday%20Photos%20Submission" className="btn btn-primary" style={{ fontSize: 'var(--fs-xs)' }}>
+                Email Photos to Media Desk ↗
+              </a>
+            </div>
+          </div>
         </div>
       )}
     </div>

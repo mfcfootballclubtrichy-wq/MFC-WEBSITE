@@ -16,6 +16,18 @@ exception
   when duplicate_object then null;
 end $$;
 
+do $$ begin
+  alter type user_role_type add value if not exists 'member';
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$ begin
+  alter type user_role_type add value if not exists 'content_editor';
+exception
+  when duplicate_object then null;
+end $$;
+
 -- 2. User Roles Table
 create table if not exists user_roles (
   id          uuid primary key default gen_random_uuid(),
