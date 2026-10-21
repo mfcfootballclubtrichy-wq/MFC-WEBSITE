@@ -131,15 +131,6 @@ export default function HeroPlayerSlider({ slides = DEFAULT_HERO_ACTION_SLIDES, 
       {/* Minimal clean slide indicators if more than 1 image */}
       {activeSlides.length > 1 && (
         <div className="hero-action-showcase__controls">
-          <button
-            type="button"
-            onClick={prevSlide}
-            className="hero-action-showcase__btn"
-            aria-label="Previous action shot"
-          >
-            ‹
-          </button>
-
           <div className="hero-action-showcase__dots">
             {activeSlides.map((_, idx) => (
               <button
@@ -155,15 +146,6 @@ export default function HeroPlayerSlider({ slides = DEFAULT_HERO_ACTION_SLIDES, 
               />
             ))}
           </div>
-
-          <button
-            type="button"
-            onClick={nextSlide}
-            className="hero-action-showcase__btn"
-            aria-label="Next action shot"
-          >
-            ›
-          </button>
         </div>
       )}
     </div>

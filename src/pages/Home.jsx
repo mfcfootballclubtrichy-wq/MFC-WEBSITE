@@ -10,6 +10,7 @@
  * - Black stat numbers with animated light green bar filling beneath each
  * - Buttons with light green hover sweep
  */
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -52,6 +53,20 @@ export default function Home() {
   const topTeamAchievements = teamAchievementsList.slice(0, 3);
   // Highlight individual achievements with consent
   const topIndividual = individualAchievementsList.filter((item) => item.hasConsent ?? true).slice(0, 3);
+
+  // Tournament record filter and view mode state
+  const [tournamentFilter, setTournamentFilter] = useState('all');
+  const [tournamentView, setTournamentView] = useState('cards');
+
+  const filteredTeamAchievements = teamAchievementsList.filter((item) => {
+    if (tournamentFilter === 'runner-up') {
+      return (item.place || '').toLowerCase().includes('runner');
+    }
+    if (tournamentFilter === '3rd') {
+      return (item.place || '').toLowerCase().includes('3rd');
+    }
+    return true;
+  });
 
   return (
     <>
@@ -608,12 +623,14 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           5. TEAM ACHIEVEMENTS & PODIUMS
       ══════════════════════════════════════════════════ */}
-      <section className="section" aria-labelledby="tournaments-heading">
+      <section className="section" aria-labelledby="tournaments-heading" style={{ position: 'relative' }}>
         <div className="container">
           <SectionDivider />
           <ScrollReveal>
-            <div className="section__header">
-              <span className="section__eyebrow">Podiums & Honors</span>
+            <div className="section__header" style={{ marginBottom: 'var(--space-8)' }}>
+              <span className="section__eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                🏆 Podiums & Competitive Record
+              </span>
               <h2 id="tournaments-heading" className="section__title">
                 Recent Tournament Record
               </h2>
@@ -623,48 +640,519 @@ export default function Home() {
             </div>
           </ScrollReveal>
 
-          <div className="mfc-table-wrapper">
-            <table className="mfc-table">
-              <thead>
-                <tr>
-                  <th>Tournament</th>
-                  <th>Season</th>
-                  <th>Result</th>
-                  <th>Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topTeamAchievements.map((item, idx) => (
-                  <tr key={item.id || idx}>
-                    <td style={{ fontWeight: 600 }}>{item.tournament}</td>
-                    <td>{item.season}</td>
-                    <td>
-                      <span
+          {/* Quick Podium Stat Highlights Strip */}
+          <ScrollReveal delay={0.05}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: 'var(--space-4)',
+                marginBottom: 'var(--space-8)',
+              }}
+            >
+              <div
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderTop: '3px solid #94A3B8',
+                  borderRadius: '16px',
+                  padding: 'var(--space-4) var(--space-5)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-3)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)',
+                    border: '1px solid #CBD5E1',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.4rem',
+                    flexShrink: 0,
+                  }}
+                >
+                  🥈
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text)' }}>
+                    4× Runner-Up
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                    District & State Finals
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderTop: '3px solid #F59E0B',
+                  borderRadius: '16px',
+                  padding: 'var(--space-4) var(--space-5)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-3)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                    border: '1px solid #FCD34D',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.4rem',
+                    flexShrink: 0,
+                  }}
+                >
+                  🥉
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text)' }}>
+                    5× Third Place
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                    Semifinal Victories & Podiums
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderTop: '3px solid var(--accent)',
+                  borderRadius: '16px',
+                  padding: 'var(--space-4) var(--space-5)',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-3)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
+                    background: 'var(--accent-glow)',
+                    border: '1px solid var(--accent)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.4rem',
+                    flexShrink: 0,
+                  }}
+                >
+                  ⚽
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text)' }}>
+                    9 Top-3 Podiums
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                    100% Grassroots Tournament Record
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* Interactive Filter & View Toggle Bar */}
+          <ScrollReveal delay={0.1}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 'var(--space-3)',
+                marginBottom: 'var(--space-6)',
+                paddingBottom: 'var(--space-3)',
+                borderBottom: '1px solid var(--border)',
+              }}
+            >
+              {/* Category Filter Pills */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setTournamentFilter('all')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    border: tournamentFilter === 'all' ? '1px solid var(--accent-dark)' : '1px solid var(--border)',
+                    background: tournamentFilter === 'all' ? 'var(--accent)' : 'var(--surface)',
+                    color: tournamentFilter === 'all' ? '#000' : 'var(--text)',
+                    boxShadow: tournamentFilter === 'all' ? '0 2px 8px rgba(22, 163, 74, 0.2)' : 'none',
+                  }}
+                >
+                  All Podiums ({teamAchievementsList.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTournamentFilter('runner-up')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    border: tournamentFilter === 'runner-up' ? '1px solid #94A3B8' : '1px solid var(--border)',
+                    background: tournamentFilter === 'runner-up' ? 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)' : 'var(--surface)',
+                    color: tournamentFilter === 'runner-up' ? '#1E293B' : 'var(--text)',
+                    boxShadow: tournamentFilter === 'runner-up' ? '0 2px 8px rgba(148, 163, 184, 0.3)' : 'none',
+                  }}
+                >
+                  🥈 Runner-Up Finals (4)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTournamentFilter('3rd')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    border: tournamentFilter === '3rd' ? '1px solid #FCD34D' : '1px solid var(--border)',
+                    background: tournamentFilter === '3rd' ? 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)' : 'var(--surface)',
+                    color: tournamentFilter === '3rd' ? '#92400E' : 'var(--text)',
+                    boxShadow: tournamentFilter === '3rd' ? '0 2px 8px rgba(245, 158, 11, 0.25)' : 'none',
+                  }}
+                >
+                  🥉 3rd Place Honours (5)
+                </button>
+              </div>
+
+              {/* View Switcher: Cards vs Table */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  background: 'var(--surface-2)',
+                  padding: '3px',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setTournamentView('cards')}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    borderRadius: '6px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: tournamentView === 'cards' ? 'var(--surface)' : 'transparent',
+                    color: tournamentView === 'cards' ? 'var(--text)' : 'var(--muted)',
+                    boxShadow: tournamentView === 'cards' ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  🎴 Cards View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTournamentView('table')}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    borderRadius: '6px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: tournamentView === 'table' ? 'var(--surface)' : 'transparent',
+                    color: tournamentView === 'table' ? 'var(--text)' : 'var(--muted)',
+                    boxShadow: tournamentView === 'table' ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  📋 Table View
+                </button>
+              </div>
+            </div>
+          </ScrollReveal>
+
+          {/* VIEW 1: Modern Championship Honor Cards Grid */}
+          {tournamentView === 'cards' && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+                gap: 'var(--space-4)',
+              }}
+            >
+              {filteredTeamAchievements.map((item, idx) => {
+                const isRunnerUp = (item.place || '').toLowerCase().includes('runner');
+                const is5s = item.tournament.includes('5s');
+                const is7s = item.tournament.includes('7s');
+                const formatLabel = is5s ? '5-a-side' : is7s ? '7-a-side' : 'Open Cup';
+
+                return (
+                  <ScrollReveal key={item.id || idx} delay={idx * 0.05}>
+                    <div
+                      style={{
+                        background: 'var(--surface)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '18px',
+                        padding: 'var(--space-5)',
+                        position: 'relative',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        minHeight: '190px',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                        transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+                        cursor: 'default',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                        e.currentTarget.style.boxShadow = isRunnerUp
+                          ? '0 14px 28px rgba(148, 163, 184, 0.22)'
+                          : '0 14px 28px rgba(245, 158, 11, 0.18)';
+                        e.currentTarget.style.borderColor = isRunnerUp ? '#94A3B8' : '#FCD34D';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.04)';
+                        e.currentTarget.style.borderColor = 'var(--border)';
+                      }}
+                    >
+                      {/* Top Bar: Medal Badge & Season */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '4px 10px',
+                              borderRadius: 'var(--radius-full)',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              background: isRunnerUp
+                                ? 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)'
+                                : 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                              border: isRunnerUp ? '1px solid #CBD5E1' : '1px solid #FCD34D',
+                              color: isRunnerUp ? '#1E293B' : '#92400E',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                            }}
+                          >
+                            <span>{isRunnerUp ? '🥈' : '🥉'}</span>
+                            <span>{item.place}</span>
+                          </span>
+
+                          <span
+                            style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 600,
+                              color: 'var(--muted)',
+                              background: 'var(--surface-2)',
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-sm)',
+                            }}
+                          >
+                            {item.season}
+                          </span>
+                        </div>
+
+                        {/* Tournament Name */}
+                        <h3
+                          style={{
+                            fontSize: '1.08rem',
+                            fontWeight: 700,
+                            lineHeight: 1.4,
+                            marginBottom: 'var(--space-2)',
+                            color: 'var(--text)',
+                          }}
+                        >
+                          {item.tournament}
+                        </h3>
+                      </div>
+
+                      {/* Bottom Details Strip */}
+                      <div
                         style={{
-                          display: 'inline-block',
-                          padding: '2px 8px',
-                          borderRadius: 'var(--radius-full)',
-                          background: 'var(--accent-glow)',
-                          color: 'var(--accent-dark)',
-                          fontWeight: 700,
-                          fontSize: 'var(--fs-xs)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          paddingTop: 'var(--space-3)',
+                          borderTop: '1px solid var(--border)',
+                          marginTop: 'var(--space-3)',
+                          fontSize: '0.75rem',
                         }}
                       >
-                        🥈 {item.place}
-                      </span>
-                    </td>
-                    <td>{item.location}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--text)', fontWeight: 600 }}>
+                          <span>📍</span> {item.location}
+                        </span>
 
-          <div style={{ textAlign: 'center', marginTop: 'var(--space-8)' }}>
-            <Link to="/team-achievements" className="btn btn-primary">
-              View Full Tournament History
-            </Link>
-          </div>
+                        <span
+                          style={{
+                            background: 'var(--surface-2)',
+                            color: 'var(--accent-dark)',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                          }}
+                        >
+                          ⚽ {formatLabel}
+                        </span>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                );
+              })}
+            </div>
+          )}
+
+          {/* VIEW 2: Upgraded Luxury Sports League Table */}
+          {tournamentView === 'table' && (
+            <ScrollReveal>
+              <div
+                className="mfc-table-wrapper"
+                style={{
+                  borderRadius: '16px',
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.05)',
+                  border: '1px solid var(--border)',
+                  overflow: 'hidden',
+                }}
+              >
+                <table className="mfc-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: 'var(--surface-2)' }}>
+                      <th style={{ padding: '14px 18px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Result</th>
+                      <th style={{ padding: '14px 18px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Tournament Name</th>
+                      <th style={{ padding: '14px 18px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Format</th>
+                      <th style={{ padding: '14px 18px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Season</th>
+                      <th style={{ padding: '14px 18px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Location</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTeamAchievements.map((item, idx) => {
+                      const isRunnerUp = (item.place || '').toLowerCase().includes('runner');
+                      const is5s = item.tournament.includes('5s');
+                      const is7s = item.tournament.includes('7s');
+                      const formatLabel = is5s ? '5-a-side' : is7s ? '7-a-side' : 'Open Cup';
+
+                      return (
+                        <tr
+                          key={item.id || idx}
+                          style={{
+                            borderBottom: '1px solid var(--border)',
+                            transition: 'background 0.15s ease',
+                          }}
+                        >
+                          <td style={{ padding: '14px 18px' }}>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                padding: '3px 10px',
+                                borderRadius: 'var(--radius-full)',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                background: isRunnerUp
+                                  ? 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)'
+                                  : 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                                border: isRunnerUp ? '1px solid #CBD5E1' : '1px solid #FCD34D',
+                                color: isRunnerUp ? '#1E293B' : '#92400E',
+                              }}
+                            >
+                              <span>{isRunnerUp ? '🥈' : '🥉'}</span>
+                              <span>{item.place}</span>
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 18px', fontWeight: 700, color: 'var(--text)' }}>
+                            {item.tournament}
+                          </td>
+                          <td style={{ padding: '14px 18px' }}>
+                            <span style={{ fontSize: '0.72rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                              {formatLabel}
+                            </span>
+                          </td>
+                          <td style={{ padding: '14px 18px', color: 'var(--muted)', fontSize: '0.85rem' }}>
+                            {item.season}
+                          </td>
+                          <td style={{ padding: '14px 18px', color: 'var(--text)', fontWeight: 500, fontSize: '0.85rem' }}>
+                            📍 {item.location}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </ScrollReveal>
+          )}
+
+          {/* Premium Bottom Call-to-Action Card */}
+          <ScrollReveal delay={0.15}>
+            <div
+              style={{
+                marginTop: 'var(--space-8)',
+                background: 'radial-gradient(ellipse at top, rgba(134, 239, 172, 0.12) 0%, rgba(248, 250, 252, 0.95) 75%)',
+                border: '1px solid var(--border)',
+                borderRadius: '20px',
+                padding: 'clamp(1.25rem, 3vw, 2rem)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 'var(--space-4)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+              }}
+            >
+              <div style={{ maxWidth: '560px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '1.2rem' }}>🏆</span>
+                  <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>
+                    Complete Tournament Archive & Historical Records
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)', lineHeight: 1.5 }}>
+                  Inspect our complete match history, age-category breakdowns (U13, U15, U16, U17 & Seniors), and competition photo archives.
+                </p>
+              </div>
+
+              <Link
+                to="/team-achievements"
+                className="btn btn-primary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '0.65rem 1.4rem',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  boxShadow: '0 6px 16px rgba(22, 163, 74, 0.25)',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span>View Full Tournament History</span>
+                <span style={{ fontSize: '1.1rem' }}>➔</span>
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

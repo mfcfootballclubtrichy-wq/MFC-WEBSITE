@@ -1217,35 +1217,47 @@ export default function TemplateManager({ sections, onRefresh, role }) {
 
             <div style={{ borderTop: '1px solid var(--border)', paddingTop: 'var(--space-4)' }}>
               <h4 style={{ fontSize: '1.1rem', marginBottom: 'var(--space-3)' }}>🖼️ Homepage Image Areas</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-5)' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
-                    <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
-                      About Section Ground Image URL
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-5)' }}>
+                {/* ── About Section Ground Image ── */}
+                <div
+                  style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: 'var(--space-4)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-3)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                    <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                      About Section Ground Image
                     </label>
-                    <span style={{ fontSize: '0.7rem', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)' }}>
-                      Recommended: 1200x800 (3:2)
+                    <span style={{ fontSize: '0.68rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)', fontWeight: 600 }}>
+                      1200×800 (3:2)
                     </span>
                   </div>
-                  <input
-                    type="url"
-                    value={formData.aboutImage || ''}
-                    onChange={(e) => updateField('aboutImage', e.target.value)}
-                    placeholder="https://..."
+
+                  {/* Photo Preview Box */}
+                  <div
                     style={{
                       width: '100%',
-                      padding: '0.6rem 0.8rem',
+                      height: '160px',
                       borderRadius: 'var(--radius)',
-                      border: '1px solid var(--border)',
-                      background: 'var(--bg)',
-                      marginBottom: 'var(--space-2)',
+                      overflow: 'hidden',
+                      background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                      border: '1px dashed var(--border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
                     }}
-                  />
-                  {formData.aboutImage && (
-                    <div style={{ width: '100%', height: '140px', overflow: 'hidden', borderRadius: 'var(--radius)', position: 'relative', marginBottom: 'var(--space-2)' }}>
+                  >
+                    {formData.aboutImage ? (
                       <img
                         src={formData.aboutImage}
-                        alt="About section preview"
+                        alt="About ground preview"
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1254,14 +1266,101 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           transition: 'transform 0.15s ease',
                         }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div style={{ textAlign: 'center', color: 'var(--muted)', padding: 'var(--space-3)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🏞️</div>
+                        <span style={{ fontSize: '0.75rem' }}>No photo uploaded</span>
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Sizing & Positioning Control Bar for About Image */}
+                  {/* Direct Device File Upload & Clear Buttons */}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <label
+                      style={{
+                        flex: 1,
+                        textAlign: 'center',
+                        padding: '0.55rem 0.85rem',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        background: 'var(--accent)',
+                        color: '#0A0A0A',
+                        borderRadius: 'var(--radius)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                      }}
+                      title="Upload photo from phone or computer storage"
+                    >
+                      📁 Choose Photo from Device
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              const result = event.target?.result;
+                              if (result) updateField('aboutImage', result);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {formData.aboutImage && (
+                      <button
+                        type="button"
+                        onClick={() => updateField('aboutImage', '')}
+                        style={{
+                          padding: '0.55rem 0.75rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          background: '#FEE2E2',
+                          color: '#DC2626',
+                          border: '1px solid #FCA5A5',
+                          borderRadius: 'var(--radius)',
+                          cursor: 'pointer',
+                        }}
+                        title="Remove photo"
+                      >
+                        🗑️ Remove
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Fallback URL Input */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '3px' }}>
+                      Or paste direct image URL:
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.aboutImage || ''}
+                      onChange={(e) => updateField('aboutImage', e.target.value)}
+                      placeholder="https://..."
+                      style={{
+                        width: '100%',
+                        padding: '0.45rem 0.65rem',
+                        fontSize: '0.75rem',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border)',
+                        background: 'var(--bg)',
+                      }}
+                    />
+                  </div>
+
+                  {/* Sizing & Framing Bar */}
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
                       gap: 'var(--space-2)',
                       padding: 'var(--space-2)',
                       background: 'var(--bg)',
@@ -1281,7 +1380,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       <input
                         type="range"
                         min="0.8"
-                        max="1.5"
+                        max="1.6"
                         step="0.05"
                         value={formData.aboutImageScale || 1}
                         onChange={(e) => updateField('aboutImageScale', parseFloat(e.target.value))}
@@ -1300,8 +1399,8 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       </div>
                       <input
                         type="range"
-                        min="-40"
-                        max="40"
+                        min="-50"
+                        max="50"
                         step="2"
                         value={formData.aboutImageOffsetY || 0}
                         onChange={(e) => updateField('aboutImageOffsetY', parseInt(e.target.value, 10))}
@@ -1311,31 +1410,43 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                   </div>
                 </div>
 
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
-                    <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
-                      Hero Background/Banner Image URL
+                {/* ── Hero Background / Banner Image ── */}
+                <div
+                  style={{
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)',
+                    padding: 'var(--space-4)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-3)',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                    <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                      Hero Background / Banner Image
                     </label>
-                    <span style={{ fontSize: '0.7rem', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)' }}>
-                      Recommended: 1920x1080 (16:9)
+                    <span style={{ fontSize: '0.68rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)', fontWeight: 600 }}>
+                      1920×1080 (16:9)
                     </span>
                   </div>
-                  <input
-                    type="url"
-                    value={formData.heroImage || ''}
-                    onChange={(e) => updateField('heroImage', e.target.value)}
-                    placeholder="https://..."
+
+                  {/* Photo Preview Box */}
+                  <div
                     style={{
                       width: '100%',
-                      padding: '0.6rem 0.8rem',
+                      height: '160px',
                       borderRadius: 'var(--radius)',
-                      border: '1px solid var(--border)',
-                      background: 'var(--bg)',
-                      marginBottom: 'var(--space-2)',
+                      overflow: 'hidden',
+                      background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                      border: '1px dashed var(--border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
                     }}
-                  />
-                  {formData.heroImage && (
-                    <div style={{ width: '100%', height: '140px', overflow: 'hidden', borderRadius: 'var(--radius)', position: 'relative', marginBottom: 'var(--space-2)' }}>
+                  >
+                    {formData.heroImage ? (
                       <img
                         src={formData.heroImage}
                         alt="Hero banner preview"
@@ -1347,14 +1458,101 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           transition: 'transform 0.15s ease',
                         }}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div style={{ textAlign: 'center', color: 'var(--muted)', padding: 'var(--space-3)' }}>
+                        <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🏟️</div>
+                        <span style={{ fontSize: '0.75rem' }}>No banner uploaded</span>
+                      </div>
+                    )}
+                  </div>
 
-                  {/* Sizing & Positioning Control Bar for Hero Image */}
+                  {/* Direct Device File Upload & Clear Buttons */}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <label
+                      style={{
+                        flex: 1,
+                        textAlign: 'center',
+                        padding: '0.55rem 0.85rem',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        background: 'var(--accent)',
+                        color: '#0A0A0A',
+                        borderRadius: 'var(--radius)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                      }}
+                      title="Upload hero banner from phone or computer storage"
+                    >
+                      📁 Choose Banner from Device
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                              const result = event.target?.result;
+                              if (result) updateField('heroImage', result);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {formData.heroImage && (
+                      <button
+                        type="button"
+                        onClick={() => updateField('heroImage', '')}
+                        style={{
+                          padding: '0.55rem 0.75rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          background: '#FEE2E2',
+                          color: '#DC2626',
+                          border: '1px solid #FCA5A5',
+                          borderRadius: 'var(--radius)',
+                          cursor: 'pointer',
+                        }}
+                        title="Remove banner"
+                      >
+                        🗑️ Remove
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Fallback URL Input */}
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '3px' }}>
+                      Or paste direct image URL:
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.heroImage || ''}
+                      onChange={(e) => updateField('heroImage', e.target.value)}
+                      placeholder="https://..."
+                      style={{
+                        width: '100%',
+                        padding: '0.45rem 0.65rem',
+                        fontSize: '0.75rem',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border)',
+                        background: 'var(--bg)',
+                      }}
+                    />
+                  </div>
+
+                  {/* Sizing & Framing Bar */}
                   <div
                     style={{
                       display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
                       gap: 'var(--space-2)',
                       padding: 'var(--space-2)',
                       background: 'var(--bg)',
@@ -1374,7 +1572,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       <input
                         type="range"
                         min="0.8"
-                        max="1.5"
+                        max="1.6"
                         step="0.05"
                         value={formData.heroImageScale || 1}
                         onChange={(e) => updateField('heroImageScale', parseFloat(e.target.value))}
@@ -1393,8 +1591,8 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       </div>
                       <input
                         type="range"
-                        min="-40"
-                        max="40"
+                        min="-50"
+                        max="50"
                         step="2"
                         value={formData.heroImageOffsetY || 0}
                         onChange={(e) => updateField('heroImageOffsetY', parseInt(e.target.value, 10))}
@@ -1491,20 +1689,79 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
                       <div>
                         <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>
-                          Image Source / Cutout File Path
+                          Action Cutout Image (Device Upload)
                         </label>
+                        <div style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
+                          <label
+                            style={{
+                              flex: 1,
+                              textAlign: 'center',
+                              padding: '0.45rem 0.65rem',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              background: 'var(--accent)',
+                              color: '#0A0A0A',
+                              borderRadius: 'var(--radius)',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                            }}
+                            title="Upload action photo / transparent cutout from your device storage"
+                          >
+                            📁 Upload Cutout from Device
+                            <input
+                              type="file"
+                              accept="image/*"
+                              style={{ display: 'none' }}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onload = (event) => {
+                                    const result = event.target?.result;
+                                    if (result) updateArrayItemField(idx, 'image', result);
+                                  };
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </label>
+
+                          {slide.image && (
+                            <button
+                              type="button"
+                              onClick={() => updateArrayItemField(idx, 'image', '')}
+                              style={{
+                                padding: '0.45rem 0.65rem',
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                background: '#FEE2E2',
+                                color: '#DC2626',
+                                border: '1px solid #FCA5A5',
+                                borderRadius: 'var(--radius)',
+                                cursor: 'pointer',
+                              }}
+                              title="Remove image"
+                            >
+                              🗑️
+                            </button>
+                          )}
+                        </div>
+
                         <input
                           type="text"
                           value={slide.image || ''}
                           onChange={(e) => updateArrayItemField(idx, 'image', e.target.value)}
-                          placeholder="e.g. /coaches/mfc-player-action.png"
+                          placeholder="Or path e.g. /coaches/mfc-player-action.png"
                           style={{
                             width: '100%',
-                            padding: '0.6rem 0.8rem',
+                            padding: '0.45rem 0.65rem',
                             borderRadius: 'var(--radius)',
                             border: '1px solid var(--border)',
                             background: 'var(--bg)',
-                            fontSize: 'var(--fs-sm)',
+                            fontSize: '0.75rem',
                           }}
                         />
                       </div>
@@ -1674,30 +1931,32 @@ export default function TemplateManager({ sections, onRefresh, role }) {
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 600 }}>
-                  About Page Featured Image URL
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: '6px' }}>
+                <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                  About Page Featured Image
                 </label>
-                <span style={{ fontSize: '0.7rem', background: 'var(--surface)', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)' }}>
-                  Recommended: 800x600 (4:3) or 1200x800
+                <span style={{ fontSize: '0.68rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)', fontWeight: 600 }}>
+                  800×600 (4:3) or 1200×800
                 </span>
               </div>
-              <input
-                type="url"
-                value={formData.image || ''}
-                onChange={(e) => updateField('image', e.target.value)}
-                placeholder="https://..."
+
+              {/* Photo Preview Box */}
+              <div
                 style={{
-                  width: '100%',
-                  padding: '0.6rem 0.8rem',
+                  maxWidth: '440px',
+                  height: '200px',
                   borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
+                  overflow: 'hidden',
+                  background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                  border: '1px dashed var(--border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
                   marginBottom: 'var(--space-2)',
                 }}
-              />
-              {formData.image && (
-                <div style={{ maxWidth: '400px', height: '220px', borderRadius: 'var(--radius)', overflow: 'hidden', position: 'relative', marginBottom: 'var(--space-2)' }}>
+              >
+                {formData.image ? (
                   <img
                     src={formData.image}
                     alt="About preview"
@@ -1709,20 +1968,106 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       transition: 'transform 0.15s ease',
                     }}
                   />
-                </div>
-              )}
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--muted)', padding: 'var(--space-3)' }}>
+                    <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🖼️</div>
+                    <span style={{ fontSize: '0.75rem' }}>No photo uploaded</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload from Device & Clear Buttons */}
+              <div style={{ display: 'flex', gap: '8px', maxWidth: '440px', marginBottom: 'var(--space-2)' }}>
+                <label
+                  style={{
+                    flex: 1,
+                    textAlign: 'center',
+                    padding: '0.55rem 0.85rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    background: 'var(--accent)',
+                    color: '#0A0A0A',
+                    borderRadius: 'var(--radius)',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                  }}
+                  title="Upload image from phone or computer storage"
+                >
+                  📁 Choose Photo from Device
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const result = event.target?.result;
+                          if (result) updateField('image', result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+
+                {formData.image && (
+                  <button
+                    type="button"
+                    onClick={() => updateField('image', '')}
+                    style={{
+                      padding: '0.55rem 0.75rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      background: '#FEE2E2',
+                      color: '#DC2626',
+                      border: '1px solid #FCA5A5',
+                      borderRadius: 'var(--radius)',
+                      cursor: 'pointer',
+                    }}
+                    title="Remove photo"
+                  >
+                    🗑️ Remove
+                  </button>
+                )}
+              </div>
+
+              <div style={{ maxWidth: '440px', marginBottom: 'var(--space-3)' }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '3px' }}>
+                  Or paste direct image URL:
+                </label>
+                <input
+                  type="url"
+                  value={formData.image || ''}
+                  onChange={(e) => updateField('image', e.target.value)}
+                  placeholder="https://..."
+                  style={{
+                    width: '100%',
+                    padding: '0.45rem 0.65rem',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    fontSize: '0.75rem',
+                  }}
+                />
+              </div>
 
               {/* Sizing & Positioning Control Bar for About Featured Image */}
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
                   gap: 'var(--space-3)',
                   padding: 'var(--space-3)',
                   background: 'var(--bg)',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border)',
-                  maxWidth: '500px',
+                  maxWidth: '440px',
                 }}
               >
                 <div>
@@ -3277,25 +3622,32 @@ export default function TemplateManager({ sections, onRefresh, role }) {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
-                School Program Training Image URL
-              </label>
-              <input
-                type="url"
-                value={formData.image || ''}
-                onChange={(e) => updateField('image', e.target.value)}
-                placeholder="https://..."
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: '6px' }}>
+                <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
+                  School Program Training Image
+                </label>
+                <span style={{ fontSize: '0.68rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)', fontWeight: 600 }}>
+                  1200×800 or 800×600
+                </span>
+              </div>
+
+              {/* Photo Preview Box */}
+              <div
                 style={{
-                  width: '100%',
-                  padding: '0.6rem 0.8rem',
+                  maxWidth: '440px',
+                  height: '200px',
                   borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
+                  overflow: 'hidden',
+                  background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                  border: '1px dashed var(--border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
                   marginBottom: 'var(--space-2)',
                 }}
-              />
-              {formData.image && (
-                <div style={{ maxWidth: '400px', height: '200px', borderRadius: 'var(--radius)', overflow: 'hidden', position: 'relative', marginBottom: 'var(--space-2)' }}>
+              >
+                {formData.image ? (
                   <img
                     src={formData.image}
                     alt="School program preview"
@@ -3307,20 +3659,106 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       transition: 'transform 0.15s ease',
                     }}
                   />
-                </div>
-              )}
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--muted)', padding: 'var(--space-3)' }}>
+                    <div style={{ fontSize: '1.8rem', marginBottom: '4px' }}>🏫</div>
+                    <span style={{ fontSize: '0.75rem' }}>No photo uploaded</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload from Device & Clear Buttons */}
+              <div style={{ display: 'flex', gap: '8px', maxWidth: '440px', marginBottom: 'var(--space-2)' }}>
+                <label
+                  style={{
+                    flex: 1,
+                    textAlign: 'center',
+                    padding: '0.55rem 0.85rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    background: 'var(--accent)',
+                    color: '#0A0A0A',
+                    borderRadius: 'var(--radius)',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                  }}
+                  title="Upload image from phone or computer storage"
+                >
+                  📁 Choose Photo from Device
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const result = event.target?.result;
+                          if (result) updateField('image', result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+
+                {formData.image && (
+                  <button
+                    type="button"
+                    onClick={() => updateField('image', '')}
+                    style={{
+                      padding: '0.55rem 0.75rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      background: '#FEE2E2',
+                      color: '#DC2626',
+                      border: '1px solid #FCA5A5',
+                      borderRadius: 'var(--radius)',
+                      cursor: 'pointer',
+                    }}
+                    title="Remove photo"
+                  >
+                    🗑️ Remove
+                  </button>
+                )}
+              </div>
+
+              <div style={{ maxWidth: '440px', marginBottom: 'var(--space-3)' }}>
+                <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '3px' }}>
+                  Or paste direct image URL:
+                </label>
+                <input
+                  type="url"
+                  value={formData.image || ''}
+                  onChange={(e) => updateField('image', e.target.value)}
+                  placeholder="https://..."
+                  style={{
+                    width: '100%',
+                    padding: '0.45rem 0.65rem',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    fontSize: '0.75rem',
+                  }}
+                />
+              </div>
 
               {/* Sizing & Positioning Control Bar for School Program Image */}
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
                   gap: 'var(--space-3)',
                   padding: 'var(--space-3)',
                   background: 'var(--bg)',
                   borderRadius: 'var(--radius-sm)',
                   border: '1px solid var(--border)',
-                  maxWidth: '500px',
+                  maxWidth: '440px',
                 }}
               >
                 <div>

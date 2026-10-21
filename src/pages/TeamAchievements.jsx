@@ -94,16 +94,23 @@ export default function TeamAchievements() {
                         <td>
                           <span
                             style={{
-                              display: 'inline-block',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
                               padding: '3px 10px',
                               borderRadius: 'var(--radius-full)',
-                              background: isRunnerUp ? 'var(--accent-glow)' : 'var(--surface-2)',
-                              color: isRunnerUp ? 'var(--accent-dark)' : 'var(--text)',
+                              background: isRunnerUp
+                                ? 'linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%)'
+                                : 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
+                              border: isRunnerUp ? '1px solid #CBD5E1' : '1px solid #FCD34D',
+                              color: isRunnerUp ? '#1E293B' : '#92400E',
                               fontWeight: 700,
                               fontSize: 'var(--fs-xs)',
+                              boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                             }}
                           >
-                            {isRunnerUp ? '🥈' : '🥉'} {item.place}
+                            <span>{isRunnerUp ? '🥈' : '🥉'}</span>
+                            <span>{item.place}</span>
                           </span>
                         </td>
                         <td style={{ fontWeight: 600 }}>{item.tournament}</td>
