@@ -51,7 +51,7 @@ export const COACHES = [
     name: 'Dhanapal',
     role: 'Head Coach',
     licence: ['AIFF C Licence', 'AIFF D Licence'],
-    photo: null,
+    photo: '/coaches/sample-coach.png',
     bio: 'Guiding player development and structured technical football training across youth squads.',
   },
   {

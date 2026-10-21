@@ -10,28 +10,21 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './locales/en.json';
 import ta from './locales/ta.json';
 
-const SUPPORTED_LANGUAGES = ['en', 'ta'];
+const SUPPORTED_LANGUAGES = ['en'];
 const DEFAULT_LANGUAGE = 'en';
 
 i18n
-  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
+    lng: DEFAULT_LANGUAGE,
     resources: {
       en: { translation: en },
-      ta: { translation: ta },
     },
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,
     interpolation: {
       // React already escapes values — no need for i18next escaping.
       escapeValue: false,
-    },
-    detection: {
-      // Check localStorage first, then browser language.
-      order: ['localStorage', 'navigator'],
-      caches: ['localStorage'],
-      lookupLocalStorage: 'mfc_lang',
     },
   });
 

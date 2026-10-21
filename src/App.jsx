@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollProgress from './components/ScrollProgress.jsx';
+import ScrollToTop from './components/ScrollToTop.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ContentProvider } from './context/ContentContext.jsx';
@@ -75,6 +76,7 @@ export default function App() {
   return (
     <AuthProvider>
       <ContentProvider>
+        <ScrollToTop />
         <ScrollProgress />
         <a href="#main-content" className="skip-link">
           Skip to main content

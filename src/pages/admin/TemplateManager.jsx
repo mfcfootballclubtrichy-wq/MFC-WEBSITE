@@ -25,6 +25,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
   const TEMPLATE_OPTIONS = [
     { id: 'updates', label: 'News & Club Updates', desc: 'Frequent updates, tournament announcements, news with images' },
     { id: 'home', label: 'Home Page Banners & Text', desc: 'Hero headlines, call-to-actions, hero background & training images' },
+    { id: 'hero_slides', label: '⚡ Hero Action Shots (Right Side)', desc: 'Large cutout ball-shooting & action images sliding in hero banner' },
     { id: 'about', label: 'About Page & Story', desc: 'Club foundation text, history, story image' },
     { id: 'vision', label: 'Vision & Values', desc: 'Club mission, community pledge and values' },
     { id: 'coaches', label: 'Coaches & Technical Staff', desc: 'Coach profiles, AIFF certification badges, photos, bios' },
@@ -73,6 +74,25 @@ export default function TemplateManager({ sections, onRefresh, role }) {
           heroImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80',
           aboutImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
         });
+        break;
+      case 'hero_slides':
+        setFormData([
+          {
+            id: 'slide-1',
+            image: '/coaches/sample-coach.png',
+            title: 'Action Shot 1 (Ball Shooting)',
+          },
+          {
+            id: 'slide-2',
+            image: '/about-mfc-freestyle.png',
+            title: 'Action Shot 2 (Freestyle / Dribble)',
+          },
+          {
+            id: 'slide-3',
+            image: '/coaches/sample-coach.png',
+            title: 'Action Shot 3 (Match Action)',
+          },
+        ]);
         break;
       case 'about':
         setFormData({
@@ -428,7 +448,13 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       <img
                         src={item.image || 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=400&q=80'}
                         alt="Preview"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: item.objectFit || 'cover',
+                          transform: `scale(${item.scale || 1}) translateY(${item.offsetY || 0}px)`,
+                          transition: 'transform 0.15s ease',
+                        }}
                         onError={(e) => {
                           e.target.src = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=400&q=80';
                         }}
@@ -568,6 +594,101 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       </div>
                     </div>
 
+                    {/* Spacious Sizing & Positioning Control Bar for Featured Main Image */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                        gap: 'var(--space-3)',
+                        padding: 'var(--space-3)',
+                        background: 'var(--bg)',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            📏 Main Banner Height
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {item.maxHeight || 200}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="150"
+                          max="480"
+                          step="10"
+                          value={item.maxHeight || 200}
+                          onChange={(e) => updateArrayItemField(index, 'maxHeight', parseInt(e.target.value, 10))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            🔍 Main Zoom / Scale
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {Math.round((item.scale || 1) * 100)}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.7"
+                          max="1.6"
+                          step="0.05"
+                          value={item.scale || 1}
+                          onChange={(e) => updateArrayItemField(index, 'scale', parseFloat(e.target.value))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            ↕️ Shift Up / Down
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {item.offsetY || 0}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-70"
+                          max="70"
+                          step="2"
+                          value={item.offsetY || 0}
+                          onChange={(e) => updateArrayItemField(index, 'offsetY', parseInt(e.target.value, 10))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      <div>
+                        <span style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)', marginBottom: '2px' }}>
+                          🔲 Main Fit Mode
+                        </span>
+                        <select
+                          value={item.objectFit || 'cover'}
+                          onChange={(e) => updateArrayItemField(index, 'objectFit', e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '0.35rem 0.5rem',
+                            fontSize: '0.75rem',
+                            borderRadius: 'var(--radius-sm)',
+                            border: '1px solid var(--border)',
+                            background: 'var(--surface)',
+                            color: 'var(--text)',
+                          }}
+                        >
+                          <option value="cover">Cover (Fill Card/Banner)</option>
+                          <option value="contain">Contain (Full Photo - No Cut)</option>
+                        </select>
+                      </div>
+                    </div>
+
                     {/* Short Teaser Description */}
                     <div>
                       <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
@@ -677,6 +798,182 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                             }}
                           />
                         </label>
+                      </div>
+
+                      {/* Gallery Photos Sizing & Fit Display Options */}
+                      <div
+                        style={{
+                          background: 'var(--bg)',
+                          borderRadius: 'var(--radius)',
+                          border: '1.5px solid var(--accent)',
+                          padding: 'var(--space-3)',
+                          marginBottom: 'var(--space-3)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: '8px' }}>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-dark)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            🖼️ Gallery Sizing & Display Settings (Prevents Face Cutoff)
+                          </span>
+
+                          {/* Quick 1-Click Sizing Presets */}
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updateArrayItemField(index, 'galleryFit', 'contain');
+                                updateArrayItemField(index, 'galleryHeight', 360);
+                                updateArrayItemField(index, 'galleryScale', 1);
+                              }}
+                              style={{
+                                padding: '3px 8px',
+                                fontSize: '0.68rem',
+                                fontWeight: 600,
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)',
+                                background: (item.galleryFit || 'contain') === 'contain' ? 'var(--accent)' : 'var(--surface)',
+                                color: (item.galleryFit || 'contain') === 'contain' ? '#000' : 'var(--text)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              📐 Contain (No Crop)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updateArrayItemField(index, 'galleryFit', 'natural');
+                                updateArrayItemField(index, 'galleryHeight', 420);
+                                updateArrayItemField(index, 'galleryScale', 1);
+                              }}
+                              style={{
+                                padding: '3px 8px',
+                                fontSize: '0.68rem',
+                                fontWeight: 600,
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)',
+                                background: item.galleryFit === 'natural' ? 'var(--accent)' : 'var(--surface)',
+                                color: item.galleryFit === 'natural' ? '#000' : 'var(--text)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              ✨ Natural (Auto Height)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updateArrayItemField(index, 'galleryFit', 'cover');
+                                updateArrayItemField(index, 'galleryHeight', 280);
+                                updateArrayItemField(index, 'galleryScale', 1);
+                              }}
+                              style={{
+                                padding: '3px 8px',
+                                fontSize: '0.68rem',
+                                fontWeight: 600,
+                                borderRadius: '4px',
+                                border: '1px solid var(--border)',
+                                background: item.galleryFit === 'cover' ? 'var(--accent)' : 'var(--surface)',
+                                color: item.galleryFit === 'cover' ? '#000' : 'var(--text)',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              🔲 Grid Tiles (Cover)
+                            </button>
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                            gap: 'var(--space-3)',
+                          }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text)' }}>
+                                📏 Gallery Card Height
+                              </span>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--accent-dark)' }}>
+                                {item.galleryHeight || 340}px
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="180"
+                              max="550"
+                              step="10"
+                              value={item.galleryHeight || 340}
+                              onChange={(e) => updateArrayItemField(index, 'galleryHeight', parseInt(e.target.value, 10))}
+                              style={{ width: '100%', accentColor: 'var(--accent)' }}
+                            />
+                          </div>
+
+                          <div>
+                            <span style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text)', marginBottom: '2px' }}>
+                              🔲 Gallery Fit Mode
+                            </span>
+                            <select
+                              value={item.galleryFit || 'contain'}
+                              onChange={(e) => updateArrayItemField(index, 'galleryFit', e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '0.35rem 0.5rem',
+                                fontSize: '0.75rem',
+                                borderRadius: 'var(--radius-sm)',
+                                border: '1px solid var(--border)',
+                                background: 'var(--surface)',
+                                color: 'var(--text)',
+                              }}
+                            >
+                              <option value="contain">Contain (Full Image - Never Crop Face)</option>
+                              <option value="natural">Natural (Adaptive Height - Zero Crop)</option>
+                              <option value="cover">Cover (Fill Equal Cards)</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <span style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--text)', marginBottom: '2px' }}>
+                              📐 Grid Layout Columns
+                            </span>
+                            <select
+                              value={item.galleryColumns || 'auto'}
+                              onChange={(e) => updateArrayItemField(index, 'galleryColumns', e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '0.35rem 0.5rem',
+                                fontSize: '0.75rem',
+                                borderRadius: 'var(--radius-sm)',
+                                border: '1px solid var(--border)',
+                                background: 'var(--surface)',
+                                color: 'var(--text)',
+                              }}
+                            >
+                              <option value="auto">Auto Responsive Grid</option>
+                              <option value="2">2 Columns (Large Photos)</option>
+                              <option value="3">3 Columns (Standard)</option>
+                              <option value="4">4 Columns (Compact)</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text)' }}>
+                                🔍 Gallery Photo Zoom
+                              </span>
+                              <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--accent-dark)' }}>
+                                {Math.round((item.galleryScale || 1) * 100)}%
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0.7"
+                              max="1.5"
+                              step="0.05"
+                              value={item.galleryScale || 1}
+                              onChange={(e) => updateArrayItemField(index, 'galleryScale', parseFloat(e.target.value))}
+                              style={{ width: '100%', accentColor: 'var(--accent)' }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       {/* Display Uploaded Device Photos Grid with Delete & Order Controls */}
@@ -945,12 +1242,73 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     }}
                   />
                   {formData.aboutImage && (
-                    <img
-                      src={formData.aboutImage}
-                      alt="About section preview"
-                      style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: 'var(--radius)' }}
-                    />
+                    <div style={{ width: '100%', height: '140px', overflow: 'hidden', borderRadius: 'var(--radius)', position: 'relative', marginBottom: 'var(--space-2)' }}>
+                      <img
+                        src={formData.aboutImage}
+                        alt="About section preview"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transform: `scale(${formData.aboutImageScale || 1}) translateY(${formData.aboutImageOffsetY || 0}px)`,
+                          transition: 'transform 0.15s ease',
+                        }}
+                      />
+                    </div>
                   )}
+
+                  {/* Sizing & Positioning Control Bar for About Image */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                      gap: 'var(--space-2)',
+                      padding: 'var(--space-2)',
+                      background: 'var(--bg)',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                          🔍 Zoom
+                        </span>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text)' }}>
+                          {Math.round((formData.aboutImageScale || 1) * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.8"
+                        max="1.5"
+                        step="0.05"
+                        value={formData.aboutImageScale || 1}
+                        onChange={(e) => updateField('aboutImageScale', parseFloat(e.target.value))}
+                        style={{ width: '100%', accentColor: 'var(--accent)' }}
+                      />
+                    </div>
+
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                          ↕️ Shift Y
+                        </span>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text)' }}>
+                          {formData.aboutImageOffsetY || 0}px
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-40"
+                        max="40"
+                        step="2"
+                        value={formData.aboutImageOffsetY || 0}
+                        onChange={(e) => updateField('aboutImageOffsetY', parseInt(e.target.value, 10))}
+                        style={{ width: '100%', accentColor: 'var(--accent)' }}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -977,14 +1335,298 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     }}
                   />
                   {formData.heroImage && (
-                    <img
-                      src={formData.heroImage}
-                      alt="Hero banner preview"
-                      style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: 'var(--radius)' }}
-                    />
+                    <div style={{ width: '100%', height: '140px', overflow: 'hidden', borderRadius: 'var(--radius)', position: 'relative', marginBottom: 'var(--space-2)' }}>
+                      <img
+                        src={formData.heroImage}
+                        alt="Hero banner preview"
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transform: `scale(${formData.heroImageScale || 1}) translateY(${formData.heroImageOffsetY || 0}px)`,
+                          transition: 'transform 0.15s ease',
+                        }}
+                      />
+                    </div>
                   )}
+
+                  {/* Sizing & Positioning Control Bar for Hero Image */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 'var(--space-2)',
+                      padding: 'var(--space-2)',
+                      background: 'var(--bg)',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                          🔍 Zoom
+                        </span>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text)' }}>
+                          {Math.round((formData.heroImageScale || 1) * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.8"
+                        max="1.5"
+                        step="0.05"
+                        value={formData.heroImageScale || 1}
+                        onChange={(e) => updateField('heroImageScale', parseFloat(e.target.value))}
+                        style={{ width: '100%', accentColor: 'var(--accent)' }}
+                      />
+                    </div>
+
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                          ↕️ Shift Y
+                        </span>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text)' }}>
+                          {formData.heroImageOffsetY || 0}px
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-40"
+                        max="40"
+                        step="2"
+                        value={formData.heroImageOffsetY || 0}
+                        onChange={(e) => updateField('heroImageOffsetY', parseInt(e.target.value, 10))}
+                        style={{ width: '100%', accentColor: 'var(--accent)' }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════
+            FORM VIEW 2.5: HERO ACTION SHOTS (SLIDESHOW)
+        ═══════════════════════════════════════════════════════ */}
+        {selectedTemplate === 'hero_slides' && Array.isArray(formData) && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-5)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+              <div>
+                <h4 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-1)' }}>
+                  ⚡ Right-Side Hero Action Shots (Ball Shooting & Match Poses)
+                </h4>
+                <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', maxWidth: '650px' }}>
+                  Manage the large action images that slide continuously on the right side of the homepage hero banner.
+                  Use <strong>transparent PNGs (cutout without any background)</strong> so the ball shooting or action pose blends seamlessly into the page!
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() =>
+                  addArrayItem({
+                    id: `slide-${Date.now()}`,
+                    image: '/coaches/sample-coach.png',
+                    title: `Action Pose ${formData.length + 1}`,
+                  })
+                }
+              >
+                + Add New Action Image
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {formData.map((slide, idx) => (
+                <div
+                  key={slide.id || idx}
+                  className="card"
+                  style={{
+                    padding: 'var(--space-5)',
+                    display: 'grid',
+                    gridTemplateColumns: '150px 1fr auto',
+                    gap: 'var(--space-5)',
+                    alignItems: 'center',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  {/* Image Preview with transparent ambient background */}
+                  <div
+                    style={{
+                      width: '150px',
+                      height: '150px',
+                      borderRadius: 'var(--radius)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'radial-gradient(circle, rgba(134, 239, 172, 0.3) 0%, #FFFFFF 70%)',
+                      border: '1px dashed var(--border)',
+                      overflow: 'hidden',
+                      position: 'relative',
+                    }}
+                  >
+                    {slide.image ? (
+                      <img
+                        src={slide.image}
+                        alt={slide.title || 'Action preview'}
+                        style={{
+                          maxHeight: '140px',
+                          maxWidth: '100%',
+                          objectFit: 'contain',
+                          transform: `scale(${slide.scale || 1}) translateY(${slide.offsetY || 0}px)`,
+                          filter: 'drop-shadow(0 6px 14px rgba(0,0,0,0.18))',
+                          transition: 'transform 0.15s ease',
+                        }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}>No image</span>
+                    )}
+                  </div>
+
+                  {/* Field inputs with Sizing & Dimension Controls */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>
+                          Image Source / Cutout File Path
+                        </label>
+                        <input
+                          type="text"
+                          value={slide.image || ''}
+                          onChange={(e) => updateArrayItemField(idx, 'image', e.target.value)}
+                          placeholder="e.g. /coaches/mfc-player-action.png"
+                          style={{
+                            width: '100%',
+                            padding: '0.6rem 0.8rem',
+                            borderRadius: 'var(--radius)',
+                            border: '1px solid var(--border)',
+                            background: 'var(--bg)',
+                            fontSize: 'var(--fs-sm)',
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>
+                          Action Pose Label / Alt Text
+                        </label>
+                        <input
+                          type="text"
+                          value={slide.title || ''}
+                          onChange={(e) => updateArrayItemField(idx, 'title', e.target.value)}
+                          placeholder="e.g. Striker Ball Shooting Pose"
+                          style={{
+                            width: '100%',
+                            padding: '0.6rem 0.8rem',
+                            borderRadius: 'var(--radius)',
+                            border: '1px solid var(--border)',
+                            background: 'var(--bg)',
+                            fontSize: 'var(--fs-sm)',
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Sizing & Positioning Control Bar */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr 1fr',
+                        gap: 'var(--space-4)',
+                        padding: 'var(--space-3)',
+                        background: 'var(--bg)',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border)',
+                      }}
+                    >
+                      {/* Height Control */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            📏 Height / Size
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {slide.maxHeight || 520}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="350"
+                          max="650"
+                          step="10"
+                          value={slide.maxHeight || 520}
+                          onChange={(e) => updateArrayItemField(idx, 'maxHeight', parseInt(e.target.value, 10))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      {/* Scale / Zoom Control */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            🔍 Zoom / Scale
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {Math.round((slide.scale || 1) * 100)}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.8"
+                          max="1.5"
+                          step="0.05"
+                          value={slide.scale || 1}
+                          onChange={(e) => updateArrayItemField(idx, 'scale', parseFloat(e.target.value))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      {/* Vertical Shift (Up/Down) Control */}
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            ↕️ Shift Up / Down
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {slide.offsetY || 0}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-60"
+                          max="60"
+                          step="5"
+                          value={slide.offsetY || 0}
+                          onChange={(e) => updateArrayItemField(idx, 'offsetY', parseInt(e.target.value, 10))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions: delete */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => removeArrayItem(idx)}
+                      className="btn btn--outline"
+                      style={{ color: '#DC2626', borderColor: 'rgba(220, 38, 38, 0.3)', padding: '0.5rem 0.8rem', fontSize: 'var(--fs-xs)' }}
+                      title="Remove slide"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {formData.length === 0 && (
+                <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--muted)', background: 'var(--surface)', borderRadius: 'var(--radius)' }}>
+                  No action shots added yet. Click <strong>+ Add New Action Image</strong> above to add your first image!
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1055,10 +1697,94 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                 }}
               />
               {formData.image && (
-                <div style={{ maxWidth: '400px', height: '220px', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-                  <img src={formData.image} alt="About preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ maxWidth: '400px', height: '220px', borderRadius: 'var(--radius)', overflow: 'hidden', position: 'relative', marginBottom: 'var(--space-2)' }}>
+                  <img
+                    src={formData.image}
+                    alt="About preview"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transform: `scale(${formData.scale || 1}) translateY(${formData.offsetY || 0}px)`,
+                      transition: 'transform 0.15s ease',
+                    }}
+                  />
                 </div>
               )}
+
+              {/* Sizing & Positioning Control Bar for About Featured Image */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr',
+                  gap: 'var(--space-3)',
+                  padding: 'var(--space-3)',
+                  background: 'var(--bg)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border)',
+                  maxWidth: '500px',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                      📏 Height
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {formData.maxHeight || 440}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="280"
+                    max="550"
+                    step="10"
+                    value={formData.maxHeight || 440}
+                    onChange={(e) => updateField('maxHeight', parseInt(e.target.value, 10))}
+                    style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                      🔍 Zoom
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {Math.round((formData.scale || 1) * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.8"
+                    max="1.5"
+                    step="0.05"
+                    value={formData.scale || 1}
+                    onChange={(e) => updateField('scale', parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                      ↕️ Shift Y
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {formData.offsetY || 0}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="-50"
+                    max="50"
+                    step="2"
+                    value={formData.offsetY || 0}
+                    onChange={(e) => updateField('offsetY', parseInt(e.target.value, 10))}
+                    style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1185,15 +1911,30 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                         height: '140px',
                         borderRadius: '16px',
                         overflow: 'hidden',
-                        background: 'var(--surface)',
-                        border: '2px solid var(--accent)',
+                        background: 'radial-gradient(circle, rgba(134, 239, 172, 0.3) 0%, #FFFFFF 70%)',
+                        border: '1px dashed var(--border)',
                         marginBottom: 'var(--space-2)',
                         marginInline: 'auto',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'relative',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
                       }}
                     >
                       {coach.photo ? (
-                        <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img
+                          src={coach.photo}
+                          alt={coach.name}
+                          style={{
+                            maxHeight: '130px',
+                            maxWidth: '100%',
+                            objectFit: 'contain',
+                            transform: `scale(${coach.scale || 1}) translateY(${coach.offsetY || 0}px)`,
+                            filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.14))',
+                            transition: 'transform 0.15s ease',
+                          }}
+                        />
                       ) : (
                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
                           {coach.name?.charAt(0) || 'C'}
@@ -1354,6 +2095,79 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           background: 'var(--bg)',
                         }}
                       />
+                    </div>
+
+                    {/* Sizing & Positioning Control Bar for Coach Photo */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                        gap: 'var(--space-3)',
+                        padding: 'var(--space-3)',
+                        background: 'var(--bg)',
+                        borderRadius: 'var(--radius-sm)',
+                        border: '1px solid var(--border)',
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            📏 Height / Size
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {coach.maxHeight || 235}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="180"
+                          max="360"
+                          step="5"
+                          value={coach.maxHeight || 235}
+                          onChange={(e) => updateArrayItemField(index, 'maxHeight', parseInt(e.target.value, 10))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            🔍 Zoom / Scale
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {Math.round((coach.scale || 1) * 100)}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.7"
+                          max="1.5"
+                          step="0.05"
+                          value={coach.scale || 1}
+                          onChange={(e) => updateArrayItemField(index, 'scale', parseFloat(e.target.value))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
+
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                            ↕️ Shift Up / Down
+                          </span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {coach.offsetY || 0}px
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-50"
+                          max="50"
+                          step="2"
+                          value={coach.offsetY || 0}
+                          onChange={(e) => updateArrayItemField(index, 'offsetY', parseInt(e.target.value, 10))}
+                          style={{ width: '100%', accentColor: 'var(--accent)' }}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -1553,7 +2367,13 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           <img
                             src={currentImage}
                             alt={item.player || 'Athlete'}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              transform: `scale(${item.scale || 1}) translateY(${item.offsetY || 0}px)`,
+                              transition: 'transform 0.15s ease',
+                            }}
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                             }}
@@ -1701,6 +2521,81 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                             <option value="District Selection" />
                             <option value="National Trials" />
                           </datalist>
+                        </div>
+                      </div>
+
+                      {/* Spacious Sizing & Positioning Control Bar for Athlete Photo */}
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                          gap: 'var(--space-3)',
+                          padding: 'var(--space-3)',
+                          background: 'var(--bg)',
+                          borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--border)',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                              🔍 Photo Zoom
+                            </span>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                              {Math.round((item.scale || 1) * 100)}%
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.7"
+                            max="1.6"
+                            step="0.05"
+                            value={item.scale || 1}
+                            onChange={(e) => updateArrayItemField(index, 'scale', parseFloat(e.target.value))}
+                            style={{ width: '100%', accentColor: 'var(--accent)' }}
+                          />
+                        </div>
+
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                              ↕️ Shift Up / Down
+                            </span>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                              {item.offsetY || 0}px
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="-60"
+                            max="60"
+                            step="2"
+                            value={item.offsetY || 0}
+                            onChange={(e) => updateArrayItemField(index, 'offsetY', parseInt(e.target.value, 10))}
+                            style={{ width: '100%', accentColor: 'var(--accent)' }}
+                          />
+                        </div>
+
+                        <div>
+                          <span style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)', marginBottom: '2px' }}>
+                            🔲 Photo Fit Mode
+                          </span>
+                          <select
+                            value={item.objectFit || 'cover'}
+                            onChange={(e) => updateArrayItemField(index, 'objectFit', e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '0.35rem 0.5rem',
+                              fontSize: '0.75rem',
+                              borderRadius: 'var(--radius-sm)',
+                              border: '1px solid var(--border)',
+                              background: 'var(--surface)',
+                              color: 'var(--text)',
+                            }}
+                          >
+                            <option value="cover">Cover (Fill Frame)</option>
+                            <option value="contain">Contain (Full Athlete - No Crop)</option>
+                          </select>
                         </div>
                       </div>
 
@@ -2026,8 +2921,11 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                               left: 0,
                               width: '100%',
                               height: '100%',
-                              objectFit: 'cover',
+                              objectFit: item.objectFit || 'cover',
                               objectPosition: 'top center',
+                              transform: `scale(${item.scale || 1}) translateY(${item.offsetY || 0}px)`,
+                              transformOrigin: 'top center',
+                              transition: 'transform 0.15s ease',
                             }}
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
@@ -2184,6 +3082,81 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                         </div>
                       </div>
 
+                      {/* Spacious Sizing & Positioning Control Bar for Squad Photo */}
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                          gap: 'var(--space-3)',
+                          padding: 'var(--space-3)',
+                          background: 'var(--bg)',
+                          borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--border)',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                              🔍 Photo Zoom
+                            </span>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                              {Math.round((item.scale || 1) * 100)}%
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0.7"
+                            max="1.6"
+                            step="0.05"
+                            value={item.scale || 1}
+                            onChange={(e) => updateArrayItemField(index, 'scale', parseFloat(e.target.value))}
+                            style={{ width: '100%', accentColor: 'var(--accent)' }}
+                          />
+                        </div>
+
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                              ↕️ Shift Up / Down
+                            </span>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                              {item.offsetY || 0}px
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="-60"
+                            max="60"
+                            step="2"
+                            value={item.offsetY || 0}
+                            onChange={(e) => updateArrayItemField(index, 'offsetY', parseInt(e.target.value, 10))}
+                            style={{ width: '100%', accentColor: 'var(--accent)' }}
+                          />
+                        </div>
+
+                        <div>
+                          <span style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)', marginBottom: '2px' }}>
+                            🔲 Card Fit Mode
+                          </span>
+                          <select
+                            value={item.objectFit || 'cover'}
+                            onChange={(e) => updateArrayItemField(index, 'objectFit', e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '0.35rem 0.5rem',
+                              fontSize: '0.75rem',
+                              borderRadius: 'var(--radius-sm)',
+                              border: '1px solid var(--border)',
+                              background: 'var(--surface)',
+                              color: 'var(--text)',
+                            }}
+                          >
+                            <option value="cover">Cover (Fill Card)</option>
+                            <option value="contain">Contain (Full Cutout)</option>
+                          </select>
+                        </div>
+                      </div>
+
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
                         <div>
                           <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
@@ -2322,10 +3295,94 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                 }}
               />
               {formData.image && (
-                <div style={{ maxWidth: '400px', height: '200px', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
-                  <img src={formData.image} alt="School program preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ maxWidth: '400px', height: '200px', borderRadius: 'var(--radius)', overflow: 'hidden', position: 'relative', marginBottom: 'var(--space-2)' }}>
+                  <img
+                    src={formData.image}
+                    alt="School program preview"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transform: `scale(${formData.scale || 1}) translateY(${formData.offsetY || 0}px)`,
+                      transition: 'transform 0.15s ease',
+                    }}
+                  />
                 </div>
               )}
+
+              {/* Sizing & Positioning Control Bar for School Program Image */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr 1fr',
+                  gap: 'var(--space-3)',
+                  padding: 'var(--space-3)',
+                  background: 'var(--bg)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border)',
+                  maxWidth: '500px',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                      📏 Height
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {formData.maxHeight || 440}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="280"
+                    max="550"
+                    step="10"
+                    value={formData.maxHeight || 440}
+                    onChange={(e) => updateField('maxHeight', parseInt(e.target.value, 10))}
+                    style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                      🔍 Zoom
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {Math.round((formData.scale || 1) * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.8"
+                    max="1.5"
+                    step="0.05"
+                    value={formData.scale || 1}
+                    onChange={(e) => updateField('scale', parseFloat(e.target.value))}
+                    style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-dark)' }}>
+                      ↕️ Shift Y
+                    </span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {formData.offsetY || 0}px
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="-50"
+                    max="50"
+                    step="2"
+                    value={formData.offsetY || 0}
+                    onChange={(e) => updateField('offsetY', parseInt(e.target.value, 10))}
+                    style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}

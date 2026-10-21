@@ -176,8 +176,11 @@ function SquadPositionRow({ title, members }) {
                     left: 0,
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
+                    objectFit: member.objectFit || 'cover',
                     objectPosition: 'top center',
+                    transform: `scale(${member.scale || 1}) translateY(${member.offsetY || 0}px)`,
+                    transformOrigin: 'top center',
+                    transition: 'transform 0.25s ease',
                   }}
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';

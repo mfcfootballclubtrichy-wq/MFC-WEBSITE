@@ -68,6 +68,23 @@ const defaultContentState = {
   },
   coaches: INITIAL_COACHES,
   squad: INITIAL_SQUAD,
+  hero_slides: [
+    {
+      id: 'slide-1',
+      image: '/coaches/sample-coach.png',
+      title: 'Action Shot 1 (Ball Shooting)',
+    },
+    {
+      id: 'slide-2',
+      image: '/about-mfc-freestyle.png',
+      title: 'Action Shot 2 (Freestyle / Dribble)',
+    },
+    {
+      id: 'slide-3',
+      image: '/coaches/sample-coach.png',
+      title: 'Action Shot 3 (Match Action)',
+    },
+  ],
   team_achievements: INITIAL_TEAM_ACH,
   individual_achievements: INITIAL_IND_ACH,
   school_program: {

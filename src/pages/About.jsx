@@ -60,11 +60,22 @@ export default function About() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.15}>
-              <div className="about-image-wrapper">
+              <div
+                className="about-image-wrapper"
+                style={{
+                  maxHeight: `${aboutData.maxHeight || 480}px`,
+                  overflow: 'hidden',
+                  borderRadius: 'var(--radius-lg)',
+                }}
+              >
                 <img
                   src={aboutImage}
                   alt="Mutharasanallur Football Club training ground"
                   loading="lazy"
+                  style={{
+                    transform: `scale(${aboutData.scale || 1}) translateY(${aboutData.offsetY || 0}px)`,
+                    transition: 'transform 0.3s ease',
+                  }}
                 />
               </div>
             </ScrollReveal>

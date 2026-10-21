@@ -61,12 +61,7 @@ export default function Header() {
   const toggleMenu = () => setMenuOpen((o) => !o);
   const closeMenu  = () => setMenuOpen(false);
 
-  const switchLang = (lang) => {
-    i18n.changeLanguage(lang);
-    document.documentElement.lang = lang;
-  };
 
-  const currentLang = i18n.language?.startsWith('ta') ? 'ta' : 'en';
 
   return (
     <header
@@ -111,31 +106,9 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* ── Right side: lang toggle + Admin/Login button + mobile hamburger ── */}
+          {/* ── Right side: Admin/Login button + mobile hamburger ── */}
           <div className="flex" style={{ gap: 'var(--space-3)', alignItems: 'center' }}>
-            {/* Language toggle */}
-            <div
-              className="lang-toggle"
-              role="group"
-              aria-label="Language selector"
-            >
-              <button
-                className={`lang-toggle__option${currentLang === 'en' ? ' active' : ''}`}
-                onClick={() => switchLang('en')}
-                aria-pressed={currentLang === 'en'}
-                aria-label="Switch to English"
-              >
-                EN
-              </button>
-              <button
-                className={`lang-toggle__option${currentLang === 'ta' ? ' active' : ''}`}
-                onClick={() => switchLang('ta')}
-                aria-pressed={currentLang === 'ta'}
-                aria-label="தமிழுக்கு மாற்று"
-              >
-                த
-              </button>
-            </div>
+            {/* Admin / Login Button */}
 
             {/* Admin / Login Button */}
             {user ? (
@@ -205,27 +178,7 @@ export default function Header() {
               ))}
             </motion.ul>
 
-            <div
-              className="lang-toggle"
-              role="group"
-              aria-label="Language selector"
-              style={{ marginTop: 'var(--space-6)', alignSelf: 'flex-start' }}
-            >
-              <button
-                className={`lang-toggle__option${currentLang === 'en' ? ' active' : ''}`}
-                onClick={() => switchLang('en')}
-                aria-pressed={currentLang === 'en'}
-              >
-                English
-              </button>
-              <button
-                className={`lang-toggle__option${currentLang === 'ta' ? ' active' : ''}`}
-                onClick={() => switchLang('ta')}
-                aria-pressed={currentLang === 'ta'}
-              >
-                தமிழ்
-              </button>
-            </div>
+
 
             <div style={{ marginTop: 'var(--space-6)', width: '100%' }}>
               {user ? (

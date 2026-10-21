@@ -96,8 +96,9 @@ export default function IndividualAchievements() {
                           style={{
                             width: '100%',
                             height: '100%',
-                            objectFit: 'cover',
+                            objectFit: ach.objectFit || 'cover',
                             objectPosition: 'center top',
+                            transform: `scale(${ach.scale || 1}) translateY(${ach.offsetY || 0}px)`,
                             transition: 'transform 0.3s ease',
                           }}
                         />

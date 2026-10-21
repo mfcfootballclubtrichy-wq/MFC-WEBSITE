@@ -67,7 +67,7 @@ export default function SchoolProgram() {
               <div
                 style={{
                   width: '100%',
-                  height: 440,
+                  height: schoolData.maxHeight || 440,
                   borderRadius: 'var(--radius)',
                   overflow: 'hidden',
                   border: '1px solid var(--border)',
@@ -77,7 +77,13 @@ export default function SchoolProgram() {
                   src={schoolImage}
                   alt="MFC School Football Training Program"
                   loading="lazy"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transform: `scale(${schoolData.scale || 1}) translateY(${schoolData.offsetY || 0}px)`,
+                    transition: 'transform 0.3s ease',
+                  }}
                 />
               </div>
             </ScrollReveal>

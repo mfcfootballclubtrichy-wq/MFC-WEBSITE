@@ -4,6 +4,7 @@
  * Implements Dhanapal, Rajesh, and Pragadeesh with AIFF license badges.
  */
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
 import { COACHES as STATIC_COACHES } from '../data/content.js';
@@ -45,51 +46,99 @@ export default function Coaches() {
           <div className="grid--3 coaches-grid">
             {coachesList.map((coach, i) => (
               <ScrollReveal key={coach.id || i} delay={i * 0.1}>
-                <article className="card coach-card" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  {/* Avatar badge or custom photo */}
-                  <div style={{ marginBottom: 'var(--space-5)', display: 'flex', alignItems: 'center' }}>
+                <article
+                  className="card coach-card"
+                  style={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    padding: 'var(--space-6)',
+                  }}
+                >
+                  {/* Transparent Cutout Portrait with Animated Sliding Entrance on Scroll */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 55, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: i * 0.15,
+                    }}
+                    style={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '240px',
+                      marginBottom: 'var(--space-4)',
+                    }}
+                  >
+                    {/* Subtle radial glow behind the transparent cutout */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '0px',
+                        width: '200px',
+                        height: '200px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(134, 239, 172, 0.25) 0%, transparent 70%)',
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                      }}
+                    />
+
                     {coach.photo ? (
-                      <div
+                      <img
+                        src={coach.photo}
+                        alt={coach.name}
                         style={{
-                          width: '120px',
-                          height: '120px',
-                          borderRadius: '16px',
-                          overflow: 'hidden',
-                          border: '2px solid var(--accent)',
-                          boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
-                          flexShrink: 0,
+                          position: 'relative',
+                          zIndex: 1,
+                          maxHeight: `${coach.maxHeight || 235}px`,
+                          width: 'auto',
+                          maxWidth: '100%',
+                          objectFit: 'contain',
+                          transform: `scale(${coach.scale || 1}) translateY(${coach.offsetY || 0}px)`,
+                          filter: 'drop-shadow(0 14px 22px rgba(0, 0, 0, 0.14))',
+                          transition: 'transform 0.2s ease',
                         }}
-                      >
-                        <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      </div>
+                      />
                     ) : (
                       <div
                         style={{
+                          position: 'relative',
+                          zIndex: 1,
                           width: '120px',
                           height: '120px',
-                          borderRadius: '16px',
+                          borderRadius: '50%',
                           background: 'var(--accent-glow)',
                           color: 'var(--accent-dark)',
-                          border: '2px solid var(--accent)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '3rem',
                           fontWeight: 700,
-                          boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
-                          flexShrink: 0,
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
                         }}
                         aria-hidden="true"
                       >
                         {coach.name?.charAt(0) || 'C'}
                       </div>
                     )}
-                  </div>
+                  </motion.div>
 
-                  <span className="card__tag">{coach.role}</span>
-                  <h3 className="card__title">{coach.name}</h3>
+                  <span className="card__tag" style={{ alignSelf: 'center', marginBottom: 'var(--space-2)' }}>
+                    {coach.role}
+                  </span>
+                  <h3 className="card__title" style={{ fontSize: '1.5rem', marginBottom: 'var(--space-2)' }}>
+                    {coach.name}
+                  </h3>
 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', justifyContent: 'center', marginBottom: 'var(--space-4)' }}>
                     {(Array.isArray(coach.licence) ? coach.licence : [coach.licence]).filter(Boolean).map((lic) => (
                       <span key={lic} className="badge--confirm">
                         {lic}

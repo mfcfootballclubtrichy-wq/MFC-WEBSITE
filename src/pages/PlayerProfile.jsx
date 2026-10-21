@@ -121,8 +121,10 @@ export default function PlayerProfile() {
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
+                      objectFit: playerItem.objectFit || 'cover',
                       objectPosition: 'center top',
+                      transform: `scale(${playerItem.scale || 1}) translateY(${playerItem.offsetY || 0}px)`,
+                      transition: 'transform 0.25s ease',
                     }}
                   />
                 </div>

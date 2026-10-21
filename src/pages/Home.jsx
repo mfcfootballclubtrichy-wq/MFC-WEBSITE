@@ -20,6 +20,7 @@ import ScrollReveal   from '../components/ScrollReveal.jsx';
 import StatCounter    from '../components/StatCounter.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
 import ConfirmBadge   from '../components/ConfirmBadge.jsx';
+import HeroPlayerSlider from '../components/HeroPlayerSlider.jsx';
 
 import {
   CLUB as STATIC_CLUB,
@@ -62,55 +63,60 @@ export default function Home() {
         <div className="hero__blob" aria-hidden="true" />
 
         <div className="container">
-          <div className="hero__content">
-            {/* Kicker */}
-            <motion.p
-              className="hero__eyebrow"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <span>{homeData.kicker || STATIC_HOME_CONTENT.kicker}</span>
-              <span style={{ color: 'var(--border)' }}>•</span>
-              <span>{STATIC_CLUB.tagline}</span>
-            </motion.p>
+          <div className="hero__grid">
+            <div className="hero__content">
+              {/* Kicker */}
+              <motion.p
+                className="hero__eyebrow"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <span>{homeData.kicker || STATIC_HOME_CONTENT.kicker}</span>
+                <span style={{ color: 'var(--border)' }}>•</span>
+                <span>{STATIC_CLUB.tagline}</span>
+              </motion.p>
 
-            {/* Headline with animated underline */}
-            <div className="hero__headline-wrapper">
-              <motion.h1
+              {/* Headline with animated underline */}
+              <div className="hero__headline-wrapper">
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {homeData.headline || STATIC_HOME_CONTENT.headline}
+                </motion.h1>
+                <div className="hero__headline-underline" aria-hidden="true" />
+              </div>
+
+              {/* Subheadline */}
+              <motion.p
+                className="hero__sub"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.6, delay: 0.2 }}
               >
-                {homeData.headline || STATIC_HOME_CONTENT.headline}
-              </motion.h1>
-              <div className="hero__headline-underline" aria-hidden="true" />
+                {homeData.subheadline || STATIC_HOME_CONTENT.subheadline}
+              </motion.p>
+
+              {/* CTAs */}
+              <motion.div
+                className="hero__cta"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.35 }}
+              >
+                <Link to="/team-achievements" className="btn btn-primary" id="hero-cta-achievements">
+                  {homeData.ctaPrimary || STATIC_HOME_CONTENT.ctaPrimary}
+                </Link>
+                <Link to="/coaches" className="btn btn--outline" id="hero-cta-coaches">
+                  {homeData.ctaSecondary || STATIC_HOME_CONTENT.ctaSecondary}
+                </Link>
+              </motion.div>
             </div>
 
-            {/* Subheadline */}
-            <motion.p
-              className="hero__sub"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              {homeData.subheadline || STATIC_HOME_CONTENT.subheadline}
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              className="hero__cta"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.35 }}
-            >
-              <Link to="/team-achievements" className="btn btn-primary" id="hero-cta-achievements">
-                {homeData.ctaPrimary || STATIC_HOME_CONTENT.ctaPrimary}
-              </Link>
-              <Link to="/coaches" className="btn btn--outline" id="hero-cta-coaches">
-                {homeData.ctaSecondary || STATIC_HOME_CONTENT.ctaSecondary}
-              </Link>
-            </motion.div>
+            {/* Right Side: Animated Cutout Action Showcase */}
+            <HeroPlayerSlider slides={content?.hero_slides} />
           </div>
         </div>
       </section>
@@ -184,12 +190,18 @@ export default function Home() {
                         }}
                       >
                         {item.image && (
-                          <div style={{ height: '200px', width: '100%', overflow: 'hidden', position: 'relative' }}>
+                          <div style={{ height: `${item.maxHeight || 200}px`, width: '100%', overflow: 'hidden', position: 'relative' }}>
                             <img
                               src={item.image}
                               alt={item.title}
                               loading="lazy"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: item.objectFit || 'cover',
+                                transform: `scale(${item.scale || 1}) translateY(${item.offsetY || 0}px)`,
+                                transition: 'transform 0.3s ease',
+                              }}
                             />
                             <div
                               style={{
@@ -434,11 +446,22 @@ export default function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.15}>
-              <div className="about-image-wrapper">
+              <div
+                className="about-image-wrapper"
+                style={{
+                  maxHeight: `${content?.about?.maxHeight || 480}px`,
+                  overflow: 'hidden',
+                  borderRadius: 'var(--radius-lg)',
+                }}
+              >
                 <img
-                  src={aboutFreestyleImg}
+                  src={homeData.aboutImage || content?.about?.image || aboutFreestyleImg}
                   alt="MFC Youth Football Training in Trichy"
                   loading="lazy"
+                  style={{
+                    transform: `scale(${homeData.aboutImageScale || content?.about?.scale || 1}) translateY(${homeData.aboutImageOffsetY || content?.about?.offsetY || 0}px)`,
+                    transition: 'transform 0.3s ease',
+                  }}
                 />
               </div>
             </ScrollReveal>
@@ -466,57 +489,109 @@ export default function Home() {
           <div className="grid--3">
             {coachesList.map((coach, i) => (
               <ScrollReveal key={coach.id || i} delay={i * 0.1}>
-                <article className="card" style={{ height: '100%' }}>
-                  <div className="card__body">
-                    <div style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center' }}>
-                      {coach.photo ? (
-                        <div
-                          style={{
-                            width: 110,
-                            height: 110,
-                            borderRadius: '16px',
-                            overflow: 'hidden',
-                            border: '2px solid var(--accent)',
-                            boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
-                            flexShrink: 0,
-                          }}
-                        >
-                          <img src={coach.photo} alt={coach.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            width: 110,
-                            height: 110,
-                            borderRadius: '16px',
-                            background: 'var(--accent-glow)',
-                            color: 'var(--accent-dark)',
-                            border: '2px solid var(--accent)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '2.5rem',
-                            fontWeight: 700,
-                            boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
-                            flexShrink: 0,
-                          }}
-                          aria-hidden="true"
-                        >
-                          {coach.name?.charAt(0) || 'C'}
-                        </div>
-                      )}
-                    </div>
-                    <span className="card__tag">{coach.role}</span>
-                    <h3 className="card__title">{coach.name}</h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
-                      {(Array.isArray(coach.licence) ? coach.licence : [coach.licence]).filter(Boolean).map((lic) => (
-                        <span key={lic} className="badge--confirm">
-                          {lic}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="card__text">{coach.bio}</p>
+                <article
+                  className="card coach-card"
+                  style={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    padding: 'var(--space-6)',
+                  }}
+                >
+                  {/* Transparent Cutout Portrait with Animated Sliding Entrance on Scroll */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: i * 0.12,
+                    }}
+                    style={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '220px',
+                      marginBottom: 'var(--space-4)',
+                    }}
+                  >
+                    {/* Subtle radial glow behind the transparent cutout */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '0px',
+                        width: '180px',
+                        height: '180px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(134, 239, 172, 0.25) 0%, transparent 70%)',
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                      }}
+                    />
+
+                    {coach.photo ? (
+                      <img
+                        src={coach.photo}
+                        alt={coach.name}
+                        style={{
+                          position: 'relative',
+                          zIndex: 1,
+                          maxHeight: `${coach.maxHeight ? Math.min(coach.maxHeight, 260) : 215}px`,
+                          width: 'auto',
+                          maxWidth: '100%',
+                          objectFit: 'contain',
+                          transform: `scale(${coach.scale || 1}) translateY(${coach.offsetY || 0}px)`,
+                          filter: 'drop-shadow(0 14px 20px rgba(0, 0, 0, 0.14))',
+                          transition: 'transform 0.2s ease',
+                        }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          position: 'relative',
+                          zIndex: 1,
+                          width: '110px',
+                          height: '110px',
+                          borderRadius: '50%',
+                          background: 'var(--accent-glow)',
+                          color: 'var(--accent-dark)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '2.5rem',
+                          fontWeight: 700,
+                          boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                        }}
+                        aria-hidden="true"
+                      >
+                        {coach.name?.charAt(0) || 'C'}
+                      </div>
+                    )}
+                  </motion.div>
+
+                  <span className="card__tag" style={{ alignSelf: 'center', marginBottom: 'var(--space-2)' }}>
+                    {coach.role}
+                  </span>
+                  <h3 className="card__title" style={{ fontSize: '1.4rem', marginBottom: 'var(--space-2)' }}>
+                    {coach.name}
+                  </h3>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', justifyContent: 'center', marginBottom: 'var(--space-4)' }}>
+                    {(Array.isArray(coach.licence) ? coach.licence : [coach.licence]).filter(Boolean).map((lic) => (
+                      <span key={lic} className="badge--confirm">
+                        {lic}
+                      </span>
+                    ))}
                   </div>
+
+                  <p className="card__text" style={{ marginTop: 'auto', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+                    {coach.bio}
+                  </p>
                 </article>
               </ScrollReveal>
             ))}
@@ -620,7 +695,13 @@ export default function Home() {
                         src={item.image || item.photo}
                         alt={item.player}
                         loading="lazy"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          transform: `scale(${item.scale || 1}) translateY(${item.offsetY || 0}px)`,
+                          transition: 'transform 0.3s ease',
+                        }}
                       />
                     </div>
                   )}
