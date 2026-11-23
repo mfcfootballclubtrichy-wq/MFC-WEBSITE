@@ -490,6 +490,7 @@ export const NAV_ITEMS = [
   { id: 'about',                   path: '/about',                  labelKey: 'nav.about' },
   { id: 'vision',                  path: '/vision',                 labelKey: 'nav.vision' },
   { id: 'coaches',                 path: '/coaches',                labelKey: 'nav.coaches' },
+  { id: 'school-program',          path: '/school-program',         labelKey: 'nav.schoolProgram' },
   { id: 'team-achievements',       path: '/team-achievements',      labelKey: 'nav.teamAchievements' },
   { id: 'individual-achievements', path: '/individual-achievements',labelKey: 'nav.individualAchievements' },
   { id: 'contact',                 path: '/contact',                labelKey: 'nav.contact' },
