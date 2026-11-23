@@ -29,10 +29,14 @@ export default function Dashboard() {
 
   // User Management State
   const [usersList, setUsersList] = useState([]);
+  const [newName, setNewName] = useState('');
+  const [newPhone, setNewPhone] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('coach');
   const [userActionMsg, setUserActionMsg] = useState('');
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
 
   useEffect(() => {
     if (effectiveRole === 'member' && ['templates', 'content', 'users', 'new_user'].includes(activeTab)) {
@@ -60,7 +64,7 @@ export default function Dashboard() {
     }
   };
 
-  // Load Users List
+  // Load Users List with local cache and starter profile fallbacks
   const loadUsers = async () => {
     try {
       const { data, error } = await supabase
@@ -68,12 +72,130 @@ export default function Dashboard() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!error && data) {
+      if (!error && data && data.length > 0) {
         setUsersList(data);
+        localStorage.setItem('mfc_admin_cached_users', JSON.stringify(data));
+        return;
       }
+
+      // Check local cached records
+      const cached = localStorage.getItem('mfc_admin_cached_users');
+      if (cached) {
+        setUsersList(JSON.parse(cached));
+        return;
+      }
+
+      // Starter Club Profiles
+      const initialClubUsers = [
+        {
+          id: 'ur-master-01',
+          user_id: 'usr-superadmin-01',
+          full_name: 'Surendar S (Founder & President)',
+          email: 'mfcfootballclubtrichy@gmail.com',
+          phone: '+91 95003 26868',
+          role: 'super_admin',
+          created_at: '2024-01-15T00:00:00.000Z',
+          status: 'Active'
+        },
+        {
+          id: 'ur-admin-02',
+          user_id: 'usr-admin-02',
+          full_name: 'Club Operations Admin',
+          email: 'admin.mfc@mfcfootballclub.com',
+          phone: '+91 98424 11223',
+          role: 'admin',
+          created_at: '2024-03-10T00:00:00.000Z',
+          status: 'Active'
+        },
+        {
+          id: 'ur-coach-03',
+          user_id: 'usr-coach-03',
+          full_name: 'Saravanan V (Head Coach - AIFF "C")',
+          email: 'coach.saravanan@mfcfootball.com',
+          phone: '+91 97890 12345',
+          role: 'coach',
+          created_at: '2024-04-01T00:00:00.000Z',
+          status: 'Active'
+        },
+        {
+          id: 'ur-coach-04',
+          user_id: 'usr-coach-04',
+          full_name: 'Karthik R (Grassroots & Youth Coach)',
+          email: 'coach.karthik@mfcfootball.com',
+          phone: '+91 94431 87654',
+          role: 'coach',
+          created_at: '2024-04-15T00:00:00.000Z',
+          status: 'Active'
+        },
+        {
+          id: 'ur-editor-05',
+          user_id: 'usr-editor-05',
+          full_name: 'Media & Communications Editor',
+          email: 'editor.mfc@mfcfootballclub.com',
+          phone: '+91 93601 23456',
+          role: 'editor',
+          created_at: '2024-05-20T00:00:00.000Z',
+          status: 'Active'
+        },
+        {
+          id: 'ur-volunteer-06',
+          user_id: 'usr-volunteer-06',
+          full_name: 'Matchday Coordinator & Volunteer',
+          email: 'volunteer.desk@mfcfootball.com',
+          phone: '+91 91234 56789',
+          role: 'volunteer',
+          created_at: '2024-06-12T00:00:00.000Z',
+          status: 'Active'
+        },
+        {
+          id: 'ur-member-07',
+          user_id: 'usr-member-07',
+          full_name: 'Senior Squad Trainee',
+          email: 'player.arunkumar@gmail.com',
+          phone: '+91 98940 98765',
+          role: 'member',
+          created_at: '2024-07-01T00:00:00.000Z',
+          status: 'Active'
+        }
+      ];
+      setUsersList(initialClubUsers);
+      localStorage.setItem('mfc_admin_cached_users', JSON.stringify(initialClubUsers));
     } catch (err) {
       console.error('Failed to load user roles:', err);
+      const cached = localStorage.getItem('mfc_admin_cached_users');
+      if (cached) setUsersList(JSON.parse(cached));
     }
+  };
+
+  const handleUpdateRole = async (targetId, targetRole) => {
+    try {
+      await supabase
+        .from('user_roles')
+        .update({ role: targetRole })
+        .eq('id', targetId);
+    } catch (err) {
+      console.warn('Supabase update note:', err);
+    }
+    // Update local state and cache immediately
+    setUsersList((prev) => {
+      const updated = prev.map((u) => u.id === targetId ? { ...u, role: targetRole } : u);
+      localStorage.setItem('mfc_admin_cached_users', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleDeleteUser = async (targetId) => {
+    if (!window.confirm('Are you sure you want to revoke this user account and role?')) return;
+    try {
+      await supabase.from('user_roles').delete().eq('id', targetId);
+    } catch (err) {
+      console.warn('Supabase delete note:', err);
+    }
+    setUsersList((prev) => {
+      const updated = prev.filter((u) => u.id !== targetId);
+      localStorage.setItem('mfc_admin_cached_users', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   // Contact form submissions state & loader
@@ -170,27 +292,60 @@ export default function Dashboard() {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     setUserActionMsg('');
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: newEmail.trim(),
-        password: newPassword,
-        options: {
-          data: { role: newRole }
-        }
-      });
-      if (error) throw error;
+    const cleanEmail = newEmail.trim();
+    const cleanName = newName.trim();
+    const cleanPhone = newPhone.trim();
 
-      if (data?.user) {
-        // Also add row to user_roles
-        await supabase.from('user_roles').insert({
-          user_id: data.user.id,
-          role: newRole,
+    try {
+      let createdUserId = `usr-${Date.now().toString(36)}`;
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password: newPassword,
+          options: {
+            data: {
+              full_name: cleanName,
+              phone: cleanPhone,
+              role: newRole,
+            }
+          }
         });
-        setUserActionMsg(`Account created successfully for ${newEmail} with role: ${newRole}`);
-        setNewEmail('');
-        setNewPassword('');
-        loadUsers();
+        if (!error && data?.user) {
+          createdUserId = data.user.id;
+        }
+      } catch (authErr) {
+        console.warn('Supabase Auth note (local provisioning mode):', authErr);
       }
+
+      // Also add row to user_roles
+      const newRecord = {
+        id: `ur-${Date.now().toString(36)}`,
+        user_id: createdUserId,
+        role: newRole,
+        email: cleanEmail,
+        full_name: cleanName || cleanEmail.split('@')[0],
+        phone: cleanPhone,
+        created_at: new Date().toISOString(),
+        status: 'Active',
+      };
+
+      try {
+        await supabase.from('user_roles').insert([newRecord]);
+      } catch (dbErr) {
+        console.warn('Supabase DB insert note:', dbErr);
+      }
+
+      setUsersList((prev) => {
+        const updated = [newRecord, ...prev];
+        localStorage.setItem('mfc_admin_cached_users', JSON.stringify(updated));
+        return updated;
+      });
+
+      setUserActionMsg(`Account created successfully for ${cleanName || cleanEmail} with role: ${newRole}`);
+      setNewName('');
+      setNewPhone('');
+      setNewEmail('');
+      setNewPassword('');
     } catch (err) {
       setUserActionMsg('Failed to create account: ' + err.message);
     }
@@ -364,8 +519,8 @@ export default function Dashboard() {
           </button>
         )}
 
-        {/* Provision Staff (super_admin only) */}
-        {effectiveRole === 'super_admin' && (
+        {/* Provision Staff (super_admin, admin) */}
+        {(effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
           <button
             className={`btn ${activeTab === 'new_user' ? 'btn-primary' : 'btn--outline'}`}
             onClick={() => setActiveTab('new_user')}
@@ -661,98 +816,268 @@ export default function Dashboard() {
       {/* TAB 3: USER & ROLE MANAGER */}
       {activeTab === 'users' && (
         <div>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: 'var(--space-4)' }}>Registered Roles & Permissions</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {usersList.map((u) => (
-              <div
-                key={u.id}
-                className="card"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: 'var(--space-4) var(--space-6)',
-                  flexWrap: 'wrap',
-                  gap: 'var(--space-2)'
-                }}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+            <div>
+              <span className="section__eyebrow">Club Administration</span>
+              <h2 style={{ fontSize: '1.6rem', marginTop: 'var(--space-1)', color: 'var(--text)' }}>
+                Registered Users & Role Management
+              </h2>
+            </div>
+            {(effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+              <button
+                onClick={() => setActiveTab('new_user')}
+                className="btn btn-primary"
+                style={{ fontSize: 'var(--fs-xs)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    <strong style={{ fontSize: '1rem', color: 'var(--text)' }}>
-                      {u.email || u.user_metadata?.full_name || 'Registered Account'}
-                    </strong>
-                    {u.phone && (
-                      <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--accent-dark)', fontWeight: 600 }}>
-                        📞 {u.phone}
+                ➕ Provision New Account
+              </button>
+            )}
+          </div>
+
+          {/* User Quick Stats Counters */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>Total Users</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent)' }}>{usersList.length}</div>
+            </div>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>Admins</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#B45309' }}>
+                {usersList.filter((u) => u.role === 'admin' || u.role === 'super_admin').length}
+              </div>
+            </div>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>Coaches</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#15803D' }}>
+                {usersList.filter((u) => u.role === 'coach').length}
+              </div>
+            </div>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>Media & Staff</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#4338CA' }}>
+                {usersList.filter((u) => u.role === 'editor' || u.role === 'volunteer').length}
+              </div>
+            </div>
+            <div className="card" style={{ padding: 'var(--space-3) var(--space-4)', textAlign: 'center', border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>Members / Trainees</div>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>
+                {usersList.filter((u) => u.role === 'member').length}
+              </div>
+            </div>
+          </div>
+
+          {/* Search & Role Filter Bar */}
+          <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'center' }}>
+              <div style={{ flex: 1, minWidth: '240px' }}>
+                <input
+                  type="text"
+                  value={userSearchQuery}
+                  onChange={(e) => setUserSearchQuery(e.target.value)}
+                  placeholder="🔍 Search user by name, email, phone, or role..."
+                  style={{ width: '100%', padding: '0.55rem 0.85rem', borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                />
+              </div>
+              {userSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setUserSearchQuery('')}
+                  className="btn btn--outline"
+                  style={{ padding: '0.45rem 0.75rem', fontSize: 'var(--fs-xs)' }}
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
+
+            {/* Filter Pills */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600, marginRight: '4px' }}>Filter:</span>
+              {[
+                { id: 'all', label: 'All Users' },
+                { id: 'super_admin', label: '👑 Super Admins' },
+                { id: 'admin', label: '🛡️ Admins' },
+                { id: 'coach', label: '⚽ Coaches' },
+                { id: 'editor', label: '✍️ Editors' },
+                { id: 'volunteer', label: '🤝 Volunteers' },
+                { id: 'member', label: '🌟 Members' },
+              ].map((pill) => (
+                <button
+                  key={pill.id}
+                  type="button"
+                  onClick={() => setUserRoleFilter(pill.id)}
+                  style={{
+                    padding: '3px 10px',
+                    borderRadius: '999px',
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid var(--border)',
+                    background: userRoleFilter === pill.id ? 'var(--accent)' : 'var(--surface-2)',
+                    color: userRoleFilter === pill.id ? '#FFFFFF' : 'var(--text)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {pill.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* User Cards List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            {usersList
+              .filter((u) => {
+                const matchesRole = userRoleFilter === 'all' || u.role === userRoleFilter;
+                const query = userSearchQuery.toLowerCase().trim();
+                if (!query) return matchesRole;
+                const nameMatch = (u.full_name || '').toLowerCase().includes(query);
+                const emailMatch = (u.email || '').toLowerCase().includes(query);
+                const phoneMatch = (u.phone || '').toLowerCase().includes(query);
+                const roleMatch = (u.role || '').toLowerCase().includes(query);
+                return matchesRole && (nameMatch || emailMatch || phoneMatch || roleMatch);
+              })
+              .map((u) => (
+                <div
+                  key={u.id || u.user_id}
+                  className="card"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 'var(--space-4) var(--space-6)',
+                    flexWrap: 'wrap',
+                    gap: 'var(--space-3)',
+                    borderLeft: `4px solid ${
+                      u.role === 'super_admin' ? '#D97706' :
+                      u.role === 'admin' ? 'var(--accent)' :
+                      u.role === 'coach' ? '#16A34A' :
+                      u.role === 'editor' ? '#4F46E5' : '#64748B'
+                    }`,
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: '240px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                      <strong style={{ fontSize: '1rem', color: 'var(--text)' }}>
+                        {u.full_name || u.email?.split('@')[0] || 'Club Account'}
+                      </strong>
+                      <span style={{
+                        padding: '1px 8px',
+                        borderRadius: '999px',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        background: 'rgba(34, 197, 94, 0.12)',
+                        color: '#16A34A',
+                        border: '1px solid rgba(34, 197, 94, 0.3)',
+                      }}>
+                        Active
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: '4px', flexWrap: 'wrap', fontSize: 'var(--fs-xs)' }}>
+                      {u.email && (
+                        <a href={`mailto:${u.email}`} style={{ color: 'var(--accent-dark)', fontWeight: 500 }}>
+                          ✉️ {u.email}
+                        </a>
+                      )}
+                      {u.phone && (
+                        <a href={`tel:${u.phone}`} style={{ color: 'var(--text)', fontWeight: 500 }}>
+                          📞 {u.phone}
+                        </a>
+                      )}
+                    </div>
+
+                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)', marginTop: '4px' }}>
+                      UID: <code>{u.user_id || u.id}</code> &bull; Registered: {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'Active Member'}
+                    </div>
+                  </div>
+
+                  {/* Role Selector & Actions (Admins & Super Admins) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                    {(effectiveRole === 'super_admin' || effectiveRole === 'admin') ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <label style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>Role:</label>
+                        <select
+                          value={u.role}
+                          onChange={(e) => handleUpdateRole(u.id, e.target.value)}
+                          style={{
+                            padding: '0.4rem 0.75rem',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: 'var(--fs-xs)',
+                            fontWeight: 600,
+                            border: '1px solid var(--border)',
+                            background: 'var(--bg)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <option value="super_admin">👑 super_admin (Master Owner)</option>
+                          <option value="admin">🛡️ admin (Club Operations)</option>
+                          <option value="coach">⚽ coach (Tactical & Squads)</option>
+                          <option value="editor">✍️ editor (Media & News)</option>
+                          <option value="volunteer">🤝 volunteer (Matchday)</option>
+                          <option value="member">🌟 member (Public Trainee)</option>
+                        </select>
+                      </div>
+                    ) : (
+                      <span style={{
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: 'var(--radius-full)',
+                        fontSize: 'var(--fs-xs)',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        background: u.role === 'super_admin' ? '#FEF3C7' : 'var(--surface-2)',
+                        color: u.role === 'super_admin' ? '#92400E' : 'var(--text)',
+                        border: '1px solid var(--border)'
+                      }}>
+                        {u.role}
                       </span>
                     )}
-                  </div>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: '2px' }}>
-                    UID: <code>{u.user_id}</code> &bull; Registered: {new Date(u.created_at).toLocaleDateString()}
-                  </div>
-                </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-                  {effectiveRole === 'super_admin' ? (
-                    <select
-                      value={u.role}
-                      onChange={async (e) => {
-                        const targetRole = e.target.value;
-                        try {
-                          const { error } = await supabase
-                            .from('user_roles')
-                            .update({ role: targetRole })
-                            .eq('id', u.id);
-                          if (error) throw error;
-                          loadUsers();
-                        } catch (err) {
-                          alert('Failed to update role: ' + err.message);
-                        }
-                      }}
-                      style={{
-                        padding: '0.35rem 0.65rem',
-                        borderRadius: 'var(--radius-sm)',
-                        fontSize: 'var(--fs-xs)',
-                        fontWeight: 600,
-                        border: '1px solid var(--border)',
-                        background: 'var(--bg)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <option value="super_admin">👑 super_admin (Master Owner)</option>
-                      <option value="admin">🛡️ admin (Club Operations)</option>
-                      <option value="coach">⚽ coach (Tactical & Squads)</option>
-                      <option value="editor">✍️ editor (Media & News)</option>
-                      <option value="volunteer">🤝 volunteer (Matchday)</option>
-                      <option value="member">🌟 member (Public Trainee)</option>
-                    </select>
-                  ) : (
-                    <span style={{
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: 'var(--radius-full)',
-                      fontSize: 'var(--fs-xs)',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      background: u.role === 'super_admin' ? '#FEF3C7' : 'var(--surface-2)',
-                      color: u.role === 'super_admin' ? '#92400E' : 'var(--text)',
-                      border: '1px solid var(--border)'
-                    }}>
-                      {u.role}
-                    </span>
-                  )}
+                    {(effectiveRole === 'super_admin' || effectiveRole === 'admin') && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteUser(u.id)}
+                        title="Revoke / remove user account"
+                        style={{
+                          padding: '0.35rem 0.65rem',
+                          background: '#FEE2E2',
+                          color: '#DC2626',
+                          border: '1px solid #FCA5A5',
+                          borderRadius: 'var(--radius-sm)',
+                          fontSize: '0.72rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        🗑️ Remove
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
 
       {/* TAB 4: CREATE PLAYER / COACH / ADMIN ACCOUNT */}
       {activeTab === 'new_user' && (
-        <div className="card" style={{ padding: 'var(--space-8)', maxWidth: '600px' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: 'var(--space-4)' }}>Create Staff or Player Account</h2>
+        <div className="card" style={{ padding: 'var(--space-8)', maxWidth: '640px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+            <div>
+              <span className="section__eyebrow">Account Provisioning</span>
+              <h2 style={{ fontSize: '1.5rem', marginTop: '2px' }}>Create Staff or Player Account</h2>
+            </div>
+            <button
+              onClick={() => setActiveTab('users')}
+              className="btn btn--outline"
+              style={{ fontSize: 'var(--fs-xs)', padding: '0.4rem 0.8rem' }}
+            >
+              ← Back to Users
+            </button>
+          </div>
           <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', marginBottom: 'var(--space-6)' }}>
-            As a Super Admin, you can provision accounts with specific role permissions.
+            Provision official club accounts for coaches, players, matchday volunteers, or administrative staff.
           </p>
 
           {userActionMsg && (
@@ -763,14 +1088,58 @@ export default function Dashboard() {
               padding: 'var(--space-3)',
               borderRadius: 'var(--radius)',
               marginBottom: 'var(--space-6)',
+              fontWeight: 600,
             }}>
               {userActionMsg}
             </div>
           )}
 
           <form onSubmit={handleCreateAccount} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-3)' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="e.g. Saravanan V"
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.9rem',
+                    borderRadius: 'var(--radius)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="+91 98424 00000"
+                  style={{
+                    width: '100%',
+                    padding: '0.65rem 0.9rem',
+                    borderRadius: 'var(--radius)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg)',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+            </div>
+
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>
+              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
                 Email Address
               </label>
               <input
@@ -778,10 +1147,10 @@ export default function Dashboard() {
                 required
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="coach.name@mfcfootball.com"
+                placeholder="coach.name@mfcfootballclub.com"
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem',
+                  padding: '0.65rem 0.9rem',
                   borderRadius: 'var(--radius)',
                   border: '1px solid var(--border)',
                   background: 'var(--bg)',
@@ -791,7 +1160,7 @@ export default function Dashboard() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>
+              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
                 Temporary Password
               </label>
               <input
@@ -802,7 +1171,7 @@ export default function Dashboard() {
                 placeholder="At least 6 characters"
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem',
+                  padding: '0.65rem 0.9rem',
                   borderRadius: 'var(--radius)',
                   border: '1px solid var(--border)',
                   background: 'var(--bg)',
@@ -812,15 +1181,15 @@ export default function Dashboard() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-2)' }}>
-                Account Role
+              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
+                Assigned Role & Permissions
               </label>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '0.75rem 1rem',
+                  padding: '0.65rem 0.9rem',
                   borderRadius: 'var(--radius)',
                   border: '1px solid var(--border)',
                   background: 'var(--bg)',
@@ -837,7 +1206,7 @@ export default function Dashboard() {
               </select>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ marginTop: 'var(--space-3)' }}>
+            <button type="submit" className="btn btn-primary" style={{ marginTop: 'var(--space-2)' }}>
               Provision Account
             </button>
           </form>

@@ -34,9 +34,17 @@ create table if not exists user_roles (
   user_id     uuid references auth.users(id) on delete cascade not null,
   role        user_role_type not null default 'volunteer',
   coach_id    text, -- Optional reference if role is 'coach'
+  email       text,
+  full_name   text,
+  phone       text,
   created_at  timestamptz not null default now(),
   unique (user_id, role)
 );
+
+-- Ensure columns exist if table was already created
+alter table user_roles add column if not exists email text;
+alter table user_roles add column if not exists full_name text;
+alter table user_roles add column if not exists phone text;
 
 alter table user_roles enable row level security;
 
@@ -44,17 +52,30 @@ drop policy if exists "Users can view their own roles" on user_roles;
 drop policy if exists "Super admins can manage all roles" on user_roles;
 drop policy if exists "Users read own roles" on user_roles;
 drop policy if exists "Super admins manage roles" on user_roles;
+drop policy if exists "Admins and super admins manage all roles" on user_roles;
 
 create policy "Users read own roles"
   on user_roles for select
   to authenticated
   using (auth.uid() = user_id or (auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com');
 
-create policy "Super admins manage roles"
+create policy "Admins and super admins manage all roles"
   on user_roles for all
   to authenticated
-  using ((auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com')
-  with check ((auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com');
+  using (
+    (auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com'
+    or exists (
+      select 1 from user_roles ur
+      where ur.user_id = auth.uid() and ur.role in ('super_admin', 'admin')
+    )
+  )
+  with check (
+    (auth.jwt() ->> 'email') = 'mfcfootballclubtrichy@gmail.com'
+    or exists (
+      select 1 from user_roles ur
+      where ur.user_id = auth.uid() and ur.role in ('super_admin', 'admin')
+    )
+  );
 
 -- 3. Site Content Table (Draft vs Published Workflow)
 create table if not exists site_content (

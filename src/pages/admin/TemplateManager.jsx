@@ -183,10 +183,20 @@ export default function TemplateManager({ sections, onRefresh, role }) {
         break;
       case 'school_program':
         setFormData({
-          description: DEFAULT_SCHOOL_PROGRAM.description,
-          image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
-          highlights: [...DEFAULT_SCHOOL_PROGRAM.highlights],
-          schoolBenefits: [...DEFAULT_SCHOOL_PROGRAM.schoolBenefits],
+          heroEyebrow: DEFAULT_SCHOOL_PROGRAM.heroEyebrow || 'Grassroots Partnership',
+          title: DEFAULT_SCHOOL_PROGRAM.title || 'MFC School Football Partnership Program',
+          subtitle: DEFAULT_SCHOOL_PROGRAM.subtitle || '',
+          description: DEFAULT_SCHOOL_PROGRAM.description || '',
+          highlightsTitle: DEFAULT_SCHOOL_PROGRAM.highlightsTitle || 'Comprehensive Coaching for Educational Institutions',
+          benefitsTitle: DEFAULT_SCHOOL_PROGRAM.benefitsTitle || 'Institutional Benefits & Advantages',
+          ctaTitle: DEFAULT_SCHOOL_PROGRAM.ctaTitle || 'Partner Your School with MFC',
+          ctaBody: DEFAULT_SCHOOL_PROGRAM.ctaBody || '',
+          image: DEFAULT_SCHOOL_PROGRAM.image || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
+          highlights: [...(DEFAULT_SCHOOL_PROGRAM.highlights || [])],
+          schoolBenefits: [...(DEFAULT_SCHOOL_PROGRAM.schoolBenefits || [])],
+          maxHeight: DEFAULT_SCHOOL_PROGRAM.maxHeight || 440,
+          scale: DEFAULT_SCHOOL_PROGRAM.scale || 1,
+          offsetY: DEFAULT_SCHOOL_PROGRAM.offsetY || 0,
         });
         break;
       case 'contact':
@@ -3637,32 +3647,97 @@ export default function TemplateManager({ sections, onRefresh, role }) {
             FORM VIEW 8: SCHOOL PROGRAM
         ═══════════════════════════════════════════════════════ */}
         {selectedTemplate === 'school_program' && formData && !Array.isArray(formData) && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>
-                Program Overview Description
-              </label>
-              <textarea
-                rows={3}
-                value={formData.description || ''}
-                onChange={(e) => updateField('description', e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.6rem 0.8rem',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                }}
-              />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+            {/* 1. Page Hero & Main Headings */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--accent-dark)' }}>
+                🏫 School Page Hero Headings & Text
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-3)' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                    Main Page Heading / Title
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title || ''}
+                    onChange={(e) => updateField('title', e.target.value)}
+                    placeholder="e.g. MFC School Football Partnership Program"
+                    style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                    Hero Eyebrow / Tagline
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.heroEyebrow || ''}
+                    onChange={(e) => updateField('heroEyebrow', e.target.value)}
+                    placeholder="e.g. Grassroots Partnership"
+                    style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginTop: 'var(--space-3)' }}>
+                <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                  Hero Subtitle / Description
+                </label>
+                <textarea
+                  rows={2}
+                  value={formData.subtitle || formData.description || ''}
+                  onChange={(e) => {
+                    updateField('subtitle', e.target.value);
+                    updateField('description', e.target.value);
+                  }}
+                  placeholder="Structured progressive coaching and sports development designed specifically for educational institutions."
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                />
+              </div>
             </div>
 
-            <div>
+            {/* 2. Section Titles */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--accent-dark)' }}>
+                📌 In-Page Section Headings
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-3)' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                    Section 1: Highlights Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.highlightsTitle || ''}
+                    onChange={(e) => updateField('highlightsTitle', e.target.value)}
+                    placeholder="e.g. Comprehensive Coaching for Educational Institutions"
+                    style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                    Section 2: Benefits Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.benefitsTitle || ''}
+                    onChange={(e) => updateField('benefitsTitle', e.target.value)}
+                    placeholder="e.g. Institutional Benefits & Advantages"
+                    style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Training Photo Upload & Adjustments */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: '6px' }}>
-                <label style={{ fontSize: 'var(--fs-sm)', fontWeight: 700, color: 'var(--text)' }}>
-                  School Program Training Image
-                </label>
+                <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent-dark)', margin: 0 }}>
+                  📸 School Program Training Image
+                </h3>
                 <span style={{ fontSize: '0.68rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)', color: 'var(--muted)', fontWeight: 600 }}>
-                  1200×800 or 800×600
+                  Recommended: 1200×800 or 800×600
                 </span>
               </div>
 
@@ -3783,7 +3858,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                 />
               </div>
 
-              {/* Sizing & Positioning Control Bar for School Program Image */}
+              {/* Sizing & Positioning Control Bar */}
               <div
                 style={{
                   display: 'grid',
@@ -3853,6 +3928,133 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     value={formData.offsetY || 0}
                     onChange={(e) => updateField('offsetY', parseInt(e.target.value, 10))}
                     style={{ width: '100%', accentColor: 'var(--accent)' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Training Highlights List */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+                <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent-dark)', margin: 0 }}>
+                  ⚡ Training Highlights
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = formData.highlights || [];
+                    updateField('highlights', [...current, 'New Training Highlight']);
+                  }}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+                >
+                  + Add Highlight
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {(formData.highlights || []).map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--muted)', width: '20px' }}>{idx + 1}.</span>
+                    <input
+                      type="text"
+                      value={item}
+                      onChange={(e) => {
+                        const updated = [...formData.highlights];
+                        updated[idx] = e.target.value;
+                        updateField('highlights', updated);
+                      }}
+                      style={{ flex: 1, padding: '0.45rem 0.65rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = formData.highlights.filter((_, i) => i !== idx);
+                        updateField('highlights', updated);
+                      }}
+                      style={{ padding: '0.35rem 0.6rem', color: '#DC2626', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 5. School Benefits List */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+                <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent-dark)', margin: 0 }}>
+                  🏆 Benefits for Partner Schools
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = formData.schoolBenefits || [];
+                    updateField('schoolBenefits', [...current, 'New School Benefit']);
+                  }}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+                >
+                  + Add Benefit
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {(formData.schoolBenefits || []).map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--muted)', width: '20px' }}>{idx + 1}.</span>
+                    <input
+                      type="text"
+                      value={item}
+                      onChange={(e) => {
+                        const updated = [...formData.schoolBenefits];
+                        updated[idx] = e.target.value;
+                        updateField('schoolBenefits', updated);
+                      }}
+                      style={{ flex: 1, padding: '0.45rem 0.65rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = formData.schoolBenefits.filter((_, i) => i !== idx);
+                        updateField('schoolBenefits', updated);
+                      }}
+                      style={{ padding: '0.35rem 0.6rem', color: '#DC2626', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 6. Call To Action Banner */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--accent-dark)' }}>
+                📣 Bottom Call To Action Banner
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-3)' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                    CTA Title
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.ctaTitle || ''}
+                    onChange={(e) => updateField('ctaTitle', e.target.value)}
+                    placeholder="e.g. Partner Your School with MFC"
+                    style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--fs-xs)', fontWeight: 600, marginBottom: '4px' }}>
+                    CTA Description Text
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.ctaBody || ''}
+                    onChange={(e) => updateField('ctaBody', e.target.value)}
+                    placeholder="Empower your students with professional football coaching..."
+                    style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-sm)' }}
                   />
                 </div>
               </div>

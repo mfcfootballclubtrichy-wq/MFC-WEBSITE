@@ -447,14 +447,19 @@ export const PARTNERSHIP_POINTS = [
 
 /** School program highlights */
 export const SCHOOL_PROGRAM = {
+  heroEyebrow: 'Grassroots Development',
+  title: 'MFC School Football Partnership Program',
+  subtitle: 'Structured progressive coaching and athletic development designed specifically for educational institutions.',
   description:
     'Technical, tactical, and physical development through progressive modules.',
+  highlightsTitle: 'Comprehensive Coaching for Educational Institutions',
   highlights: [
     'Training at school premises',
     'Periodic assessments and match exposure',
     'Inter-school and academy tournaments',
     'Pathways to Tamil Nadu and Karnataka state leagues',
   ],
+  benefitsTitle: 'Institutional Benefits & Advantages',
   schoolBenefits: [
     'Sports reputation',
     'Talent identification',
@@ -462,6 +467,12 @@ export const SCHOOL_PROGRAM = {
     'Discipline and teamwork',
     'Recognition through AIFF and academy events',
   ],
+  ctaTitle: 'Partner Your School with MFC',
+  ctaBody: 'Empower your students with professional football coaching, physical discipline, and competitive tournament exposure.',
+  image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
+  maxHeight: 440,
+  scale: 1,
+  offsetY: 0,
 };
 
 /** Stats shown on home page */

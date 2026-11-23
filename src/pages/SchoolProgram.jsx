@@ -29,9 +29,9 @@ export default function SchoolProgram() {
       {/* Page hero */}
       <section className="page-hero">
         <div className="container">
-          <span className="section__eyebrow">{t('nav.schoolProgram')}</span>
-          <h1 className="page-hero__title">{t('schoolProgram.title')}</h1>
-          <p className="page-hero__sub">{schoolData.description || t('schoolProgram.description')}</p>
+          <span className="section__eyebrow">{schoolData.heroEyebrow || t('nav.schoolProgram')}</span>
+          <h1 className="page-hero__title">{schoolData.title || t('schoolProgram.title')}</h1>
+          <p className="page-hero__sub">{schoolData.subtitle || schoolData.description || t('schoolProgram.description')}</p>
         </div>
       </section>
 
@@ -42,7 +42,7 @@ export default function SchoolProgram() {
             <ScrollReveal>
               <div>
                 <h2 id="school-desc-heading" className="section__title" style={{ textAlign: 'left' }}>
-                  {t('schoolProgram.highlightsTitle')}
+                  {schoolData.highlightsTitle || t('schoolProgram.highlightsTitle')}
                 </h2>
                 <div className="divider--accent" />
                 <p style={{ color: 'var(--muted)', marginTop: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
@@ -100,9 +100,9 @@ export default function SchoolProgram() {
         <div className="container">
           <ScrollReveal>
             <div className="section__header">
-              <span className="section__eyebrow">{t('schoolProgram.benefitsTitle')}</span>
+              <span className="section__eyebrow">Institutional Partnership</span>
               <h2 id="school-benefits-heading" className="section__title">
-                {t('schoolProgram.benefitsTitle')}
+                {schoolData.benefitsTitle || t('schoolProgram.benefitsTitle')}
               </h2>
             </div>
           </ScrollReveal>
@@ -157,7 +157,7 @@ export default function SchoolProgram() {
                 color: 'var(--text)',
               }}
             >
-              {t('schoolProgram.ctaTitle')}
+              {schoolData.ctaTitle || t('schoolProgram.ctaTitle')}
             </h2>
             <p
               style={{
@@ -167,7 +167,7 @@ export default function SchoolProgram() {
                 maxWidth: '55ch',
               }}
             >
-              {t('schoolProgram.ctaBody')}
+              {schoolData.ctaBody || t('schoolProgram.ctaBody')}
             </p>
             <Link
               to="/contact"
