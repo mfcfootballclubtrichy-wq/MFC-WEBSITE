@@ -1562,13 +1562,16 @@ p {
   background: var(--text) !important;
 }
 
+.header .container {
+  max-width: 1440px;
+}
+
 .header__inner {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-8);
-  overflow: hidden;
+  gap: clamp(8px, 1.5vw, 24px);
 }
 
 .header__logo {
@@ -1635,14 +1638,15 @@ p {
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: clamp(2px, 0.4vw, 6px);
+  flex-shrink: 1;
 }
 
 .nav__link {
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--fs-xs);
+  padding: 6px clamp(6px, 0.7vw, 12px);
+  font-size: clamp(0.72rem, 0.78vw, 0.8rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--text);
   border-radius: var(--radius-sm);
@@ -1795,16 +1799,16 @@ p {
 }
 
 /* Portable Navigation Breakpoints for All Devices (Mobile, iPad, Mac, Desktop) */
-@media (max-width: 1120px) {
+@media (max-width: 1220px) {
   .menu-btn { display: flex; }
   .nav { display: none; }
 }
 
-@media (min-width: 1121px) and (max-width: 1280px) {
-  .header__inner { gap: var(--space-3); }
+@media (min-width: 1221px) and (max-width: 1380px) {
+  .header__inner { gap: var(--space-2); }
   .nav { gap: 2px; }
   .nav__link {
-    padding: var(--space-2) var(--space-2);
+    padding: 5px 8px;
     font-size: 0.72rem;
     letter-spacing: 0.02em;
   }
@@ -1924,7 +1928,7 @@ p {
 .hero__content {
   position: relative;
   z-index: 1;
-  max-width: 620px;
+  max-width: 680px;
   width: 100%;
   min-width: 0;
 }
@@ -2138,9 +2142,11 @@ p {
   color: #FFFFFF;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  line-height: 1.05;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  line-height: 1.02;
+  font-size: clamp(2rem, 3.8vw, 3.85rem);
+  word-break: keep-all;
+  overflow-wrap: normal;
+  hyphens: none;
   max-width: 100%;
 }
 
@@ -2548,11 +2554,12 @@ p {
 
   .hero h1,
   .hero__content h1 {
-    font-size: clamp(1.75rem, 8vw, 2.35rem) !important;
+    font-size: clamp(1.4rem, 6.2vw, 2.1rem) !important;
     line-height: 1.04 !important;
     letter-spacing: 0 !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    hyphens: none !important;
   }
 
   .hero__sub {
@@ -2673,11 +2680,12 @@ p {
 
   .hero h1,
   .hero__content h1 {
-    font-size: clamp(1.45rem, 7.2vw, 1.75rem) !important;
+    font-size: clamp(1.22rem, 5.6vw, 1.55rem) !important;
     line-height: 1.06 !important;
     letter-spacing: -0.01em !important;
-    overflow-wrap: break-word !important;
-    word-break: break-word !important;
+    overflow-wrap: normal !important;
+    word-break: keep-all !important;
+    hyphens: none !important;
     white-space: normal !important;
     max-width: 100% !important;
   }
