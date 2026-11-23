@@ -53,6 +53,133 @@ export function isValidPhone(phone) {
   return clean.length >= 10 && clean.length <= 13;
 }
 
+// Strict URL protocol validation to prevent javascript: / data: URI injections
+export function sanitizeUrl(url) {
+  if (!url || typeof url !== 'string') return '#';
+  const trimmed = url.trim();
+  // Safe relative paths
+  if (trimmed.startsWith('/') || trimmed.startsWith('#') || trimmed.startsWith('./')) {
+    return trimmed;
+  }
+  // Safe protocols
+  const safeProtocols = ['https:', 'http:', 'mailto:', 'tel:'];
+  try {
+    const parsed = new URL(trimmed, window.location.origin);
+    if (safeProtocols.includes(parsed.protocol)) {
+      return trimmed;
+    }
+  } catch {
+    return '#';
+  }
+  return '#';
+}
+
+// -------------------------------------------------------------
+// Global Web Application & Media Protection System
+// -------------------------------------------------------------
+let isProtectionInitialized = false;
+
+export function initWebSecurity() {
+  if (typeof window === 'undefined' || isProtectionInitialized) return;
+  isProtectionInitialized = true;
+
+  let toastTimer = null;
+
+  const showSecurityNotice = (message) => {
+    let toast = document.getElementById('mfc-security-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'mfc-security-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+
+    toast.textContent = message;
+    toast.className = 'mfc-security-toast active';
+
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      if (toast) {
+        toast.className = 'mfc-security-toast';
+      }
+    }, 2400);
+  };
+
+  // 1. Right-Click Prevention on Images and Media
+  const onContextMenu = (e) => {
+    // Permit right-click in text fields, textareas, and editable areas
+    if (['INPUT', 'TEXTAREA'].includes(e.target.tagName) || e.target.isContentEditable) {
+      return;
+    }
+
+    const isImageOrMedia =
+      e.target.tagName === 'IMG' ||
+      e.target.tagName === 'PICTURE' ||
+      e.target.tagName === 'VIDEO' ||
+      e.target.tagName === 'CANVAS' ||
+      e.target.tagName === 'FIGURE' ||
+      e.target.closest('img') ||
+      e.target.closest('.card') ||
+      e.target.closest('.coach-card') ||
+      e.target.closest('.hero-action-showcase') ||
+      e.target.closest('.squad-card') ||
+      e.target.closest('.gallery-card') ||
+      e.target.closest('[data-protected-img]') ||
+      e.target.classList.contains('coach-card') ||
+      e.target.classList.contains('hero-action-showcase');
+
+    if (isImageOrMedia) {
+      e.preventDefault();
+      showSecurityNotice('MFC image and media assets are protected against unauthorized saving.');
+      return false;
+    }
+  };
+
+  // 2. Drag & Drop Prevention on Images and Media
+  const onDragStart = (e) => {
+    if (
+      e.target.tagName === 'IMG' ||
+      e.target.tagName === 'PICTURE' ||
+      e.target.tagName === 'VIDEO' ||
+      e.target.tagName === 'CANVAS' ||
+      e.target.closest('img')
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  };
+
+  // 3. Save & Print Shortcut Prevention
+  const onKeyDown = (e) => {
+    const isSave = (e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S');
+    const isPrint = (e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P');
+    const isViewSource = (e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U');
+
+    if (isSave) {
+      e.preventDefault();
+      showSecurityNotice('Saving this webpage or media is disabled for security.');
+      return false;
+    }
+
+    if (isPrint) {
+      e.preventDefault();
+      showSecurityNotice('Printing and media export is disabled.');
+      return false;
+    }
+
+    if (isViewSource) {
+      e.preventDefault();
+      return false;
+    }
+  };
+
+  // Attach global protection listeners
+  window.addEventListener('contextmenu', onContextMenu, { passive: false });
+  window.addEventListener('dragstart', onDragStart, { passive: false });
+  window.addEventListener('keydown', onKeyDown, { passive: false });
+}
+
 // -------------------------------------------------------------
 // AES-GCM 256-bit Encryption & Decryption (In-Transit & Storage)
 // -------------------------------------------------------------

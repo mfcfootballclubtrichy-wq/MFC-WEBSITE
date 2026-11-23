@@ -6,3 +6,14 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.botpress.cloud https://files.bpcontent.cloud; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://cdn.botpress.cloud https://files.bpcontent.cloud https://i.ytimg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.botpress.cloud https://files.bpcontent.cloud https://*.bpcontent.cloud https://*.botpress.cloud wss://*.botpress.cloud https://*.onrender.com; media-src 'self' data: blob: https://*.supabase.co; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://cdn.botpress.cloud; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"

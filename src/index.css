@@ -2692,3 +2692,92 @@ p {
   }
 }
 
+/* ============================================================
+   Media & Image Protection System
+   Prevents saving, dragging, long-press extraction, and printing
+   ============================================================ */
+
+/* Disable dragging, touch callouts, and selection on all images and media */
+img,
+picture,
+video,
+canvas,
+svg,
+.hero-action-showcase__img,
+.coach-card img,
+.card img,
+.squad-card img,
+[data-protected-img] {
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+  -webkit-touch-callout: none !important; /* Disables mobile touch-and-hold "Save Image" popup */
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -ms-user-select: none !important;
+  -moz-user-select: none !important;
+  pointer-events: auto;
+}
+
+/* Print protection: hide all images when printing or saving as PDF */
+@media print {
+  img,
+  picture,
+  video,
+  canvas,
+  svg,
+  .hero-action-showcase,
+  .coaches-grid,
+  .coaches-layout,
+  .gallery-grid {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  body::after {
+    content: "MFC Football Club Trichy — Official Website (Protected Content)";
+    display: block;
+    padding: 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #D2042D;
+    text-align: center;
+  }
+}
+
+/* Security Toast Notification Badge */
+.mfc-security-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(24px) scale(0.96);
+  background: #141416;
+  color: #FFFFFF;
+  border: 1px solid rgba(210, 4, 45, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(210, 4, 45, 0.25);
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mfc-security-toast::before {
+  content: '🛡️';
+  font-size: 1.05rem;
+}
+
+.mfc-security-toast.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
