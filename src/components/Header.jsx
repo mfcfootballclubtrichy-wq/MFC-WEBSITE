@@ -109,7 +109,7 @@ export default function Header() {
           {/* ── Right side: Register / Sign In / Portal buttons + mobile hamburger ── */}
           <div className="flex" style={{ gap: 'var(--space-2)', alignItems: 'center' }}>
             {user ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <div className="header__auth-btns" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <Link
                   to="/portal"
                   className="btn btn-primary"
@@ -151,7 +151,7 @@ export default function Header() {
                 </button>
               </div>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <div className="header__auth-btns" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                 <button
                   type="button"
                   onClick={() => window.dispatchEvent(new CustomEvent('open-register-modal'))}

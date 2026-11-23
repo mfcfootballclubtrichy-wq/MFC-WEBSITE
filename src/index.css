@@ -1568,6 +1568,7 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-8);
+  overflow: hidden;
 }
 
 .header__logo {
@@ -1813,6 +1814,16 @@ p {
   .header__logo-sub { display: none; }
   .header__logo-name { font-size: 0.95rem; }
   .header__logo-img { width: 38px; height: 38px; }
+}
+
+/* ── Hide header auth buttons on very small phones ≤480px (they appear in the mobile drawer) ── */
+@media (max-width: 480px) {
+  .header__auth-btns {
+    display: none !important;
+  }
+  .header__inner {
+    overflow: hidden;
+  }
 }
 
 /* Coaches Grid: Balanced layout for all devices */
@@ -2665,12 +2676,27 @@ p {
     font-size: clamp(1.45rem, 7.2vw, 1.75rem) !important;
     line-height: 1.06 !important;
     letter-spacing: -0.01em !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    max-width: 100% !important;
   }
 
   .hero__eyebrow {
     font-size: 0.65rem !important;
     letter-spacing: 0.02em !important;
     gap: 3px 6px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Truncate the tagline span in eyebrow if it overflows */
+  .hero__eyebrow > span:last-child {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
   }
 
   .hero__eyebrow::before {
@@ -2686,6 +2712,20 @@ p {
 
   .header .header__logo-name {
     font-size: 0.82rem !important;
+  }
+
+  /* Ensure hero container doesn't overflow */
+  .hero .container {
+    overflow: hidden !important;
+    max-width: 100% !important;
+  }
+
+  .hero__grid {
+    overflow: hidden !important;
+  }
+
+  .hero__content {
+    overflow: hidden !important;
   }
 }
 
