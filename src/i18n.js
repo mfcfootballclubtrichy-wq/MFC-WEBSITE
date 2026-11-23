@@ -10,15 +10,17 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import en from './locales/en.json';
 import ta from './locales/ta.json';
 
-const SUPPORTED_LANGUAGES = ['en'];
+const SUPPORTED_LANGUAGES = ['en', 'ta'];
 const DEFAULT_LANGUAGE = 'en';
 
 i18n
+  .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     lng: DEFAULT_LANGUAGE,
     resources: {
       en: { translation: en },
+      ta: { translation: ta },
     },
     fallbackLng: DEFAULT_LANGUAGE,
     supportedLngs: SUPPORTED_LANGUAGES,

@@ -3,7 +3,6 @@
  * Displays player bio, achievements, milestones, position, gallery, and honors.
  */
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useContent } from '../context/ContentContext.jsx';
 import { INDIVIDUAL_ACHIEVEMENTS as STATIC_IND_ACH } from '../data/content.js';
 import ScrollReveal from '../components/ScrollReveal.jsx';
@@ -12,7 +11,6 @@ import SectionDivider from '../components/SectionDivider.jsx';
 export default function PlayerProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { content } = useContent();
 
   const achievementsList = content?.individual_achievements || STATIC_IND_ACH;

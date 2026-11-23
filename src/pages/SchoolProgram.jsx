@@ -108,7 +108,7 @@ export default function SchoolProgram() {
           </ScrollReveal>
 
           <div className="grid--3" style={{ maxWidth: 1000, margin: '0 auto' }}>
-            {SCHOOL_PROGRAM.schoolBenefits.map((benefit, i) => (
+            {(schoolData.schoolBenefits || STATIC_SCHOOL_PROGRAM.schoolBenefits).map((benefit, i) => (
               <ScrollReveal key={benefit} delay={i * 0.07}>
                 <div
                   style={{

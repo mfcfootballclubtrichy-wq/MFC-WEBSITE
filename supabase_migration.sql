@@ -105,6 +105,11 @@ create or replace view public_site_content as
 
 -- 6. Row Level Security Policies on site_content
 
+-- Anyone (including public/anonymous visitors) can read published site content
+create policy "Public can read published site content"
+  on site_content for select
+  using (status = 'published');
+
 -- Authenticated editors, coaches, and admins can view draft content
 create policy "Staff can read site content drafts"
   on site_content for select

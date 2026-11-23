@@ -111,6 +111,8 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -122,6 +124,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 /* Links default to accessible high-contrast cherry red */
@@ -1894,6 +1898,7 @@ p {
   align-items: center;
   gap: var(--space-8);
   width: 100%;
+  min-width: 0;
   position: relative;
   z-index: 1;
 }
@@ -1909,6 +1914,8 @@ p {
   position: relative;
   z-index: 1;
   max-width: 620px;
+  width: 100%;
+  min-width: 0;
 }
 
 /* ── Hero Action Showcase (Large Cutout Image Only) ── */
@@ -2093,15 +2100,18 @@ p {
 }
 
 .hero__eyebrow {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-3);
   font-size: var(--text-kicker);
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.85);
   margin-bottom: var(--space-4);
+  max-width: 100%;
+  word-break: break-word;
 }
 
 .hero__eyebrow::before {
@@ -2110,6 +2120,7 @@ p {
   height: 2px;
   background: #FFFFFF;
   border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .hero h1, .hero__content h1 {
@@ -2117,12 +2128,16 @@ p {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1.05;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 /* Headline with white underline that draws in beneath the title */
 .hero__headline-wrapper {
   position: relative;
-  display: inline-block;
+  display: block;
+  max-width: 100%;
   margin-bottom: var(--space-4);
 }
 
@@ -2499,12 +2514,42 @@ p {
 
 @media (max-width: 640px) {
   :root {
-    --text-hero: clamp(2rem, 7.5vw, 2.75rem);
-    --text-h2: clamp(1.5rem, 5.2vw, 2rem);
+    --text-hero: clamp(1.75rem, 7.8vw, 2.35rem);
+    --text-h2: clamp(1.4rem, 5.2vw, 1.9rem);
   }
 
   .container {
     padding-inline: 16px !important;
+    max-width: 100% !important;
+  }
+
+  .hero__content {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .hero__eyebrow {
+    font-size: 0.72rem !important;
+    letter-spacing: 0.04em !important;
+    gap: 4px 8px !important;
+  }
+
+  .hero h1,
+  .hero__content h1 {
+    font-size: clamp(1.75rem, 8vw, 2.35rem) !important;
+    line-height: 1.04 !important;
+    letter-spacing: 0 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .hero__sub {
+    font-size: 0.95rem !important;
+    line-height: 1.55 !important;
+    max-width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
   }
 
   .page-hero {
@@ -2606,6 +2651,41 @@ p {
     padding: 10px 12px !important;
     font-size: 0.72rem !important;
     white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 400px) {
+  /* Targeted tuning for iPhone SE (375px) and compact mobile devices */
+  :root {
+    --text-hero: clamp(1.45rem, 7.2vw, 1.75rem);
+  }
+
+  .hero h1,
+  .hero__content h1 {
+    font-size: clamp(1.45rem, 7.2vw, 1.75rem) !important;
+    line-height: 1.06 !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .hero__eyebrow {
+    font-size: 0.65rem !important;
+    letter-spacing: 0.02em !important;
+    gap: 3px 6px !important;
+  }
+
+  .hero__eyebrow::before {
+    width: 18px !important;
+  }
+
+  /* Compact header buttons on 375px screens */
+  .header .btn {
+    padding: 0.3rem 0.52rem !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+  }
+
+  .header .header__logo-name {
+    font-size: 0.82rem !important;
   }
 }
 

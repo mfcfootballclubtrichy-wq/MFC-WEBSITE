@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types, react/no-unescaped-entities */
+/* eslint-disable react/no-unescaped-entities */
 /**
  * TemplateManager.jsx — Visual Form-Based Template Editor for All MFC Pages.
  *
@@ -12,7 +12,17 @@
  */
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase.js';
-import { DEFAULT_SQUAD } from '../../data/content.js';
+import {
+  DEFAULT_SQUAD,
+  COACHES as DEFAULT_COACHES,
+  TEAM_ACHIEVEMENTS as DEFAULT_TEAM_ACHIEVEMENTS,
+  INDIVIDUAL_ACHIEVEMENTS as DEFAULT_INDIVIDUAL_ACHIEVEMENTS,
+  HOME_CONTENT as DEFAULT_HOME_CONTENT,
+  ABOUT_TEXT as DEFAULT_ABOUT_TEXT,
+  VISION_TEXT as DEFAULT_VISION_TEXT,
+  SCHOOL_PROGRAM as DEFAULT_SCHOOL_PROGRAM,
+  CLUB as DEFAULT_CLUB,
+} from '../../data/content.js';
 
 export default function TemplateManager({ sections, onRefresh, role }) {
   const [selectedTemplate, setSelectedTemplate] = useState('updates');
@@ -39,15 +49,40 @@ export default function TemplateManager({ sections, onRefresh, role }) {
 
   // Load current section data when selectedTemplate changes or sections reload
   useEffect(() => {
+    // 1. Check loaded Supabase sections (draft_data first, then published_data)
     const found = sections.find((s) => s.section === selectedTemplate);
     if (found && found.draft_data && Object.keys(found.draft_data).length > 0) {
       setFormData(JSON.parse(JSON.stringify(found.draft_data)));
-    } else if (found && found.published_data && Object.keys(found.published_data).length > 0) {
-      setFormData(JSON.parse(JSON.stringify(found.published_data)));
-    } else {
-      // Default empty template schemas
-      initDefaultTemplate(selectedTemplate);
+      setMessage({ text: '', type: '' });
+      return;
     }
+    if (found && found.published_data && Object.keys(found.published_data).length > 0) {
+      setFormData(JSON.parse(JSON.stringify(found.published_data)));
+      setMessage({ text: '', type: '' });
+      return;
+    }
+
+    // 2. Check local content cache if Supabase is offline or not yet seeded
+    try {
+      const cached = localStorage.getItem('mfc_site_content_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed[selectedTemplate] && (
+          Array.isArray(parsed[selectedTemplate])
+            ? parsed[selectedTemplate].length > 0
+            : Object.keys(parsed[selectedTemplate]).length > 0
+        )) {
+          setFormData(JSON.parse(JSON.stringify(parsed[selectedTemplate])));
+          setMessage({ text: '', type: '' });
+          return;
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // 3. Fallback to comprehensive default content schema
+    initDefaultTemplate(selectedTemplate);
     setMessage({ text: '', type: '' });
   }, [selectedTemplate, sections]);
 
@@ -62,117 +97,105 @@ export default function TemplateManager({ sections, onRefresh, role }) {
             tag: 'Academy',
             image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80',
             description: 'Registration is now open for our annual grassroots coaching camp for Super Seniors, Seniors, Juniors, and Kids batches at Tamilan Nagar Ground.',
+          },
+          {
+            id: 'update-2',
+            title: 'MFC U15 Squad Claims Runner-Up in Chinthamani Tournament',
+            date: '2025-03-28',
+            tag: 'Tournament',
+            image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
+            description: 'Outstanding technical performance and determination exhibited by our young academy players throughout the tournament stages.',
+          },
+          {
+            id: 'update-3',
+            title: 'New AIFF Licensed Training Modules Implemented',
+            date: '2025-03-15',
+            tag: 'Academy',
+            image: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&w=800&q=80',
+            description: 'Head Coach Dhanapal and Technical Staff have refreshed progressive age-appropriate drills prioritizing ball control and speed.',
           }
         ]);
         break;
       case 'home':
         setFormData({
-          kicker: 'Mutharasanallur, Trichy',
-          headline: 'Mutharasanallur Football Club',
-          subheadline: 'Founded 2020. Creating young football talent from our village and across Trichy.',
-          ctaPrimary: 'Explore Achievements',
-          ctaSecondary: 'Meet the Coaches',
+          kicker: DEFAULT_HOME_CONTENT.kicker,
+          headline: DEFAULT_HOME_CONTENT.headline,
+          subheadline: DEFAULT_HOME_CONTENT.subheadline,
+          ctaPrimary: DEFAULT_HOME_CONTENT.ctaPrimary,
+          ctaSecondary: DEFAULT_HOME_CONTENT.ctaSecondary,
           heroImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80',
-          aboutImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80',
+          aboutImage: '/about-mfc-freestyle.png',
         });
         break;
       case 'hero_slides':
         setFormData([
           {
             id: 'slide-1',
-            image: '/coaches/sample-coach.png',
+            image: '/coaches/mfc-player-action.png',
             title: 'Action Shot 1 (Ball Shooting)',
+            maxHeight: 530,
+            scale: 1.05,
+            offsetY: 0,
           },
           {
             id: 'slide-2',
-            image: '/about-mfc-freestyle.png',
-            title: 'Action Shot 2 (Freestyle / Dribble)',
+            image: '/coaches/sample-coach.png',
+            title: 'Action Shot 2 (Tactical Pose)',
+            maxHeight: 500,
+            scale: 1,
+            offsetY: 0,
           },
           {
             id: 'slide-3',
-            image: '/coaches/sample-coach.png',
-            title: 'Action Shot 3 (Match Action)',
+            image: '/about-mfc-freestyle.png',
+            title: 'Action Shot 3 (Freestyle / Dribble)',
+            maxHeight: 500,
+            scale: 1,
+            offsetY: 0,
           },
         ]);
         break;
       case 'about':
         setFormData({
           title: 'About MFC',
-          body: 'Mutharasanallur Football Club, known as MFC, was founded in 2020 to create young football talent from our village side and across Trichy. We give players a platform to develop their skills while building teamwork, discipline, and sportsmanship.',
-          image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80',
+          body: DEFAULT_ABOUT_TEXT,
+          image: '/about-mfc-freestyle.png',
         });
         break;
       case 'vision':
         setFormData({
-          title: 'Our Vision',
-          body: 'To create young football talent from our village and Trichy, with a platform to thrive and strong values of teamwork, discipline, and sportsmanship.',
-          communityText: 'Our vision extends beyond the field. We measure MFC\'s success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities.',
+          title: DEFAULT_VISION_TEXT.title,
+          body: DEFAULT_VISION_TEXT.body,
+          communityText: "Our vision extends beyond the field. We measure MFC's success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities.",
         });
         break;
       case 'coaches':
-        setFormData([
-          {
-            id: 'dhanapal',
-            name: 'Dhanapal',
-            role: 'Head Coach',
-            licence: ['AIFF C Licence', 'AIFF D Licence'],
-            photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-            bio: 'Guiding player development and structured technical football training across youth squads.',
-          }
-        ]);
+        setFormData(JSON.parse(JSON.stringify(DEFAULT_COACHES)));
         break;
       case 'team_achievements':
-        setFormData([
-          {
-            id: 'ta-1',
-            season: '2021–2023',
-            place: 'Runner-up',
-            tournament: 'Chinthamani U15 5s Football Tournament',
-            location: 'Trichy',
-          }
-        ]);
+        setFormData(JSON.parse(JSON.stringify(DEFAULT_TEAM_ACHIEVEMENTS)));
         break;
       case 'individual_achievements':
-        setFormData([
-          {
-            id: 'ind-1',
-            player: 'Pragadeesh D',
-            category: 'State Representation',
-            highlight: 'Represented Tamil Nadu state team at the Santosh Trophy (2023)',
-            hasConsent: true,
-            image: '',
-          }
-        ]);
+        setFormData(JSON.parse(JSON.stringify(DEFAULT_INDIVIDUAL_ACHIEVEMENTS)));
         break;
       case 'squad':
-        setFormData(DEFAULT_SQUAD);
+        setFormData(JSON.parse(JSON.stringify(DEFAULT_SQUAD)));
         break;
       case 'school_program':
         setFormData({
-          description: 'Technical, tactical, and physical development through progressive modules.',
+          description: DEFAULT_SCHOOL_PROGRAM.description,
           image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
-          highlights: [
-            'Training at school premises',
-            'Periodic assessments and match exposure',
-            'Inter-school and academy tournaments',
-            'Pathways to Tamil Nadu and Karnataka state leagues',
-          ],
-          schoolBenefits: [
-            'Sports reputation',
-            'Talent identification',
-            'Student health',
-            'Discipline and teamwork',
-            'Recognition through AIFF and academy events',
-          ],
+          highlights: [...DEFAULT_SCHOOL_PROGRAM.highlights],
+          schoolBenefits: [...DEFAULT_SCHOOL_PROGRAM.schoolBenefits],
         });
         break;
       case 'contact':
         setFormData({
-          address: 'Tamilan Nagar, Mutharasanallur, Trichy-1',
-          phone: '8072694818',
-          email: 'mfcfootballacademy@gmail.com',
-          instagram: 'https://www.instagram.com/mfc_trichy',
-          instagramHandle: '@mfc_trichy',
+          address: DEFAULT_CLUB.address,
+          phone: DEFAULT_CLUB.phone,
+          email: DEFAULT_CLUB.email,
+          instagram: DEFAULT_CLUB.instagram,
+          instagramHandle: DEFAULT_CLUB.instagramHandle,
         });
         break;
       default:

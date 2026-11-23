@@ -12,11 +12,11 @@ export const CLUB = {
   address: 'Tamilan Nagar, Mutharasanallur, Trichy-1',
   phone: '8072694818',
   email: 'mfcfootballclubtrichy@gmail.com',
-  instagram: 'https://www.instagram.com/mfc_trichy',
+  instagram: 'https://www.instagram.com/mfc_trichy/',
   instagramHandle: '@mfc_trichy',
   mapQuery: 'Mutharasanallur+Trichy+Tamil+Nadu',
   mapsUrl: 'https://www.google.com/maps?ftid=0x3baa5f1fbab6b02f:0x640fe554b7a67e15',
-  mapsEmbedUrl: 'https://maps.google.com/maps?q=Mutharasanallur,Trichy&ftid=0x3baa5f1fbab6b02f:0x640fe554b7a67e15&hl=en&z=15&output=embed',
+  mapsEmbedUrl: 'https://maps.google.com/maps?q=Mutharasanallur%2C%20Trichy%2C%20Tamil%20Nadu&t=&z=15&ie=UTF8&iwloc=&output=embed',
   footerNote: '© MFC Football Club, Mutharasanallur, Trichy. Established 2020.',
 };
 

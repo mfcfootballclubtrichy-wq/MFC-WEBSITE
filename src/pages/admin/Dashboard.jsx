@@ -40,7 +40,7 @@ export default function Dashboard() {
     } else if (effectiveRole === 'volunteer' && ['templates', 'content', 'users', 'new_user'].includes(activeTab)) {
       setActiveTab('volunteer_hub');
     }
-  }, [effectiveRole]);
+  }, [effectiveRole, activeTab]);
 
   // Load Content Sections
   const loadContent = async () => {

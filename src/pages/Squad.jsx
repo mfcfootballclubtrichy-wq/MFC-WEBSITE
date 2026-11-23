@@ -8,7 +8,6 @@
  * - Category tabs: All, Super Seniors, Seniors, Juniors, Coaches & Staff
  * - Server-side / youth consent filtering
  */
-/* eslint-disable react/prop-types */
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useContent } from '../context/ContentContext.jsx';

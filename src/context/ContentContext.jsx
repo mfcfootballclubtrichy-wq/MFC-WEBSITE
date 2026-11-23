@@ -16,7 +16,6 @@ import {
   INDIVIDUAL_ACHIEVEMENTS as INITIAL_IND_ACH,
   DEFAULT_SQUAD as INITIAL_SQUAD,
   SCHOOL_PROGRAM as INITIAL_SCHOOL,
-  STATS as INITIAL_STATS,
 } from '../data/content.js';
 
 // Default initial state
@@ -193,7 +192,7 @@ export function ContentProvider({ children }) {
         if (cached) {
           setContent((prev) => ({ ...prev, ...JSON.parse(cached) }));
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     };

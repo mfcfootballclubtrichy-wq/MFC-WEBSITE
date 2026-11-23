@@ -76,7 +76,7 @@ export default function Vision() {
                 Community Commitment
               </h3>
               <p style={{ color: '#4B5563', lineHeight: 1.8, fontSize: '1.05rem', margin: '0 auto' }}>
-                Our vision extends beyond the field. We measure MFC&apos;s success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities.
+                {visionData.communityText || "Our vision extends beyond the field. We measure MFC's success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities."}
               </p>
             </div>
           </ScrollReveal>

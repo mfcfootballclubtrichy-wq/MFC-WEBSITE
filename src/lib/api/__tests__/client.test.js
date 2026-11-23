@@ -1,3 +1,4 @@
+/* global global */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { apiClient, setTokenProvider } from '../client.js';
 import { ApiError } from '../error.js';

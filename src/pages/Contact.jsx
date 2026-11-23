@@ -10,11 +10,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
-import ConfirmBadge  from '../components/ConfirmBadge.jsx';
 import { CLUB as STATIC_CLUB } from '../data/content.js';
 import { useContent } from '../context/ContentContext.jsx';
 import { supabase } from '../lib/supabase.js';
-import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone, encryptData } from '../utils/security.js';
+import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone } from '../utils/security.js';
 
 const FORM_STATES = {
   IDLE:     'idle',
@@ -96,10 +95,6 @@ export default function Contact() {
     try {
       // Brevo Transactional Email API Key
       const BREVO_KEY = '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';
-
-      // 4. AES-GCM 256-bit Encrypted storage for data transfer privacy
-      const encryptedPhone = await encryptData(sanitizedPhone);
-      const encryptedEmail = await encryptData(sanitizedEmail);
 
       const emailPayload = {
         sender: {
@@ -257,7 +252,7 @@ export default function Contact() {
                   <div style={{ height: '260px', width: '100%', position: 'relative' }}>
                     <iframe
                       title="Mutharasanallur Football Club Location"
-                      src="https://maps.google.com/maps?q=Mutharasanallur,Trichy&ftid=0x3baa5f1fbab6b02f:0x640fe554b7a67e15&hl=en&z=15&output=embed"
+                      src={clubContact.mapsEmbedUrl || "https://maps.google.com/maps?q=Mutharasanallur%2C%20Trichy%2C%20Tamil%20Nadu&t=&z=15&ie=UTF8&iwloc=&output=embed"}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}

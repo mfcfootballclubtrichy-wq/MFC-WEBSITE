@@ -156,7 +156,7 @@ export default function ChatbotWidget() {
               whiteSpace: 'nowrap',
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isBotpressReady ? '#22C55E' : 'var(--accent)', display: 'inline-block' }} />
             <span>Chat with MFC AI</span>
           </motion.div>
         )}

@@ -174,10 +174,22 @@ export function initWebSecurity() {
     }
   };
 
+  // 4. Copy protection on media
+  const onCopy = (e) => {
+    const selection = window.getSelection();
+    if (!selection || selection.toString().trim() === '') {
+      if (e.clipboardData) {
+        e.clipboardData.setData('text/plain', 'MFC Trichy — Protected Content.');
+        e.preventDefault();
+      }
+    }
+  };
+
   // Attach global protection listeners
   window.addEventListener('contextmenu', onContextMenu, { passive: false });
   window.addEventListener('dragstart', onDragStart, { passive: false });
   window.addEventListener('keydown', onKeyDown, { passive: false });
+  window.addEventListener('copy', onCopy, { passive: false });
 }
 
 // -------------------------------------------------------------

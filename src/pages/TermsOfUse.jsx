@@ -4,7 +4,6 @@
 import { Link } from 'react-router-dom';
 import ScrollReveal from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import { CLUB } from '../data/content.js';
 
 export default function TermsOfUse() {
   return (
