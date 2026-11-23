@@ -1,14 +1,11 @@
 /**
  * Vision.jsx — MFC Vision, Mission & Values.
  */
-import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
-import SectionDivider from '../components/SectionDivider.jsx';
 import { VISION_TEXT as STATIC_VISION_TEXT } from '../data/content.js';
 import { useContent } from '../context/ContentContext.jsx';
 
 export default function Vision() {
-  const { t } = useTranslation();
   const { content } = useContent();
 
   const visionData = content?.vision || STATIC_VISION_TEXT;
@@ -32,7 +29,7 @@ export default function Vision() {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="vision-values-heading">
+      <section className="section section--white" aria-labelledby="vision-values-heading">
         <div className="container">
           <ScrollReveal>
             <div className="section__header">
@@ -56,26 +53,30 @@ export default function Vision() {
               </ScrollReveal>
             ))}
           </div>
+        </div>
+      </section>
 
-          <SectionDivider />
-
-          <ScrollReveal delay={0.2}>
+      {/* Community Commitment (Cherry Red Band with Animated Shading) */}
+      <section className="section section--red-band" aria-labelledby="community-heading">
+        <div className="container">
+          <ScrollReveal delay={0.1}>
             <div
               style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: 'var(--space-8)',
+                background: '#FFFFFF',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                borderRadius: 'var(--radius-lg)',
+                padding: 'var(--space-10) var(--space-8)',
                 textAlign: 'center',
-                maxWidth: 800,
+                maxWidth: 820,
                 margin: '0 auto',
+                boxShadow: '0 20px 45px rgba(0, 0, 0, 0.25)',
               }}
             >
-              <h3 style={{ fontSize: '1.5rem', marginBottom: 'var(--space-3)', textTransform: 'uppercase' }}>
+              <h3 id="community-heading" style={{ fontSize: '1.75rem', marginBottom: 'var(--space-3)', textTransform: 'uppercase', color: '#0A0A0A' }}>
                 Community Commitment
               </h3>
-              <p style={{ color: 'var(--muted)', lineHeight: 1.7 }}>
-                Our vision extends beyond the field. We measure MFC's success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities.
+              <p style={{ color: '#4B5563', lineHeight: 1.8, fontSize: '1.05rem', margin: '0 auto' }}>
+                Our vision extends beyond the field. We measure MFC&apos;s success by how many players finish school, gain university scholarships, and lead upright, active, and healthy lives in their communities.
               </p>
             </div>
           </ScrollReveal>

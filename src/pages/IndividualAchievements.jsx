@@ -32,7 +32,7 @@ export default function IndividualAchievements() {
       </section>
 
       {/* Main Content */}
-      <section className="section" aria-labelledby="ind-ach-heading">
+      <section className="section section--white" aria-labelledby="ind-ach-heading">
         <div className="container">
           <ScrollReveal>
             <div className="section__header">

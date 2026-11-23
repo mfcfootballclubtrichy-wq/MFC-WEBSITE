@@ -4,8 +4,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ScrollReveal  from '../components/ScrollReveal.jsx';
-import SectionDivider from '../components/SectionDivider.jsx';
-import { ABOUT_TEXT as STATIC_ABOUT, PARTNERSHIP_POINTS, CLUB } from '../data/content.js';
+import { ABOUT_TEXT as STATIC_ABOUT, PARTNERSHIP_POINTS } from '../data/content.js';
 import { useContent } from '../context/ContentContext.jsx';
 import aboutFreestyleImg from '../assets/about-freestyle.png';
 
@@ -34,7 +33,7 @@ export default function About() {
       </section>
 
       {/* Main content */}
-      <section className="section" aria-labelledby="about-main-heading">
+      <section className="section section--white" aria-labelledby="about-main-heading">
         <div className="container">
           <div className="about-grid">
             <ScrollReveal>
@@ -80,14 +79,16 @@ export default function About() {
               </div>
             </ScrollReveal>
           </div>
+        </div>
+      </section>
 
-          <SectionDivider />
-
-          {/* Core Values / Pillars */}
+      {/* Core Values / Pillars (Cherry Red Band with Animated Shading) */}
+      <section className="section section--red-band" aria-labelledby="pillars-heading">
+        <div className="container">
           <ScrollReveal>
             <div className="section__header">
               <span className="section__eyebrow">Our Pillars</span>
-              <h2 className="section__title">Why Choose MFC</h2>
+              <h2 id="pillars-heading" className="section__title">Why Choose MFC</h2>
             </div>
             <div className="grid--3">
               {PARTNERSHIP_POINTS.map((point, i) => (

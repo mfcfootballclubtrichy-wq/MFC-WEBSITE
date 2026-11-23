@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -37,11 +38,6 @@ export default function HeroPlayerSlider({ slides = DEFAULT_HERO_ACTION_SLIDES, 
   const nextSlide = useCallback(() => {
     setDirection(1);
     setCurrentIndex((prev) => (prev + 1) % activeSlides.length);
-  }, [activeSlides.length]);
-
-  const prevSlide = useCallback(() => {
-    setDirection(-1);
-    setCurrentIndex((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
   }, [activeSlides.length]);
 
   useEffect(() => {
@@ -102,7 +98,12 @@ export default function HeroPlayerSlider({ slides = DEFAULT_HERO_ACTION_SLIDES, 
       </div>
 
       {/* Dynamic Sizing Stage */}
-      <div className="hero-action-showcase__stage" style={{ height: `${stageHeight}px` }}>
+      <div
+        className="hero-action-showcase__stage"
+        style={{
+          '--desktop-stage-height': `${stageHeight}px`,
+        }}
+      >
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={current?.id || current?.image || currentIndex}
@@ -118,7 +119,7 @@ export default function HeroPlayerSlider({ slides = DEFAULT_HERO_ACTION_SLIDES, 
               alt={current?.title || 'MFC Football Action'}
               className="hero-action-showcase__img"
               style={{
-                maxHeight: `${imgMaxHeight}px`,
+                '--desktop-img-height': `${imgMaxHeight}px`,
                 transform: `scale(${imgScale}) translateY(${imgOffsetY}px)`,
                 objectFit: current?.objectFit || 'contain',
               }}

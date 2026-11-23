@@ -155,7 +155,7 @@ export default function PlayerProfile() {
                   </div>
                   <div>
                     <span style={{ fontSize: '0.75rem', color: 'var(--muted)', display: 'block' }}>Status</span>
-                    <strong style={{ fontSize: '0.9rem', color: '#16A34A' }}>Active Representative</strong>
+                    <strong style={{ fontSize: '0.9rem', color: 'var(--accent)' }}>Active Representative</strong>
                   </div>
                   {playerItem.batch && (
                     <div style={{ marginTop: 'var(--space-2)' }}>
@@ -184,7 +184,7 @@ export default function PlayerProfile() {
                     borderRadius: '20px',
                     border: '2px solid var(--accent)',
                     background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)',
-                    boxShadow: '0 6px 20px rgba(22, 163, 74, 0.08)',
+                    boxShadow: '0 6px 20px rgba(210, 4, 45, 0.1)',
                   }}
                 >
                   <span className="card__tag" style={{ marginBottom: 'var(--space-3)', display: 'inline-block' }}>

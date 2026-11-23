@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types, react/no-unescaped-entities */
 /**
  * TemplateManager.jsx — Visual Form-Based Template Editor for All MFC Pages.
  *
@@ -23,17 +24,17 @@ export default function TemplateManager({ sections, onRefresh, role }) {
 
   // Pre-configured section definitions
   const TEMPLATE_OPTIONS = [
-    { id: 'updates', label: 'News & Club Updates', desc: 'Frequent updates, tournament announcements, news with images' },
-    { id: 'home', label: 'Home Page Banners & Text', desc: 'Hero headlines, call-to-actions, hero background & training images' },
+    { id: 'updates', label: '📰 News & Club Updates', desc: 'Frequent updates, tournament announcements, news with images' },
+    { id: 'home', label: '🏠 Home Page Banners & Text', desc: 'Hero headlines, call-to-actions, hero background & training images' },
     { id: 'hero_slides', label: '⚡ Hero Action Shots (Right Side)', desc: 'Large cutout ball-shooting & action images sliding in hero banner' },
-    { id: 'about', label: 'About Page & Story', desc: 'Club foundation text, history, story image' },
-    { id: 'vision', label: 'Vision & Values', desc: 'Club mission, community pledge and values' },
-    { id: 'coaches', label: 'Coaches & Technical Staff', desc: 'Coach profiles, AIFF certification badges, photos, bios' },
-    { id: 'squad', label: 'Squad Players & Staff', desc: 'Player cards, photos, positions, junior/senior tiers, physio & staff' },
-    { id: 'team_achievements', label: 'Team Tournament Podiums', desc: 'Season, placement, tournament name, venue' },
-    { id: 'individual_achievements', label: 'Selections & Scholarships', desc: 'Player name, photo upload/update, selections, scholarships' },
-    { id: 'school_program', label: 'School Program Partnership', desc: 'Program description, photo, training highlights and school benefits' },
-    { id: 'contact', label: 'Contact & Club Details', desc: 'Ground address, phone number, official email, Instagram' },
+    { id: 'about', label: '📖 About Page & Story', desc: 'Club foundation text, history, story image' },
+    { id: 'vision', label: '🎯 Vision & Values', desc: 'Club mission, community pledge and values' },
+    { id: 'coaches', label: '👔 Coaches & Technical Staff', desc: 'Coach profiles, AIFF certification badges, photos, bios' },
+    { id: 'squad', label: '⚽ Squad Players & Staff', desc: 'Player cards, photos, positions, junior/senior tiers, physio & staff' },
+    { id: 'team_achievements', label: '🏆 Team Tournament Podiums', desc: 'Season, placement, tournament name, venue' },
+    { id: 'individual_achievements', label: '🌟 Selections & Scholarships', desc: 'Player name, photo upload/update, selections, scholarships' },
+    { id: 'school_program', label: '🏫 School Program Partnership', desc: 'Program description, photo, training highlights and school benefits' },
+    { id: 'contact', label: '📞 Contact & Club Details', desc: 'Ground address, phone number, official email, Instagram' },
   ];
 
   // Load current section data when selectedTemplate changes or sections reload
@@ -372,9 +373,9 @@ export default function TemplateManager({ sections, onRefresh, role }) {
               padding: 'var(--space-4)',
               borderRadius: 'var(--radius)',
               marginBottom: 'var(--space-6)',
-              background: message.type === 'error' ? '#FEE2E2' : '#DCFCE7',
-              border: `1px solid ${message.type === 'error' ? '#F87171' : '#86EFAC'}`,
-              color: message.type === 'error' ? '#991B1B' : '#166534',
+              background: message.type === 'error' ? '#FEE2E2' : 'var(--surface)',
+              border: `1px solid ${message.type === 'error' ? '#F87171' : 'var(--accent)'}`,
+              color: message.type === 'error' ? '#991B1B' : 'var(--accent-dark)',
               fontSize: 'var(--fs-sm)',
             }}
           >
@@ -1246,7 +1247,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       height: '160px',
                       borderRadius: 'var(--radius)',
                       overflow: 'hidden',
-                      background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                      background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, var(--surface-2) 70%)',
                       border: '1px dashed var(--border)',
                       display: 'flex',
                       alignItems: 'center',
@@ -1284,14 +1285,14 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                         fontSize: '0.78rem',
                         fontWeight: 700,
                         background: 'var(--accent)',
-                        color: '#0A0A0A',
+                        color: '#FFFFFF',
                         borderRadius: 'var(--radius)',
                         cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '6px',
-                        boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                        boxShadow: '0 2px 6px rgba(210, 4, 45, 0.2)',
                       }}
                       title="Upload photo from phone or computer storage"
                     >
@@ -1438,7 +1439,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       height: '160px',
                       borderRadius: 'var(--radius)',
                       overflow: 'hidden',
-                      background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                      background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, var(--surface-2) 70%)',
                       border: '1px dashed var(--border)',
                       display: 'flex',
                       alignItems: 'center',
@@ -1476,14 +1477,14 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                         fontSize: '0.78rem',
                         fontWeight: 700,
                         background: 'var(--accent)',
-                        color: '#0A0A0A',
+                        color: '#FFFFFF',
                         borderRadius: 'var(--radius)',
                         cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '6px',
-                        boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                        boxShadow: '0 2px 6px rgba(210, 4, 45, 0.2)',
                       }}
                       title="Upload hero banner from phone or computer storage"
                     >
@@ -1660,7 +1661,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: 'radial-gradient(circle, rgba(134, 239, 172, 0.3) 0%, #FFFFFF 70%)',
+                      background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, #FFFFFF 70%)',
                       border: '1px dashed var(--border)',
                       overflow: 'hidden',
                       position: 'relative',
@@ -1700,7 +1701,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                               fontSize: '0.75rem',
                               fontWeight: 700,
                               background: 'var(--accent)',
-                              color: '#0A0A0A',
+                              color: '#FFFFFF',
                               borderRadius: 'var(--radius)',
                               cursor: 'pointer',
                               display: 'inline-flex',
@@ -1947,7 +1948,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                   height: '200px',
                   borderRadius: 'var(--radius)',
                   overflow: 'hidden',
-                  background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                  background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, var(--surface-2) 70%)',
                   border: '1px dashed var(--border)',
                   display: 'flex',
                   alignItems: 'center',
@@ -1986,14 +1987,14 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     fontSize: '0.78rem',
                     fontWeight: 700,
                     background: 'var(--accent)',
-                    color: '#0A0A0A',
+                    color: '#FFFFFF',
                     borderRadius: 'var(--radius)',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                    boxShadow: '0 2px 6px rgba(210, 4, 45, 0.2)',
                   }}
                   title="Upload image from phone or computer storage"
                 >
@@ -2252,11 +2253,13 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     </div>
                     <div
                       style={{
-                        width: '140px',
-                        height: '140px',
+                        width: '100%',
+                        maxWidth: '160px',
+                        height: `${Math.round((coach.maxHeight ? Math.min(Math.max(coach.maxHeight, 180), 245) : 220) * 0.72)}px`,
+                        minHeight: '135px',
                         borderRadius: '16px',
                         overflow: 'hidden',
-                        background: 'radial-gradient(circle, rgba(134, 239, 172, 0.3) 0%, #FFFFFF 70%)',
+                        background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, #FFFFFF 70%)',
                         border: '1px dashed var(--border)',
                         marginBottom: 'var(--space-2)',
                         marginInline: 'auto',
@@ -2272,10 +2275,10 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           src={coach.photo}
                           alt={coach.name}
                           style={{
-                            maxHeight: '130px',
+                            maxHeight: '100%',
                             maxWidth: '100%',
                             objectFit: 'contain',
-                            transform: `scale(${coach.scale || 1}) translateY(${coach.offsetY || 0}px)`,
+                            transform: `scale(${Math.min(coach.scale || 1, 1.25)}) translateY(${Math.min(Math.max(coach.offsetY || 0, -35), 35)}px)`,
                             filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.14))',
                             transition: 'transform 0.15s ease',
                           }}
@@ -2285,6 +2288,15 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           {coach.name?.charAt(0) || 'C'}
                         </div>
                       )}
+                    </div>
+                    {/* Live label preview showing text visibility */}
+                    <div style={{ textAlign: 'center', padding: '3px 6px', background: 'var(--surface)', borderRadius: '6px', marginBottom: '8px', border: '1px solid var(--border)' }}>
+                      <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--accent-dark)', textTransform: 'uppercase', display: 'block' }}>
+                        {coach.role || 'Coach Role'}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+                        {coach.name || 'Coach Name'}
+                      </span>
                     </div>
                     <input
                       type="url"
@@ -2460,15 +2472,15 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                             📏 Height / Size
                           </span>
                           <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
-                            {coach.maxHeight || 235}px
+                            {coach.maxHeight ? Math.min(Math.max(coach.maxHeight, 180), 245) : 220}px
                           </span>
                         </div>
                         <input
                           type="range"
                           min="180"
-                          max="360"
+                          max="245"
                           step="5"
-                          value={coach.maxHeight || 235}
+                          value={coach.maxHeight ? Math.min(Math.max(coach.maxHeight, 180), 245) : 220}
                           onChange={(e) => updateArrayItemField(index, 'maxHeight', parseInt(e.target.value, 10))}
                           style={{ width: '100%', accentColor: 'var(--accent)' }}
                         />
@@ -2480,15 +2492,15 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                             🔍 Zoom / Scale
                           </span>
                           <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
-                            {Math.round((coach.scale || 1) * 100)}%
+                            {Math.round(Math.min(coach.scale || 1, 1.25) * 100)}%
                           </span>
                         </div>
                         <input
                           type="range"
-                          min="0.7"
-                          max="1.5"
+                          min="0.8"
+                          max="1.25"
                           step="0.05"
-                          value={coach.scale || 1}
+                          value={Math.min(coach.scale || 1, 1.25)}
                           onChange={(e) => updateArrayItemField(index, 'scale', parseFloat(e.target.value))}
                           style={{ width: '100%', accentColor: 'var(--accent)' }}
                         />
@@ -2500,15 +2512,15 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                             ↕️ Shift Up / Down
                           </span>
                           <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text)' }}>
-                            {coach.offsetY || 0}px
+                            {Math.min(Math.max(coach.offsetY || 0, -30), 30)}px
                           </span>
                         </div>
                         <input
                           type="range"
-                          min="-50"
-                          max="50"
+                          min="-30"
+                          max="30"
                           step="2"
-                          value={coach.offsetY || 0}
+                          value={Math.min(Math.max(coach.offsetY || 0, -30), 30)}
                           onChange={(e) => updateArrayItemField(index, 'offsetY', parseInt(e.target.value, 10))}
                           style={{ width: '100%', accentColor: 'var(--accent)' }}
                         />
@@ -3638,7 +3650,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                   height: '200px',
                   borderRadius: 'var(--radius)',
                   overflow: 'hidden',
-                  background: 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, var(--surface-2) 70%)',
+                  background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, var(--surface-2) 70%)',
                   border: '1px dashed var(--border)',
                   display: 'flex',
                   alignItems: 'center',
@@ -3677,14 +3689,14 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     fontSize: '0.78rem',
                     fontWeight: 700,
                     background: 'var(--accent)',
-                    color: '#0A0A0A',
+                    color: '#FFFFFF',
                     borderRadius: 'var(--radius)',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)',
+                    boxShadow: '0 2px 6px rgba(210, 4, 45, 0.2)',
                   }}
                   title="Upload image from phone or computer storage"
                 >

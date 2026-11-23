@@ -5,7 +5,6 @@
  */
 import { useTranslation } from 'react-i18next';
 import ScrollReveal from '../components/ScrollReveal.jsx';
-import SectionDivider from '../components/SectionDivider.jsx';
 import { TEAM_ACHIEVEMENTS as STATIC_TEAM_ACHIEVEMENTS } from '../data/content.js';
 import { useContent } from '../context/ContentContext.jsx';
 
@@ -14,8 +13,6 @@ export default function TeamAchievements() {
   const { content } = useContent();
 
   const achievementsList = content?.team_achievements || STATIC_TEAM_ACHIEVEMENTS;
-  const runnerUps = achievementsList.filter((t) => (t.place || '').toLowerCase().includes('runner'));
-  const thirdPlaces = achievementsList.filter((t) => (t.place || '').toLowerCase().includes('3rd'));
 
   return (
     <>
@@ -30,8 +27,8 @@ export default function TeamAchievements() {
         </div>
       </section>
 
-      {/* Main content */}
-      <section className="section" aria-labelledby="team-ach-heading">
+      {/* Main content - Section 1: Quick Highlights (White Section) */}
+      <section className="section section--white" aria-labelledby="team-ach-heading">
         <div className="container">
           <ScrollReveal>
             <div className="section__header">
@@ -45,7 +42,7 @@ export default function TeamAchievements() {
           </ScrollReveal>
 
           {/* Quick Highlight Cards */}
-          <div className="grid--2" style={{ marginBottom: 'var(--space-12)' }}>
+          <div className="grid--2" style={{ marginBottom: 'var(--space-6)' }}>
             <ScrollReveal>
               <div className="card" style={{ padding: 'var(--space-8)' }}>
                 <span className="card__tag" style={{ color: 'var(--accent-dark)' }}>Podium Summary</span>
@@ -66,18 +63,29 @@ export default function TeamAchievements() {
               </div>
             </ScrollReveal>
           </div>
+        </div>
+      </section>
 
-          <SectionDivider />
-
-          {/* Complete Tournament Table */}
+      {/* Section 2: Complete Tournament Table (Cherry Red Band with Animated Shading) */}
+      <section className="section section--red-band" aria-labelledby="all-tournaments-heading">
+        <div className="container">
           <ScrollReveal>
-            <h3 style={{ marginBottom: 'var(--space-6)', textTransform: 'uppercase' }}>
-              All Official Tournament Records
-            </h3>
-            <div className="mfc-table-wrapper">
+            <div className="section__header">
+              <span className="section__eyebrow">Official Records</span>
+              <h2 id="all-tournaments-heading" className="section__title">
+                All Official Tournament Records
+              </h2>
+              <p className="section__subtitle">
+                Verified runner-up and third-place finishes across district and state invitationals.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.1}>
+            <div className="mfc-table-wrapper" style={{ background: '#FFFFFF', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 20px 45px rgba(0,0,0,0.25)' }}>
               <table className="mfc-table">
                 <thead>
-                  <tr>
+                  <tr style={{ background: '#F8FAFC' }}>
                     <th>Season</th>
                     <th>Result</th>
                     <th>Tournament Name</th>
@@ -90,7 +98,7 @@ export default function TeamAchievements() {
                     const isRunnerUp = (item.place || '').toLowerCase().includes('runner');
                     return (
                       <tr key={item.id || idx}>
-                        <td style={{ color: 'var(--muted)', fontWeight: 500 }}>{item.season}</td>
+                        <td style={{ color: '#4B5563', fontWeight: 500 }}>{item.season}</td>
                         <td>
                           <span
                             style={{
@@ -113,11 +121,13 @@ export default function TeamAchievements() {
                             <span>{item.place}</span>
                           </span>
                         </td>
-                        <td style={{ fontWeight: 600 }}>{item.tournament}</td>
+                        <td style={{ fontWeight: 600, color: '#0A0A0A' }}>{item.tournament}</td>
                         <td>
-                          {item.tournament.includes('5s') ? '5-a-side' : item.tournament.includes('7s') ? '7-a-side' : 'Open'}
+                          <span style={{ fontSize: '0.75rem', background: '#F1F5F9', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                            {item.tournament.includes('5s') ? '5-a-side' : item.tournament.includes('7s') ? '7-a-side' : 'Open'}
+                          </span>
                         </td>
-                        <td>📍 {item.location}</td>
+                        <td style={{ color: '#0A0A0A', fontWeight: 500 }}>📍 {item.location}</td>
                       </tr>
                     );
                   })}
@@ -129,10 +139,10 @@ export default function TeamAchievements() {
           <ScrollReveal delay={0.2}>
             <p
               style={{
-                marginTop: 'var(--space-10)',
-                color: 'var(--muted)',
+                marginTop: 'var(--space-8)',
+                color: 'rgba(255, 255, 255, 0.85)',
                 fontSize: 'var(--fs-sm)',
-                borderLeft: '3px solid var(--accent-light)',
+                borderLeft: '3px solid rgba(255, 255, 255, 0.5)',
                 paddingLeft: 'var(--space-5)',
               }}
             >

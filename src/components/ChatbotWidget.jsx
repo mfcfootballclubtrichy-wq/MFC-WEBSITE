@@ -156,7 +156,7 @@ export default function ChatbotWidget() {
               whiteSpace: 'nowrap',
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22C55E', display: 'inline-block' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
             <span>Chat with MFC AI</span>
           </motion.div>
         )}
@@ -171,10 +171,10 @@ export default function ChatbotWidget() {
             width: '60px',
             height: '60px',
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #15803D 0%, #166534 100%)',
+            background: 'var(--accent)',
             color: '#FFFFFF',
             border: '2px solid rgba(255, 255, 255, 0.85)',
-            boxShadow: '0 10px 28px rgba(22, 101, 52, 0.45)',
+            boxShadow: '0 10px 28px rgba(210, 4, 45, 0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -208,9 +208,9 @@ export default function ChatbotWidget() {
               width: '14px',
               height: '14px',
               borderRadius: '50%',
-              background: '#22C55E',
-              border: '2px solid #FFFFFF',
-              boxShadow: '0 0 6px rgba(34, 197, 94, 0.8)',
+              background: '#FFFFFF',
+              border: '2px solid var(--accent)',
+              boxShadow: '0 0 6px rgba(210, 4, 45, 0.5)',
             }}
           />
         </motion.button>
@@ -243,7 +243,8 @@ export default function ChatbotWidget() {
             {/* Header */}
             <div
               style={{
-                background: 'linear-gradient(135deg, #14532D 0%, #166534 100%)',
+                background: '#0A0A0A',
+                borderBottom: '2px solid var(--accent)',
                 color: '#FFFFFF',
                 padding: '14px 18px',
                 display: 'flex',
@@ -262,7 +263,7 @@ export default function ChatbotWidget() {
                     MFC Football Club
                   </h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', opacity: 0.9 }}>
-                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#86EFAC' }} />
+                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent)' }} />
                     <span>AI Assistant Online</span>
                   </div>
                 </div>
@@ -404,7 +405,7 @@ export default function ChatbotWidget() {
                   width: '36px',
                   height: '36px',
                   borderRadius: '50%',
-                  background: 'var(--accent-dark)',
+                  background: 'var(--accent)',
                   color: '#FFFFFF',
                   border: 'none',
                   cursor: 'pointer',

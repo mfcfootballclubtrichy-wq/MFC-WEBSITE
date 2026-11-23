@@ -1,21 +1,13 @@
+/* eslint-disable react/prop-types */
 /**
  * Login.jsx — Official MFC Authentication & Public Registration Portal.
  * Supports public member sign-ups, volunteer onboarding, and staff role sign-in.
  */
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone } from '../../utils/security.js';
-
-const ROLES_INFO = [
-  { id: 'super_admin', label: 'Super Admin', desc: 'Club Owner & Full Master Control', icon: '👑', badgeColor: '#FEF3C7', textColor: '#92400E' },
-  { id: 'admin', label: 'Club Admin', desc: 'Content Publishing & Management', icon: '🛡️', badgeColor: '#DCFCE7', textColor: '#166534' },
-  { id: 'coach', label: 'Coach', desc: 'Squad & Training Operations', icon: '⚽', badgeColor: '#DBEAFE', textColor: '#1E40AF' },
-  { id: 'editor', label: 'Media Editor', desc: 'Match News & Media Showcase', icon: '✍️', badgeColor: '#F3E8FF', textColor: '#6B21A8' },
-  { id: 'volunteer', label: 'Volunteer', desc: 'Matchday Coordination & Logistics', icon: '🤝', badgeColor: '#FFEDD5', textColor: '#9A3412' },
-  { id: 'member', label: 'Public Member', desc: 'Academy Trainee, Parent & Supporter', icon: '🌟', badgeColor: '#F1F5F9', textColor: '#334155' },
-];
 
 export default function Login({ defaultMode }) {
   const navigate = useNavigate();
@@ -32,14 +24,13 @@ export default function Login({ defaultMode }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('member'); // default public role
+  const selectedRole = 'member'; // default public role
   const [agreeTerms, setAgreeTerms] = useState(true);
 
   // Status feedback
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showRoleGuide, setShowRoleGuide] = useState(false);
 
   // If already authenticated, redirect to portal
   const from = location.state?.from?.pathname || '/portal';
@@ -119,9 +110,9 @@ export default function Login({ defaultMode }) {
           phone: phone.trim(),
           email: cleanEmail,
           password,
-          role: selectedRole,
+          role: selectedRole || 'member',
         });
-        setSuccessMsg(`Welcome to MFC! Your ${selectedRole} account has been registered.`);
+        setSuccessMsg('Welcome to MFC! Your account has been registered successfully.');
         setTimeout(() => {
           navigate(from, { replace: true });
         }, 1000);
@@ -141,7 +132,7 @@ export default function Login({ defaultMode }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 'var(--space-8) var(--space-4)',
-      background: 'radial-gradient(circle at 50% 20%, rgba(187, 247, 208, 0.4) 0%, var(--bg) 75%)',
+      background: 'radial-gradient(circle at 50% 20%, rgba(210, 4, 45, 0.1) 0%, var(--bg) 75%)',
     }}>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -229,9 +220,9 @@ export default function Login({ defaultMode }) {
         {/* Success Alert */}
         {successMsg && (
           <div style={{
-            background: '#DCFCE7',
-            border: '1px solid #86EFAC',
-            color: '#166534',
+            background: 'var(--surface)',
+            border: '1px solid var(--accent)',
+            color: 'var(--accent-dark)',
             padding: 'var(--space-3) var(--space-4)',
             borderRadius: 'var(--radius)',
             fontSize: 'var(--fs-sm)',
@@ -315,40 +306,6 @@ export default function Login({ defaultMode }) {
                     outline: 'none',
                   }}
                 />
-              </div>
-
-              {/* Role / Registration Category Selection */}
-              <div>
-                <label
-                  htmlFor="reg-role"
-                  style={{ display: 'block', fontSize: 'var(--fs-sm)', fontWeight: 600, marginBottom: 'var(--space-1)' }}
-                >
-                  I am registering as: *
-                </label>
-                <select
-                  id="reg-role"
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    borderRadius: 'var(--radius)',
-                    border: '1px solid var(--border)',
-                    background: 'var(--bg)',
-                    color: 'var(--text)',
-                    fontSize: 'var(--fs-base)',
-                    outline: 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <option value="member">🌟 Public Member / Academy Student / Parent</option>
-                  <option value="volunteer">🤝 Club Volunteer (Matchday helper)</option>
-                  <option value="coach">⚽ Coach (Technical Staff)</option>
-                  <option value="editor">✍️ Media & Content Editor</option>
-                </select>
-                <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: '4px', display: 'block' }}>
-                  Public members get instant access to the player & academy portal. Staff roles can be verified by Super Admin.
-                </span>
               </div>
             </>
           )}
@@ -463,71 +420,8 @@ export default function Login({ defaultMode }) {
           </button>
         </form>
 
-        {/* Roles Decided Reference & Assistance */}
-        <div style={{ marginTop: 'var(--space-6)', borderTop: '1px solid var(--border)', paddingTop: 'var(--space-5)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
-              MFC Unified Role Architecture
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowRoleGuide(!showRoleGuide)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--accent-dark)',
-                fontSize: 'var(--fs-xs)',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              {showRoleGuide ? 'Hide Roles' : 'View Roles Decided ▾'}
-            </button>
-          </div>
-
-          <AnimatePresence>
-            {showRoleGuide && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                style={{
-                  marginTop: 'var(--space-3)',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '8px',
-                  overflow: 'hidden',
-                }}
-              >
-                {ROLES_INFO.map((r) => (
-                  <div
-                    key={r.id}
-                    style={{
-                      background: 'var(--surface-2)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius)',
-                      padding: '8px 10px',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span>{r.icon}</span>
-                      <strong style={{ fontSize: 'var(--fs-xs)' }}>{r.label}</strong>
-                    </div>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: 'var(--muted)' }}>
-                      {r.desc}
-                    </p>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
         {/* Bottom Back & Help Link */}
-        <div style={{ marginTop: 'var(--space-5)', textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ marginTop: 'var(--space-6)', borderTop: '1px solid var(--border)', paddingTop: 'var(--space-5)', textAlign: 'center', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link to="/" style={{ color: 'var(--muted)', fontSize: 'var(--fs-xs)', fontWeight: 600 }}>
             ← Back to Home
           </Link>

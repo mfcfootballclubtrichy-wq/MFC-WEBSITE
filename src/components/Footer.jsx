@@ -1,6 +1,6 @@
 /**
  * Footer.jsx — Site footer with nav links, contact info, and branding.
- * Clean light theme: #F5F7F5 background, #0A0A0A headings, #0F7A36 links.
+ * Professional modern theme: #0A0A0A background, #FFFFFF headings, #D2042D hover links.
  */
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

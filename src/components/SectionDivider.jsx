@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 
 /**
- * SectionDivider.jsx — Animated thin light green line that grows from left to right as scrolled into view.
+ * SectionDivider.jsx — Animated thin cherry red line that grows from left to right as scrolled into view.
  * Uses transform: scaleX for optimal performance.
  * Respects prefers-reduced-motion.
  */

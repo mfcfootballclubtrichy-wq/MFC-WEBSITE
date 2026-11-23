@@ -119,13 +119,13 @@ export default function Contact() {
         subject: `New Website Enquiry from ${sanitizedName}`,
         htmlContent: `
           <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111; max-width: 600px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
-            <h2 style="color: #16a34a; margin-top: 0;">Mutharasanallur Football Club</h2>
-            <h3 style="border-bottom: 2px solid #16a34a; padding-bottom: 8px;">New Contact Form Submission</h3>
+            <h2 style="color: #D2042D; margin-top: 0;">Mutharasanallur Football Club</h2>
+            <h3 style="border-bottom: 2px solid #D2042D; padding-bottom: 8px;">New Contact Form Submission</h3>
             <p><strong>Sender Name:</strong> ${sanitizedName}</p>
             <p><strong>Sender Phone:</strong> <a href="tel:${sanitizedPhone}">${sanitizedPhone}</a></p>
             <p><strong>Sender Email:</strong> <a href="mailto:${sanitizedEmail}">${sanitizedEmail}</a></p>
             <p><strong>Message:</strong></p>
-            <div style="background: #f9fafb; padding: 12px 16px; border-left: 4px solid #16a34a; border-radius: 4px;">
+            <div style="background: #f9fafb; padding: 12px 16px; border-left: 4px solid #D2042D; border-radius: 4px;">
               ${sanitizedMessage.replace(/\n/g, '<br/>')}
             </div>
             <p style="font-size: 12px; color: #6b7280; margin-top: 24px;">
@@ -185,7 +185,7 @@ export default function Contact() {
       </section>
 
       {/* Contact info + form */}
-      <section className="section" aria-labelledby="contact-body-heading">
+      <section className="section section--white" aria-labelledby="contact-body-heading">
         <div className="container">
           <div className="grid--2" style={{ alignItems: 'start', gap: 'var(--space-16)' }}>
             {/* ── Contact info ── */}
@@ -321,11 +321,11 @@ export default function Contact() {
                     role="alert"
                     style={{
                       padding: 'var(--space-8)',
-                      background: 'rgba(34, 197, 94, 0.1)',
+                      background: 'var(--surface)',
                       borderRadius: 'var(--radius)',
-                      border: '1px solid rgba(34, 197, 94, 0.3)',
+                      border: '1px solid var(--accent)',
                       textAlign: 'center',
-                      color: '#86efac',
+                      color: 'var(--accent-dark)',
                     }}
                   >
                     ✓ {t('contact.successMessage')}

@@ -104,7 +104,7 @@ export default function NewsDetail() {
                     boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
                     border: '1px solid var(--border)',
                     background: article.objectFit === 'contain'
-                      ? 'radial-gradient(circle, rgba(134, 239, 172, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%)'
+                      ? 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)'
                       : 'var(--surface-2)',
                     display: 'flex',
                     alignItems: 'center',
@@ -218,7 +218,7 @@ export default function NewsDetail() {
                             boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                             background: fitMode === 'cover'
                               ? 'var(--surface-2)'
-                              : 'radial-gradient(circle, rgba(134, 239, 172, 0.12) 0%, rgba(248, 250, 252, 0.98) 75%)',
+                              : 'radial-gradient(circle, rgba(210, 4, 45, 0.08) 0%, rgba(248, 250, 252, 0.98) 75%)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',

@@ -2,17 +2,17 @@
  * Home.jsx — Landing page for Mutharasanallur Football Club (MFC).
  *
  * Implements:
- * - Clean light theme (#FFFFFF, #16A34A, #86EFAC, #0F7A36, #0A0A0A)
- * - Hero light green gradient blob drifting slowly behind headline
- * - Light green underline that draws in beneath the title
+ * - Modern sports theme (#FFFFFF, #D2042D, #A8001F, #0A0A0A)
+ * - Hero cherry red gradient blob drifting slowly behind headline
+ * - Cherry red underline that draws in beneath the title
  * - Section dividers that grow from left to right as you scroll
- * - Cards with 6px lift & light green glow box-shadow (0 10px 30px rgba(134, 239, 172, 0.45))
- * - Black stat numbers with animated light green bar filling beneath each
- * - Buttons with light green hover sweep
+ * - Cards with 6px lift & cherry red glow box-shadow
+ * - Cherry red stat numbers with animated red bar filling beneath each
+ * - Buttons with white text and cherry hover sweep
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useContent } from '../context/ContentContext.jsx';
 import aboutFreestyleImg from '../assets/about-freestyle.png';
@@ -20,7 +20,6 @@ import aboutFreestyleImg from '../assets/about-freestyle.png';
 import ScrollReveal   from '../components/ScrollReveal.jsx';
 import StatCounter    from '../components/StatCounter.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
-import ConfirmBadge   from '../components/ConfirmBadge.jsx';
 import HeroPlayerSlider from '../components/HeroPlayerSlider.jsx';
 
 import {
@@ -29,17 +28,13 @@ import {
   ABOUT_TEXT as STATIC_ABOUT_TEXT,
   COACHES as STATIC_COACHES,
   AGE_GROUPS,
-  PARTNERSHIP_POINTS,
   TEAM_ACHIEVEMENTS as STATIC_TEAM_ACHIEVEMENTS,
   INDIVIDUAL_ACHIEVEMENTS as STATIC_INDIVIDUAL_ACHIEVEMENTS,
   STATS,
 } from '../data/content.js';
 
-const PARTNER_ICONS = ['🏅', '🛡️', '📋', '💪', '🏆'];
-
 export default function Home() {
   const { t } = useTranslation();
-  const prefersReduced = useReducedMotion();
   const { content } = useContent();
 
   const homeData = content?.home || STATIC_HOME_CONTENT;
@@ -49,10 +44,14 @@ export default function Home() {
   const teamAchievementsList = content?.team_achievements || STATIC_TEAM_ACHIEVEMENTS;
   const individualAchievementsList = content?.individual_achievements || STATIC_INDIVIDUAL_ACHIEVEMENTS;
 
-  // Highlight first 3 team achievements
-  const topTeamAchievements = teamAchievementsList.slice(0, 3);
   // Highlight individual achievements with consent
   const topIndividual = individualAchievementsList.filter((item) => item.hasConsent ?? true).slice(0, 3);
+
+  // News pagination state (Template style)
+  const [newsPage, setNewsPage] = useState(0);
+  const newsPerPage = 3;
+  const totalNewsPages = Math.ceil(updatesList.length / newsPerPage) || 1;
+  const visibleUpdates = updatesList.slice(newsPage * newsPerPage, (newsPage + 1) * newsPerPage);
 
   // Tournament record filter and view mode state
   const [tournamentFilter, setTournamentFilter] = useState('all');
@@ -74,7 +73,7 @@ export default function Home() {
           1. HERO
       ══════════════════════════════════════════════════ */}
       <section className="hero" aria-label="Hero banner">
-        {/* Animated Light Green Blob */}
+        {/* Animated Cherry Red Blob */}
         <div className="hero__blob" aria-hidden="true" />
 
         <div className="container">
@@ -139,7 +138,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           2. STATS ROW
       ══════════════════════════════════════════════════ */}
-      <section className="section section--surface" aria-label="Club Statistics">
+      <section className="section section--white" aria-label="Club Statistics">
         <div className="container">
           <div className="stats-grid">
             {STATS.map((stat) => (
@@ -158,7 +157,7 @@ export default function Home() {
           2.5. LATEST UPDATES & ANNOUNCEMENTS (DYNAMIC TEMPLATE)
       ══════════════════════════════════════════════════ */}
       {updatesList && updatesList.length > 0 && (
-        <section className="section" aria-labelledby="updates-heading">
+        <section className="section section--red-band" aria-labelledby="updates-heading">
           <div className="container">
             <ScrollReveal>
               <div className="section__header">
@@ -173,7 +172,7 @@ export default function Home() {
             </ScrollReveal>
 
             <div className="grid--3">
-              {updatesList.map((item, idx) => {
+              {visibleUpdates.map((item, idx) => {
                 const articleId = item.id || encodeURIComponent((item.title || `update-${idx}`).toLowerCase().replace(/\s+/g, '-'));
 
                 return (
@@ -258,6 +257,42 @@ export default function Home() {
                 );
               })}
             </div>
+
+            {/* Custom Pagination Controls (Template Style) */}
+            {totalNewsPages > 1 && (
+              <div style={{ textAlign: 'center', marginTop: 'var(--space-6)' }}>
+                <div className="pagination-controls">
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => setNewsPage((p) => Math.max(p - 1, 0))}
+                    disabled={newsPage === 0}
+                    aria-label="Previous page"
+                  >
+                    ‹
+                  </button>
+                  {Array.from({ length: totalNewsPages }).map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className={`pagination-btn ${newsPage === i ? 'is-active' : ''}`}
+                      onClick={() => setNewsPage(i)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    className="pagination-btn"
+                    onClick={() => setNewsPage((p) => Math.min(p + 1, totalNewsPages - 1))}
+                    disabled={newsPage === totalNewsPages - 1}
+                    aria-label="Next page"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -265,9 +300,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           2.8. OFFICIAL YOUTUBE VIDEO & SHORTS REEL SHOWCASE
       ══════════════════════════════════════════════════ */}
-      <section id="mfc-media" className="section" style={{ background: 'var(--surface-2)', scrollMarginTop: '80px' }} aria-labelledby="media-heading">
+      <section id="mfc-media" className="section section--red-band" style={{ scrollMarginTop: '80px' }} aria-labelledby="media-heading">
         <div className="container">
-          <SectionDivider />
           <ScrollReveal>
             <div className="section__header" style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section__eyebrow">Match Action & Training</span>
@@ -280,121 +314,38 @@ export default function Home() {
             </div>
           </ScrollReveal>
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: 'var(--space-8)',
-              alignItems: 'start',
-            }}
-          >
-            {/* 16:9 Landscape Video */}
+          <div className="media-grid">
+            {/* 16:9 Landscape Video inside Floating Mockup Window */}
             <ScrollReveal delay={0.1}>
-              <div
-                className="card"
-                style={{
-                  padding: 'var(--space-5)',
-                  borderRadius: 'var(--radius-lg)',
-                  boxShadow: 'var(--shadow-glow)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--surface)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
-                  <span className="card__tag" style={{ background: 'var(--accent-dark)', color: '#FFF' }}>
-                    Feature Match Video
-                  </span>
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>16:9 HD</span>
+              <div className="mockup-window">
+                <div className="mockup-window__bar">
+                  <span className="mockup-window__dot mockup-window__dot--red" />
+                  <span className="mockup-window__dot mockup-window__dot--yellow" />
+                  <span className="mockup-window__dot mockup-window__dot--green" />
+                  <span className="mockup-window__title">MFC Match Center HD • 16:9 Documentary</span>
                 </div>
+                <div className="mockup-window__body">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                    <span className="card__tag" style={{ background: 'var(--accent-dark)', color: '#FFF' }}>
+                      Feature Match Video
+                    </span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>16:9 HD</span>
+                  </div>
 
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '100%',
-                    paddingTop: '56.25%',
-                    borderRadius: '16px',
-                    overflow: 'hidden',
-                    background: '#000',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-                  }}
-                >
-                  <iframe
-                    src="https://www.youtube.com/embed/AB9QMbrBq5g?si=RCbJALNNCkxoExzq"
-                    title="Mutharasanallur Football Club Official Video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: '100%',
-                      border: 'none',
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginTop: 'var(--space-4)' }}>
-                  <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-2)' }}>
-                    MFC Football Academy — Tournament & Training Documentary
-                  </h3>
-                  <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>
-                    Follow our young football players as they train at Tamilan Nagar Ground, compete in regional invitationals, and prepare for state leagues.
-                  </p>
-                  <a
-                    href="https://www.youtube.com/watch?v=AB9QMbrBq5g"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn--outline"
-                    style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 1rem' }}
-                  >
-                    Watch on YouTube ↗
-                  </a>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* 9:16 Vertical Reel Player */}
-            <ScrollReveal delay={0.2}>
-              <div
-                className="card"
-                style={{
-                  padding: 'var(--space-5)',
-                  borderRadius: 'var(--radius-lg)',
-                  boxShadow: 'var(--shadow-glow)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--surface)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
-                  <span className="card__tag" style={{ background: 'var(--accent)', color: '#FFF' }}>
-                    Academy Shorts
-                  </span>
-                  <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>9:16 Reel</span>
-                </div>
-
-                <div
-                  style={{
-                    maxWidth: '280px',
-                    margin: '0 auto',
-                    borderRadius: '22px',
-                    overflow: 'hidden',
-                    border: '3px solid #1E293B',
-                    boxShadow: '0 12px 30px rgba(0,0,0,0.22)',
-                    background: '#000',
-                  }}
-                >
                   <div
                     style={{
                       position: 'relative',
                       width: '100%',
-                      paddingTop: '177.77%',
+                      paddingTop: '56.25%',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      background: '#000',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                     }}
                   >
                     <iframe
-                      src="https://www.youtube.com/embed/Gis6rlwzR5U"
-                      title="MFC Academy YouTube Shorts"
+                      src="https://www.youtube.com/embed/AB9QMbrBq5g?si=RCbJALNNCkxoExzq"
+                      title="Mutharasanallur Football Club Official Video"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allowFullScreen
@@ -408,24 +359,98 @@ export default function Home() {
                       }}
                     />
                   </div>
-                </div>
 
-                <div style={{ marginTop: 'var(--space-4)', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-2)' }}>
-                    Ball Mastery & Skills Highlight Reel
-                  </h3>
-                  <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', lineHeight: 1.5, marginBottom: 'var(--space-4)' }}>
-                    Fast-paced footwork, agility drills, and technical shooting practice from our youth squad.
-                  </p>
-                  <a
-                    href="https://youtube.com/shorts/Gis6rlwzR5U"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn--outline"
-                    style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 1rem' }}
+                  <div style={{ marginTop: 'var(--space-4)' }}>
+                    <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-2)', color: '#0A0A0A' }}>
+                      MFC Football Academy — Tournament & Training Documentary
+                    </h3>
+                    <p style={{ color: '#4B5563', fontSize: 'var(--fs-sm)', lineHeight: 1.6, marginBottom: 'var(--space-4)' }}>
+                      Follow our young football players as they train at Tamilan Nagar Ground, compete in regional invitationals, and prepare for state leagues.
+                    </p>
+                    <a
+                      href="https://www.youtube.com/watch?v=AB9QMbrBq5g"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline"
+                      style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 1rem', color: 'var(--accent-dark)', borderColor: 'var(--border)', background: '#FFFFFF' }}
+                    >
+                      Watch on YouTube ↗
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* 9:16 Vertical Reel Player inside Floating Mockup Window */}
+            <ScrollReveal delay={0.2}>
+              <div className="mockup-window">
+                <div className="mockup-window__bar">
+                  <span className="mockup-window__dot mockup-window__dot--red" />
+                  <span className="mockup-window__dot mockup-window__dot--yellow" />
+                  <span className="mockup-window__dot mockup-window__dot--green" />
+                  <span className="mockup-window__title">MFC Skills Reel • 9:16 Mobile View</span>
+                </div>
+                <div className="mockup-window__body">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                    <span className="card__tag" style={{ background: 'var(--accent)', color: '#FFF' }}>
+                      Academy Shorts
+                    </span>
+                    <span style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>9:16 Reel</span>
+                  </div>
+
+                  <div
+                    style={{
+                      maxWidth: '260px',
+                      margin: '0 auto',
+                      borderRadius: '22px',
+                      overflow: 'hidden',
+                      border: '3px solid #1E293B',
+                      boxShadow: '0 12px 30px rgba(0,0,0,0.22)',
+                      background: '#000',
+                    }}
                   >
-                    Open Shorts Reel ↗
-                  </a>
+                    <div
+                      style={{
+                        position: 'relative',
+                        width: '100%',
+                        paddingTop: '177.77%',
+                      }}
+                    >
+                      <iframe
+                        src="https://www.youtube.com/embed/Gis6rlwzR5U"
+                        title="MFC Academy YouTube Shorts"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          border: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: 'var(--space-4)', textAlign: 'center' }}>
+                    <h3 style={{ fontSize: '1.15rem', marginBottom: 'var(--space-2)', color: '#0A0A0A' }}>
+                      Ball Mastery & Skills Highlight Reel
+                    </h3>
+                    <p style={{ color: '#4B5563', fontSize: 'var(--fs-sm)', lineHeight: 1.5, marginBottom: 'var(--space-4)' }}>
+                      Fast-paced footwork, agility drills, and technical shooting practice from our youth squad.
+                    </p>
+                    <a
+                      href="https://youtube.com/shorts/Gis6rlwzR5U"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline"
+                      style={{ fontSize: 'var(--fs-xs)', padding: '0.45rem 1rem', color: 'var(--accent-dark)', borderColor: 'var(--border)', background: '#FFFFFF' }}
+                    >
+                      Open Shorts Reel ↗
+                    </a>
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -436,7 +461,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           3. ABOUT MFC
       ══════════════════════════════════════════════════ */}
-      <section className="section" aria-labelledby="about-heading">
+      <section className="section section--white" aria-labelledby="about-heading">
         <div className="container">
           <SectionDivider />
           <div className="about-grid">
@@ -487,7 +512,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           4. COACHING STAFF PREVIEW
       ══════════════════════════════════════════════════ */}
-      <section className="section section--surface" aria-labelledby="coaches-heading">
+      <section className="section section--white" aria-labelledby="coaches-heading">
         <div className="container">
           <ScrollReveal>
             <div className="section__header">
@@ -502,114 +527,128 @@ export default function Home() {
           </ScrollReveal>
 
           <div className="grid--3">
-            {coachesList.map((coach, i) => (
-              <ScrollReveal key={coach.id || i} delay={i * 0.1}>
-                <article
-                  className="card coach-card"
-                  style={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    padding: 'var(--space-6)',
-                  }}
-                >
-                  {/* Transparent Cutout Portrait with Animated Sliding Entrance on Scroll */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                    viewport={{ once: true, amount: 0.2 }}
-                    transition={{
-                      duration: 0.7,
-                      ease: [0.22, 1, 0.36, 1],
-                      delay: i * 0.12,
-                    }}
+            {coachesList.map((coach, i) => {
+              const stageHeight = coach.maxHeight ? Math.min(Math.max(coach.maxHeight, 180), 245) : 220;
+              const coachScale = Math.min(coach.scale || 1, 1.25);
+              const coachOffsetY = Math.min(Math.max(coach.offsetY || 0, -35), 35);
+
+              return (
+                <ScrollReveal key={coach.id || i} delay={i * 0.1}>
+                  <article
+                    className="card coach-card"
                     style={{
-                      position: 'relative',
+                      height: '100%',
                       display: 'flex',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      width: '100%',
-                      height: '220px',
-                      marginBottom: 'var(--space-4)',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      textAlign: 'center',
+                      padding: 'var(--space-6)',
                     }}
                   >
-                    {/* Subtle radial glow behind the transparent cutout */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '0px',
-                        width: '180px',
-                        height: '180px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, rgba(134, 239, 172, 0.25) 0%, transparent 70%)',
-                        pointerEvents: 'none',
-                        zIndex: 0,
+                    {/* Dedicated Portrait Stage — Never overlaps or hides text */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 35, scale: 0.96 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true, amount: 0.2 }}
+                      transition={{
+                        duration: 0.6,
+                        ease: [0.22, 1, 0.36, 1],
+                        delay: i * 0.1,
                       }}
-                    />
-
-                    {coach.photo ? (
-                      <img
-                        src={coach.photo}
-                        alt={coach.name}
-                        style={{
-                          position: 'relative',
-                          zIndex: 1,
-                          maxHeight: `${coach.maxHeight ? Math.min(coach.maxHeight, 260) : 215}px`,
-                          width: 'auto',
-                          maxWidth: '100%',
-                          objectFit: 'contain',
-                          transform: `scale(${coach.scale || 1}) translateY(${coach.offsetY || 0}px)`,
-                          filter: 'drop-shadow(0 14px 20px rgba(0, 0, 0, 0.14))',
-                          transition: 'transform 0.2s ease',
-                        }}
-                      />
-                    ) : (
+                      style={{
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                        height: `${stageHeight}px`,
+                        minHeight: `${stageHeight}px`,
+                        marginBottom: 'var(--space-4)',
+                        overflow: 'hidden',
+                        borderRadius: '16px',
+                        background: 'radial-gradient(circle at center 60%, rgba(210, 4, 45, 0.08) 0%, transparent 72%)',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {/* Subtle ambient lighting behind cutout */}
                       <div
                         style={{
-                          position: 'relative',
-                          zIndex: 1,
-                          width: '110px',
-                          height: '110px',
+                          position: 'absolute',
+                          width: '180px',
+                          height: '180px',
                           borderRadius: '50%',
-                          background: 'var(--accent-glow)',
-                          color: 'var(--accent-dark)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '2.5rem',
-                          fontWeight: 700,
-                          boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                          background: 'radial-gradient(circle, rgba(210, 4, 45, 0.12) 0%, transparent 70%)',
+                          pointerEvents: 'none',
+                          zIndex: 0,
                         }}
-                        aria-hidden="true"
-                      >
-                        {coach.name?.charAt(0) || 'C'}
-                      </div>
-                    )}
-                  </motion.div>
+                      />
 
-                  <span className="card__tag" style={{ alignSelf: 'center', marginBottom: 'var(--space-2)' }}>
-                    {coach.role}
-                  </span>
-                  <h3 className="card__title" style={{ fontSize: '1.4rem', marginBottom: 'var(--space-2)' }}>
-                    {coach.name}
-                  </h3>
+                      {coach.photo ? (
+                        <img
+                          src={coach.photo}
+                          alt={coach.name}
+                          style={{
+                            position: 'relative',
+                            zIndex: 1,
+                            maxHeight: '100%',
+                            maxWidth: '100%',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain',
+                            transform: `scale(${coachScale}) translateY(${coachOffsetY}px)`,
+                            filter: 'drop-shadow(0 10px 18px rgba(0, 0, 0, 0.12))',
+                            transition: 'transform 0.2s ease',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            position: 'relative',
+                            zIndex: 1,
+                            width: '110px',
+                            height: '110px',
+                            borderRadius: '50%',
+                            background: 'var(--accent-glow)',
+                            color: 'var(--accent-dark)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '2.5rem',
+                            fontWeight: 700,
+                            boxShadow: '0 6px 18px rgba(0,0,0,0.08)',
+                          }}
+                          aria-hidden="true"
+                        >
+                          {coach.name?.charAt(0) || 'C'}
+                        </div>
+                      )}
+                    </motion.div>
 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', justifyContent: 'center', marginBottom: 'var(--space-4)' }}>
-                    {(Array.isArray(coach.licence) ? coach.licence : [coach.licence]).filter(Boolean).map((lic) => (
-                      <span key={lic} className="badge--confirm">
-                        {lic}
+                    {/* Text Details Area — Full priority, guaranteed visibility */}
+                    <div style={{ position: 'relative', zIndex: 2, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <span className="card__tag" style={{ marginBottom: 'var(--space-2)' }}>
+                        {coach.role}
                       </span>
-                    ))}
-                  </div>
+                      <h3 className="card__title" style={{ fontSize: '1.4rem', marginBottom: 'var(--space-2)', color: '#0A0A0A' }}>
+                        {coach.name}
+                      </h3>
 
-                  <p className="card__text" style={{ marginTop: 'auto', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
-                    {coach.bio}
-                  </p>
-                </article>
-              </ScrollReveal>
-            ))}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', justifyContent: 'center', marginBottom: 'var(--space-4)' }}>
+                        {(Array.isArray(coach.licence) ? coach.licence : [coach.licence]).filter(Boolean).map((lic) => (
+                          <span key={lic} className="badge--confirm">
+                            {lic}
+                          </span>
+                        ))}
+                      </div>
+
+                      <p className="card__text" style={{ marginTop: 'auto', color: 'var(--muted)', fontSize: 'var(--fs-sm)' }}>
+                        {coach.bio}
+                      </p>
+                    </div>
+                  </article>
+                </ScrollReveal>
+              );
+            })}
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 'var(--space-10)' }}>
@@ -623,9 +662,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           5. TEAM ACHIEVEMENTS & PODIUMS
       ══════════════════════════════════════════════════ */}
-      <section className="section" aria-labelledby="tournaments-heading" style={{ position: 'relative' }}>
+      <section className="section section--red-band" aria-labelledby="tournaments-heading" style={{ position: 'relative' }}>
         <div className="container">
-          <SectionDivider />
           <ScrollReveal>
             <div className="section__header" style={{ marginBottom: 'var(--space-8)' }}>
               <span className="section__eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -652,12 +690,12 @@ export default function Home() {
             >
               <div
                 style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderTop: '3px solid #94A3B8',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  borderTop: '4px solid #94A3B8',
                   borderRadius: '16px',
                   padding: 'var(--space-4) var(--space-5)',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 'var(--space-3)',
@@ -680,10 +718,10 @@ export default function Home() {
                   🥈
                 </div>
                 <div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text)' }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: '#0A0A0A' }}>
                     4× Runner-Up
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#4B5563', marginTop: '2px' }}>
                     District & State Finals
                   </div>
                 </div>
@@ -691,12 +729,12 @@ export default function Home() {
 
               <div
                 style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderTop: '3px solid #F59E0B',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  borderTop: '4px solid #F59E0B',
                   borderRadius: '16px',
                   padding: 'var(--space-4) var(--space-5)',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 'var(--space-3)',
@@ -719,10 +757,10 @@ export default function Home() {
                   🥉
                 </div>
                 <div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text)' }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: '#0A0A0A' }}>
                     5× Third Place
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#4B5563', marginTop: '2px' }}>
                     Semifinal Victories & Podiums
                   </div>
                 </div>
@@ -730,12 +768,12 @@ export default function Home() {
 
               <div
                 style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border)',
-                  borderTop: '3px solid var(--accent)',
+                  background: '#FFFFFF',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  borderTop: '4px solid var(--accent)',
                   borderRadius: '16px',
                   padding: 'var(--space-4) var(--space-5)',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 'var(--space-3)',
@@ -758,10 +796,10 @@ export default function Home() {
                   ⚽
                 </div>
                 <div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: 'var(--text)' }}>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.1, color: '#0A0A0A' }}>
                     9 Top-3 Podiums
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '2px' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#4B5563', marginTop: '2px' }}>
                     100% Grassroots Tournament Record
                   </div>
                 </div>
@@ -795,10 +833,10 @@ export default function Home() {
                     fontWeight: 600,
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    border: tournamentFilter === 'all' ? '1px solid var(--accent-dark)' : '1px solid var(--border)',
+                    border: tournamentFilter === 'all' ? '1px solid var(--accent)' : '1px solid var(--border)',
                     background: tournamentFilter === 'all' ? 'var(--accent)' : 'var(--surface)',
-                    color: tournamentFilter === 'all' ? '#000' : 'var(--text)',
-                    boxShadow: tournamentFilter === 'all' ? '0 2px 8px rgba(22, 163, 74, 0.2)' : 'none',
+                    color: tournamentFilter === 'all' ? '#FFFFFF' : 'var(--text)',
+                    boxShadow: tournamentFilter === 'all' ? '0 2px 8px rgba(210, 4, 45, 0.3)' : 'none',
                   }}
                 >
                   All Podiums ({teamAchievementsList.length})
@@ -893,13 +931,7 @@ export default function Home() {
 
           {/* VIEW 1: Modern Championship Honor Cards Grid */}
           {tournamentView === 'cards' && (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-                gap: 'var(--space-4)',
-              }}
-            >
+            <div className="tournament-cards-grid">
               {filteredTeamAchievements.map((item, idx) => {
                 const isRunnerUp = (item.place || '').toLowerCase().includes('runner');
                 const is5s = item.tournament.includes('5s');
@@ -909,20 +941,7 @@ export default function Home() {
                 return (
                   <ScrollReveal key={item.id || idx} delay={idx * 0.05}>
                     <div
-                      style={{
-                        background: 'var(--surface)',
-                        border: '1px solid var(--border)',
-                        borderRadius: '18px',
-                        padding: 'var(--space-5)',
-                        position: 'relative',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        minHeight: '190px',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
-                        transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
-                        cursor: 'default',
-                      }}
+                      className="tournament-card"
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-5px)';
                         e.currentTarget.style.boxShadow = isRunnerUp
@@ -976,12 +995,13 @@ export default function Home() {
 
                         {/* Tournament Name */}
                         <h3
+                          className="tournament-card__title"
                           style={{
                             fontSize: '1.08rem',
                             fontWeight: 700,
                             lineHeight: 1.4,
                             marginBottom: 'var(--space-2)',
-                            color: 'var(--text)',
+                            color: '#0A0A0A',
                           }}
                         >
                           {item.tournament}
@@ -1000,7 +1020,7 @@ export default function Home() {
                           fontSize: '0.75rem',
                         }}
                       >
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--text)', fontWeight: 600 }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#0A0A0A', fontWeight: 600 }}>
                           <span>📍</span> {item.location}
                         </span>
 
@@ -1108,9 +1128,10 @@ export default function Home() {
           {/* Premium Bottom Call-to-Action Card */}
           <ScrollReveal delay={0.15}>
             <div
+              className="archive-cta-card"
               style={{
                 marginTop: 'var(--space-8)',
-                background: 'radial-gradient(ellipse at top, rgba(134, 239, 172, 0.12) 0%, rgba(248, 250, 252, 0.95) 75%)',
+                background: '#FFFFFF',
                 border: '1px solid var(--border)',
                 borderRadius: '20px',
                 padding: 'clamp(1.25rem, 3vw, 2rem)',
@@ -1119,17 +1140,17 @@ export default function Home() {
                 alignItems: 'center',
                 flexWrap: 'wrap',
                 gap: 'var(--space-4)',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
               }}
             >
               <div style={{ maxWidth: '560px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                   <span style={{ fontSize: '1.2rem' }}>🏆</span>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text)' }}>
+                  <span style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0A0A0A' }}>
                     Complete Tournament Archive & Historical Records
                   </span>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--muted)', lineHeight: 1.5 }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#4B5563', lineHeight: 1.5 }}>
                   Inspect our complete match history, age-category breakdowns (U13, U15, U16, U17 & Seniors), and competition photo archives.
                 </p>
               </div>
@@ -1144,7 +1165,7 @@ export default function Home() {
                   padding: '0.65rem 1.4rem',
                   fontSize: '0.88rem',
                   fontWeight: 700,
-                  boxShadow: '0 6px 16px rgba(22, 163, 74, 0.25)',
+                  boxShadow: '0 6px 16px rgba(210, 4, 45, 0.25)',
                   whiteSpace: 'nowrap',
                 }}
               >
@@ -1159,7 +1180,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           6. INDIVIDUAL PATHWAYS & SCHOLARSHIPS
       ══════════════════════════════════════════════════ */}
-      <section className="section section--surface" aria-labelledby="player-pathways-heading">
+      <section className="section section--white" aria-labelledby="player-pathways-heading">
         <div className="container">
           <ScrollReveal>
             <div className="section__header">
@@ -1216,7 +1237,7 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           7. AGE GROUPS
       ══════════════════════════════════════════════════ */}
-      <section className="section" aria-labelledby="age-groups-heading">
+      <section className="section section--white" aria-labelledby="age-groups-heading">
         <div className="container">
           <SectionDivider />
           <ScrollReveal>
@@ -1250,11 +1271,7 @@ export default function Home() {
           8. PARTNERSHIP & CONTACT CALLOUT
       ══════════════════════════════════════════════════ */}
       <section
-        className="section"
-        style={{
-          background: 'linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%)',
-          borderTop: '1px solid var(--border)',
-        }}
+        className="section section--red-band"
         aria-labelledby="cta-banner-heading"
       >
         <div className="container" style={{ textAlign: 'center' }}>

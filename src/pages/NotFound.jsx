@@ -9,7 +9,7 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   return (
-    <div className="not-found" style={{ paddingTop: 'var(--header-height)' }}>
+    <div className="not-found" style={{ paddingTop: 'calc(var(--header-height) + var(--space-8))' }}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}

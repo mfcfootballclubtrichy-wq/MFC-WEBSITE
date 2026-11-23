@@ -8,11 +8,11 @@
  * - Category tabs: All, Super Seniors, Seniors, Juniors, Coaches & Staff
  * - Server-side / youth consent filtering
  */
+/* eslint-disable react/prop-types */
 import { useState, useRef, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useContent } from '../context/ContentContext.jsx';
-import { DEFAULT_SQUAD, AGE_GROUPS } from '../data/content.js';
+import { DEFAULT_SQUAD } from '../data/content.js';
 import ScrollReveal from '../components/ScrollReveal.jsx';
 import SectionDivider from '../components/SectionDivider.jsx';
 
@@ -273,7 +273,6 @@ function SquadPositionRow({ title, members }) {
 }
 
 export default function Squad() {
-  const { t } = useTranslation();
   const { content } = useContent();
   const [selectedTier, setSelectedTier] = useState('all');
 
@@ -323,7 +322,7 @@ export default function Squad() {
 
   return (
     <>
-      <section className="section" style={{ paddingTop: 'calc(var(--space-12) + 20px)' }}>
+      <section className="section section--white" style={{ paddingTop: 'calc(var(--header-height) + var(--space-8))' }}>
         <div className="container">
           {/* ── Page Header ── */}
           <ScrollReveal>

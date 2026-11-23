@@ -11,7 +11,6 @@ export default function Dashboard() {
   const { user, role, signOut } = useAuth();
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(true);
   const effectiveRole = role || user?.user_metadata?.role || (user?.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member');
 
   // Determine initial tab based on role
@@ -57,7 +56,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error('Failed to load sections:', err);
     } finally {
-      setLoading(false);
+      // Finished loading sections
     }
   };
 
@@ -617,7 +616,7 @@ export default function Dashboard() {
           </div>
 
           {saveSuccess && (
-            <div style={{ background: '#DCFCE7', border: '1px solid #86EFAC', color: '#166534', padding: 'var(--space-3)', borderRadius: 'var(--radius)', marginBottom: 'var(--space-4)' }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--accent)', color: 'var(--accent-dark)', padding: 'var(--space-3)', borderRadius: 'var(--radius)', marginBottom: 'var(--space-4)' }}>
               {saveSuccess}
             </div>
           )}
@@ -758,9 +757,9 @@ export default function Dashboard() {
 
           {userActionMsg && (
             <div style={{
-              background: userActionMsg.includes('Failed') ? '#FEE2E2' : '#DCFCE7',
-              border: `1px solid ${userActionMsg.includes('Failed') ? '#F87171' : '#86EFAC'}`,
-              color: userActionMsg.includes('Failed') ? '#991B1B' : '#166534',
+              background: userActionMsg.includes('Failed') ? '#FEE2E2' : 'var(--surface)',
+              border: `1px solid ${userActionMsg.includes('Failed') ? '#F87171' : 'var(--accent)'}`,
+              color: userActionMsg.includes('Failed') ? '#991B1B' : 'var(--accent-dark)',
               padding: 'var(--space-3)',
               borderRadius: 'var(--radius)',
               marginBottom: 'var(--space-6)',
@@ -942,11 +941,11 @@ export default function Dashboard() {
           <div
             className="card"
             style={{
-              background: 'linear-gradient(135deg, #14532D 0%, #166534 50%, #15803D 100%)',
+              background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #0A0A0A 100%)',
               color: '#FFFFFF',
               borderRadius: '20px',
               padding: 'var(--space-8)',
-              boxShadow: '0 12px 30px rgba(22, 101, 52, 0.25)',
+              boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
               position: 'relative',
               overflow: 'hidden',
               border: '2px solid rgba(255, 255, 255, 0.2)',
@@ -967,14 +966,14 @@ export default function Dashboard() {
                     {user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'MFC Academy Trainee'}
                   </h2>
                   <p style={{ margin: '4px 0 0 0', opacity: 0.9, fontSize: 'var(--fs-sm)' }}>
-                    Membership ID: <strong style={{ letterSpacing: '1px', color: '#86EFAC' }}>MFC-{user?.id?.slice(0, 8)?.toUpperCase()}</strong>
+                    Membership ID: <strong style={{ letterSpacing: '1px', color: '#FFFFFF' }}>MFC-{user?.id?.slice(0, 8)?.toUpperCase()}</strong>
                   </p>
                 </div>
               </div>
 
               <span style={{
-                background: '#86EFAC',
-                color: '#14532D',
+                background: 'var(--accent)',
+                color: '#FFFFFF',
                 padding: '6px 14px',
                 borderRadius: '999px',
                 fontWeight: 800,
@@ -983,7 +982,7 @@ export default function Dashboard() {
                 textTransform: 'uppercase',
                 alignSelf: 'flex-start',
               }}>
-                🟢 ACTIVE MEMBER
+                ACTIVE MEMBER
               </span>
             </div>
 
@@ -1009,7 +1008,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Training Category</span>
-                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: '#86EFAC' }}>Grassroots & Youth Development</div>
+                <div style={{ fontSize: 'var(--fs-sm)', fontWeight: 600, color: '#FFFFFF' }}>Grassroots & Youth Development</div>
               </div>
             </div>
           </div>

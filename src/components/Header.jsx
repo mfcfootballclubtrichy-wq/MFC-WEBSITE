@@ -3,8 +3,8 @@
  *
  * Light Theme styling:
  * - Clean white background with thin border at bottom
- * - Active nav link with #0A0A0A black text and 3px light green underline (#86EFAC)
- * - Mobile menu: white panel with black links and light green hover backgrounds
+ * - Active nav link with #A8001F text and 3px cherry red underline (#D2042D)
+ * - Mobile menu: white panel with high-contrast links and cherry red hover backgrounds
  */
 import { useState, useEffect, useCallback } from 'react';
 import { NavLink, Link } from 'react-router-dom';
@@ -33,7 +33,7 @@ const linkItemVariants = {
 };
 
 export default function Header() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user, role, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -152,18 +152,20 @@ export default function Header() {
               </div>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <Link
-                  to="/register"
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-register-modal'))}
                   className="btn btn--outline"
                   style={{
                     padding: '0.42rem 0.85rem',
                     fontSize: 'var(--fs-xs)',
                     borderRadius: 'var(--radius-full)',
                     fontWeight: 600,
+                    cursor: 'pointer',
                   }}
                 >
                   Register
-                </Link>
+                </button>
                 <Link
                   to="/login"
                   className="btn btn-primary"
@@ -251,14 +253,17 @@ export default function Header() {
                 </>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-2)', width: '100%' }}>
-                  <Link
-                    to="/register"
+                  <button
+                    type="button"
                     className="btn btn--outline"
-                    onClick={closeMenu}
-                    style={{ justifyContent: 'center' }}
+                    onClick={() => {
+                      closeMenu();
+                      window.dispatchEvent(new CustomEvent('open-register-modal'));
+                    }}
+                    style={{ justifyContent: 'center', cursor: 'pointer' }}
                   >
                     Register
-                  </Link>
+                  </button>
                   <Link
                     to="/login"
                     className="btn btn-primary"

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 /**
  * ScrollProgress.jsx — Displays a thin reading progress bar at the very top of the window.
- * Uses --accent-light (#86EFAC) with transform scaleX (GPU accelerated).
+ * Uses --accent (#D2042D) with transform scaleX (GPU accelerated).
  * Turns off transitions / animations under prefers-reduced-motion.
  */
 export default function ScrollProgress() {

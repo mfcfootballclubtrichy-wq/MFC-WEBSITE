@@ -14,6 +14,7 @@ import ScrollProgress from './components/ScrollProgress.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import ChatbotWidget from './components/ChatbotWidget.jsx';
+import RegisterModal from './components/RegisterModal.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ContentProvider } from './context/ContentContext.jsx';
 
@@ -130,6 +131,7 @@ export default function App() {
         </main>
         <Footer />
         <ChatbotWidget />
+        <RegisterModal />
       </ContentProvider>
     </AuthProvider>
   );
