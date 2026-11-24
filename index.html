@@ -40,7 +40,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.botpress.cloud https://files.bpcontent.cloud https://*.google.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://cdn.botpress.cloud https://files.bpcontent.cloud https://i.ytimg.com https://maps.google.com https://www.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.botpress.cloud https://files.bpcontent.cloud https://*.bpcontent.cloud https://*.botpress.cloud wss://*.botpress.cloud https://*.onrender.com https://api.brevo.com https://maps.google.com https://www.google.com https://*.google.com https://*.googleapis.com; media-src 'self' data: blob: https://*.supabase.co; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://cdn.botpress.cloud https://maps.google.com https://www.google.com https://*.google.com; base-uri 'self'; form-action 'self';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.botpress.cloud https://files.bpcontent.cloud https://*.google.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://cdn.botpress.cloud https://files.bpcontent.cloud https://i.ytimg.com https://maps.google.com https://www.google.com https://*.google.com https://*.googleapis.com https://*.gstatic.com; connect-src 'self' http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:* https://*.supabase.co wss://*.supabase.co https://cdn.botpress.cloud https://files.bpcontent.cloud https://*.bpcontent.cloud https://*.botpress.cloud wss://*.botpress.cloud https://*.onrender.com https://api.brevo.com https://maps.google.com https://www.google.com https://*.google.com https://*.googleapis.com; media-src 'self' data: blob: https://*.supabase.co; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://cdn.botpress.cloud https://maps.google.com https://www.google.com https://*.google.com; base-uri 'self'; form-action 'self';"
     />
 
     <!-- Preconnect to Google Fonts (loaded in index.css) -->
@@ -50,8 +50,8 @@
     <!-- Theme colour for browser chrome -->
     <meta name="theme-color" content="#FFFFFF" />
 
-    <!-- Botpress WebChat Integration (Must be in <head>) -->
-    <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"></script>
+    <!-- Botpress WebChat Integration (Asynchronous non-blocking in <head>) -->
+    <script src="https://cdn.botpress.cloud/webchat/v5.0/inject.js" defer></script>
     <script src="https://files.bpcontent.cloud/2026/10/21/18/20261021180624-FHAJM72X.js" defer></script>
   </head>
   <body>

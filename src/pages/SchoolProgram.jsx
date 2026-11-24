@@ -91,6 +91,142 @@ export default function SchoolProgram() {
         </div>
       </section>
 
+      {/* Program Packages & Multiple Choice Curriculum Modules */}
+      {(schoolData.modules || STATIC_SCHOOL_PROGRAM.modules)?.length > 0 && (
+        <section className="section section--surface" aria-labelledby="school-modules-heading">
+          <div className="container">
+            <ScrollReveal>
+              <div className="section__header">
+                <span className="section__eyebrow">Flexible Curriculums</span>
+                <h2 id="school-modules-heading" className="section__title">
+                  {schoolData.modulesTitle || STATIC_SCHOOL_PROGRAM.modulesTitle || 'Partnership Program Modules'}
+                </h2>
+                <p className="section__subtitle">
+                  Tailored football modules designed to integrate seamlessly into academic schedules.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid--2" style={{ gap: 'var(--space-6)' }}>
+              {(schoolData.modules || STATIC_SCHOOL_PROGRAM.modules).map((mod, i) => (
+                <ScrollReveal key={mod.id || i} delay={i * 0.08}>
+                  <div
+                    className="card"
+                    style={{
+                      padding: 'var(--space-6)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 'var(--space-3)',
+                      height: '100%',
+                      borderTop: '4px solid var(--accent)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                      <h3 style={{ fontSize: '1.25rem', margin: 0, color: 'var(--text)' }}>
+                        {mod.title}
+                      </h3>
+                      {mod.duration && (
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '3px 8px',
+                          borderRadius: '999px',
+                          background: 'var(--accent-glow)',
+                          color: 'var(--accent-dark)',
+                          border: '1px solid var(--accent)',
+                        }}>
+                          ⏱️ {mod.duration}
+                        </span>
+                      )}
+                    </div>
+
+                    {mod.ageBracket && (
+                      <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', fontWeight: 600 }}>
+                        👥 Target Bracket: <span style={{ color: 'var(--text)' }}>{mod.ageBracket}</span>
+                      </div>
+                    )}
+
+                    <p style={{ color: 'var(--text)', fontSize: 'var(--fs-sm)', lineHeight: 1.6, marginTop: 'auto' }}>
+                      {mod.desc}
+                    </p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+
+            {/* Target Age Groups & Facility Readiness */}
+            {((schoolData.ageCategories || STATIC_SCHOOL_PROGRAM.ageCategories)?.length > 0 || (schoolData.facilitiesNeeded || STATIC_SCHOOL_PROGRAM.facilitiesNeeded)?.length > 0) && (
+              <ScrollReveal delay={0.2}>
+                <div
+                  style={{
+                    marginTop: 'var(--space-8)',
+                    padding: 'var(--space-6)',
+                    background: 'var(--bg)',
+                    borderRadius: 'var(--radius)',
+                    border: '1px solid var(--border)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: 'var(--space-6)',
+                  }}
+                >
+                  {(schoolData.ageCategories || STATIC_SCHOOL_PROGRAM.ageCategories)?.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--accent-dark)' }}>
+                        👥 Eligible Student Age Categories:
+                      </h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {(schoolData.ageCategories || STATIC_SCHOOL_PROGRAM.ageCategories).map((cat) => (
+                          <span
+                            key={cat}
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              padding: '4px 10px',
+                              borderRadius: '999px',
+                              background: 'var(--surface-2)',
+                              border: '1px solid var(--border)',
+                              color: 'var(--text)',
+                            }}
+                          >
+                            ✓ {cat}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {(schoolData.facilitiesNeeded || STATIC_SCHOOL_PROGRAM.facilitiesNeeded)?.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--accent-dark)' }}>
+                        🏟️ Supported Ground & Pitch Facilities:
+                      </h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {(schoolData.facilitiesNeeded || STATIC_SCHOOL_PROGRAM.facilitiesNeeded).map((fac) => (
+                          <span
+                            key={fac}
+                            style={{
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              padding: '4px 10px',
+                              borderRadius: '999px',
+                              background: 'var(--surface-2)',
+                              border: '1px solid var(--border)',
+                              color: 'var(--text)',
+                            }}
+                          >
+                            🏟️ {fac}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </ScrollReveal>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Benefits for schools */}
       <section
         className="section"

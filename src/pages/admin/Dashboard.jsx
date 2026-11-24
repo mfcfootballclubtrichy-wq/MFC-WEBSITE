@@ -11,7 +11,7 @@ export default function Dashboard() {
   const { user, role, signOut } = useAuth();
   const navigate = useNavigate();
   const [sections, setSections] = useState([]);
-  const effectiveRole = role || user?.user_metadata?.role || (user?.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member');
+  const effectiveRole = role || 'member';
 
   // Determine initial tab based on role
   const getInitialTab = () => {
@@ -22,6 +22,7 @@ export default function Dashboard() {
   };
 
   const [activeTab, setActiveTab] = useState(getInitialTab);
+  const [currentTemplateTab, setCurrentTemplateTab] = useState('school_program');
   const [selectedSection, setSelectedSection] = useState(null);
   const [editJson, setEditJson] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
@@ -714,45 +715,124 @@ export default function Dashboard() {
           sections={sections}
           onRefresh={loadContent}
           role={effectiveRole}
+          initialTemplate={currentTemplateTab}
+          onTemplateChange={setCurrentTemplateTab}
         />
       )}
 
-      {/* TAB 1: WEBSITE CONTENT SECTIONS */}
+      {/* TAB 1: WEBSITE CONTENT SECTIONS (CLICK ANY PAGE TO GO DIRECTLY TO ITS EDITOR) */}
       {activeTab === 'content' && (
         <div>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: 'var(--space-4)' }}>Website Content Sections</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+            <div>
+              <span className="section__eyebrow">Content Architecture</span>
+              <h2 style={{ fontSize: '1.6rem', marginTop: '2px', color: 'var(--text)' }}>
+                Website Pages & Content Architecture
+              </h2>
+              <p style={{ color: 'var(--muted)', fontSize: 'var(--fs-sm)', marginTop: '2px' }}>
+                Click any page below to open its live editor or preview its live route.
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveTab('templates')}
+              className="btn btn-primary"
+              style={{ fontSize: 'var(--fs-xs)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              🎨 Open Visual Template Manager →
+            </button>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {sections.map((sec) => (
-              <div
-                key={sec.id}
-                className="card"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: 'var(--space-4) var(--space-6)',
-                  flexWrap: 'wrap',
-                  gap: 'var(--space-3)'
-                }}
-              >
-                <div>
-                  <strong style={{ fontSize: '1.15rem' }}>{sec.section.toUpperCase()}</strong>
-                  <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: 'var(--space-1)' }}>
-                    Version: v{sec.version} &bull; Status: <span style={{ fontWeight: 700, color: 'var(--accent-dark)' }}>{sec.status}</span> &bull; Updated: {new Date(sec.updated_at).toLocaleDateString()}
+            {[
+              { id: 'home', label: '🏠 Home Page Banners & Text', path: '/', desc: 'Hero headlines, club tagline, background visuals & registration CTAs' },
+              { id: 'hero_slides', label: '⚡ Hero Action Shots', path: '/', desc: 'Right-side sliding football cutout images and action player cutouts' },
+              { id: 'about', label: '📖 About Page & Story', path: '/about', desc: 'Club foundation story, historic milestones, president address & images' },
+              { id: 'vision', label: '🎯 Vision & Values', path: '/vision', desc: 'Core pillars, youth community commitment, character building' },
+              { id: 'coaches', label: '👔 Coaches & Technical Staff', path: '/coaches', desc: 'Coach profiles, AIFF certification licences, photos & bios' },
+              { id: 'school_program', label: '🏫 School Program Partnership', path: '/school-program', desc: 'School curriculum, training image, multiple choice packages, age categories & benefits' },
+              { id: 'team_achievements', label: '🏆 Team Tournament Podiums', path: '/team-achievements', desc: 'Trophies, tournament placings, cup seasons, locations' },
+              { id: 'individual_achievements', label: '🌟 Selections & Scholarships', path: '/individual-achievements', desc: 'Player individual state selections, sports quota scholarships' },
+              { id: 'squad', label: '⚽ Squad Players & Staff', path: '/squad', desc: 'Roster cards, player numbers, positions, junior & senior tiers' },
+              { id: 'updates', label: '📰 News & Club Updates', path: '/', desc: 'Camp announcements, matchday results, press releases' },
+              { id: 'contact', label: '📞 Contact & Club Details', path: '/contact', desc: 'Academy ground location, phone, email, and Instagram handle' },
+            ].map((page) => {
+              const sec = sections.find((s) => s.section === page.id) || {
+                id: `sec-${page.id}`,
+                section: page.id,
+                version: 1,
+                status: 'published',
+                updated_at: new Date().toISOString(),
+                draft_data: {},
+                published_data: {},
+              };
+
+              return (
+                <div
+                  key={page.id}
+                  className="card"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 'var(--space-4) var(--space-6)',
+                    flexWrap: 'wrap',
+                    gap: 'var(--space-3)',
+                    borderLeft: `4px solid ${page.id === 'school_program' ? 'var(--accent)' : 'var(--border)'}`,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: '260px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                      <strong style={{ fontSize: '1.1rem', color: 'var(--text)' }}>{page.label}</strong>
+                      <code style={{ fontSize: '0.72rem', background: 'var(--surface-2)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+                        {page.path}
+                      </code>
+                    </div>
+                    <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', marginTop: '4px', marginBottom: '2px' }}>
+                      {page.desc}
+                    </p>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>
+                      Version: v{sec.version} &bull; Status: <span style={{ fontWeight: 700, color: '#16A34A' }}>{sec.status || 'Active'}</span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentTemplateTab(page.id);
+                        setActiveTab('templates');
+                      }}
+                      className="btn btn-primary"
+                      style={{ padding: '0.45rem 1rem', fontSize: 'var(--fs-xs)', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                      title={`Open visual editor for ${page.label}`}
+                    >
+                      ✏️ Edit Page Content →
+                    </button>
+
+                    <Link
+                      to={page.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn--outline"
+                      style={{ padding: '0.45rem 0.85rem', fontSize: 'var(--fs-xs)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      👁️ View Live ↗
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => openEditor(sec)}
+                      className="btn btn--outline"
+                      style={{ padding: '0.45rem 0.75rem', fontSize: 'var(--fs-xs)', color: 'var(--muted)' }}
+                      title="Edit raw JSON payload"
+                    >
+                      ⚙️ JSON
+                    </button>
                   </div>
                 </div>
-
-                <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-                  <button
-                    onClick={() => openEditor(sec)}
-                    className="btn btn-primary"
-                    style={{ padding: '0.4rem 1rem', fontSize: 'var(--fs-xs)' }}
-                  >
-                    Edit Content
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-name: CI
+name: Security & Quality CI
 
 on:
   push:
@@ -6,11 +6,15 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   quality:
     name: Lint, Test & Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -25,37 +29,54 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Phase 2: uncomment once ESLint is configured
-      # - name: Lint
-      #   run: npm run lint
+      - name: Lint Codebase (ESLint)
+        run: npm run lint
 
-      # Phase 2: uncomment once Vitest tests are written
-      # - name: Test
-      #   run: npm run test -- --run
+      - name: Run Security & Unit Tests
+        run: npm test
 
-      - name: Build
+      - name: Production Build Verification
         run: npm run build
         env:
-          # Dummy values so Vite doesn't fail on undefined env vars in Phase 1
-          VITE_API_URL: https://placeholder.example.com
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_BREVO_API_KEY: ${{ secrets.VITE_BREVO_API_KEY }}
 
-      - name: Check bundle size
-        run: |
-          BUNDLE_SIZE=$(du -sh dist/assets/*.js 2>/dev/null | awk '{sum += $1} END {print sum}')
-          echo "Total JS bundle: ${BUNDLE_SIZE} KB"
-          # CI will warn but not fail on size in Phase 1
-
-  security:
-    name: Security Audit
+  security-audit:
+    name: Dependency & Secret Scanning
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secret Scan (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
-      - name: npm audit
-        run: npm audit --audit-level=high || true
-        # 'true' allows the step to pass even with moderate vulnerabilities in Phase 1.
-        # Change to '--audit-level=moderate' in Phase 5 for production hardening.
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Dependency Vulnerability Audit
+        run: npm audit --audit-level=high
+
+  sast-semgrep:
+    name: SAST Code Analysis (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep SAST Ruleset
+        run: semgrep scan --config auto --error --skip-unknown-extensions

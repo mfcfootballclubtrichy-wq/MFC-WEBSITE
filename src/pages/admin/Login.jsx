@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone } from '../../utils/security.js';
+import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone, validatePassword, isValidRedirect } from '../../utils/security.js';
 
 export default function Login({ defaultMode }) {
   const navigate = useNavigate();
@@ -31,8 +31,9 @@ export default function Login({ defaultMode }) {
   const [successMsg, setSuccessMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already authenticated, redirect to portal
-  const from = location.state?.from?.pathname || '/portal';
+  // If already authenticated, redirect to validated internal path
+  const rawFrom = location.state?.from?.pathname || '/portal';
+  const from = isValidRedirect(rawFrom) ? rawFrom : '/portal';
 
   useEffect(() => {
     if (user && role) {
@@ -68,12 +69,12 @@ export default function Login({ defaultMode }) {
       return;
     }
 
-    if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.');
-      return;
-    }
-
     if (mode === 'register') {
+      const passValidation = validatePassword(password);
+      if (!passValidation.valid) {
+        setErrorMsg(passValidation.message);
+        return;
+      }
       const cleanName = sanitizeText(name);
       if (!cleanName || cleanName.length < 2) {
         setErrorMsg('Please enter your full name (at least 2 characters).');
@@ -89,6 +90,11 @@ export default function Login({ defaultMode }) {
       }
       if (!agreeTerms) {
         setErrorMsg('Please agree to the MFC Academy Guidelines and Terms to register.');
+        return;
+      }
+    } else {
+      if (password.length < 6) {
+        setErrorMsg('Invalid email or password. Please verify your credentials.');
         return;
       }
     }
@@ -118,7 +124,13 @@ export default function Login({ defaultMode }) {
       }
     } catch (err) {
       console.error('Auth error:', err);
-      setErrorMsg(err.message || 'Operation failed. Please check your credentials or try again.');
+      let userFriendly = 'Unable to complete request. Please verify your details and try again.';
+      if (err.message?.includes('Invalid login credentials')) {
+        userFriendly = 'Invalid email or password. Please verify your credentials.';
+      } else if (err.message?.includes('User already registered') || err.message?.includes('already registered')) {
+        userFriendly = 'This email is already registered. Please sign in or use a different email.';
+      }
+      setErrorMsg(userFriendly);
     } finally {
       setIsSubmitting(false);
     }

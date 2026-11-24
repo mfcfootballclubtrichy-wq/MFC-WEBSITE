@@ -13,7 +13,7 @@ import ScrollReveal  from '../components/ScrollReveal.jsx';
 import { CLUB as STATIC_CLUB } from '../data/content.js';
 import { useContent } from '../context/ContentContext.jsx';
 import { supabase } from '../lib/supabase.js';
-import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone } from '../utils/security.js';
+import { checkRateLimit, sanitizeText, isValidEmail, isValidPhone, escapeHtml } from '../utils/security.js';
 
 const FORM_STATES = {
   IDLE:     'idle',
@@ -93,44 +93,7 @@ export default function Contact() {
     setFormState(FORM_STATES.LOADING);
 
     try {
-      // Brevo Transactional Email API Key
-      const BREVO_KEY = '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';
-
-      const emailPayload = {
-        sender: {
-          name: 'MFC Website Enquiry',
-          email: 'mfcfootballclubtrichy@gmail.com',
-        },
-        to: [
-          {
-            email: 'mfcfootballclubtrichy@gmail.com',
-            name: 'MFC Club Management',
-          },
-        ],
-        replyTo: {
-          email: sanitizedEmail,
-          name: sanitizedName,
-        },
-        subject: `New Website Enquiry from ${sanitizedName}`,
-        htmlContent: `
-          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111; max-width: 600px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
-            <h2 style="color: #D2042D; margin-top: 0;">Mutharasanallur Football Club</h2>
-            <h3 style="border-bottom: 2px solid #D2042D; padding-bottom: 8px;">New Contact Form Submission</h3>
-            <p><strong>Sender Name:</strong> ${sanitizedName}</p>
-            <p><strong>Sender Phone:</strong> <a href="tel:${sanitizedPhone}">${sanitizedPhone}</a></p>
-            <p><strong>Sender Email:</strong> <a href="mailto:${sanitizedEmail}">${sanitizedEmail}</a></p>
-            <p><strong>Message:</strong></p>
-            <div style="background: #f9fafb; padding: 12px 16px; border-left: 4px solid #D2042D; border-radius: 4px;">
-              ${sanitizedMessage.replace(/\n/g, '<br/>')}
-            </div>
-            <p style="font-size: 12px; color: #6b7280; margin-top: 24px;">
-              Sent securely via MFC official web contact portal. Reply directly to this email to contact the sender.
-            </p>
-          </div>
-        `,
-      };
-
-      // 5. Store submission in Supabase Database (Guarantees zero data loss with encrypted phone)
+      // 5. Store submission in Supabase Database (Guarantees zero data loss with sanitized fields)
       try {
         await supabase.from('contact_submissions').insert([
           {
@@ -143,20 +106,63 @@ export default function Contact() {
         console.warn('Database backup note for contact submission:', dbErr);
       }
 
-      // 6. Dispatch live transactional email alert via Brevo API
-      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'api-key': BREVO_KEY,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(emailPayload),
-      });
+      // 6. Dispatch transactional email alert if environment key configured
+      const brevoApiKey = import.meta.env.VITE_BREVO_API_KEY;
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        console.warn('Brevo email notice:', errorData);
+      if (brevoApiKey) {
+        const safeName = escapeHtml(sanitizedName);
+        const safePhone = escapeHtml(sanitizedPhone);
+        const safeEmail = escapeHtml(sanitizedEmail);
+        const safeMessage = escapeHtml(sanitizedMessage).replace(/\n/g, '<br/>');
+
+        const emailPayload = {
+          sender: {
+            name: 'MFC Website Enquiry',
+            email: 'mfcfootballclubtrichy@gmail.com',
+          },
+          to: [
+            {
+              email: 'mfcfootballclubtrichy@gmail.com',
+              name: 'MFC Club Management',
+            },
+          ],
+          replyTo: {
+            email: sanitizedEmail,
+            name: sanitizedName,
+          },
+          subject: `New Website Enquiry from ${safeName}`,
+          htmlContent: `
+            <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111; max-width: 600px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+              <h2 style="color: #D2042D; margin-top: 0;">Mutharasanallur Football Club</h2>
+              <h3 style="border-bottom: 2px solid #D2042D; padding-bottom: 8px;">New Contact Form Submission</h3>
+              <p><strong>Sender Name:</strong> ${safeName}</p>
+              <p><strong>Sender Phone:</strong> <a href="tel:${encodeURIComponent(sanitizedPhone)}">${safePhone}</a></p>
+              <p><strong>Sender Email:</strong> <a href="mailto:${encodeURIComponent(sanitizedEmail)}">${safeEmail}</a></p>
+              <p><strong>Message:</strong></p>
+              <div style="background: #f9fafb; padding: 12px 16px; border-left: 4px solid #D2042D; border-radius: 4px;">
+                ${safeMessage}
+              </div>
+              <p style="font-size: 12px; color: #6b7280; margin-top: 24px;">
+                Sent securely via MFC official web contact portal. Reply directly to this email to contact the sender.
+              </p>
+            </div>
+          `,
+        };
+
+        const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': brevoApiKey,
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(emailPayload),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          console.warn('Brevo email dispatch notice:', errorData);
+        }
       }
 
       setFormState(FORM_STATES.SUCCESS);

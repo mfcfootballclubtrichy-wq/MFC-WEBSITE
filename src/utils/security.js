@@ -30,12 +30,76 @@ export function checkRateLimit(key, maxAttempts = 3, windowSeconds = 60) {
   return { allowed: true, remaining: maxAttempts - record.count };
 }
 
-// Input sanitizer to prevent XSS / malicious tags
+// Input sanitizer to strip HTML tags and malicious markup
 export function sanitizeText(str) {
   if (typeof str !== 'string') return '';
   return str
-    .replace(/[<>]/g, '') // Strip < and >
+    .replace(/<[^>]*>/g, '') // Strip full HTML tags like <b> or </b>
+    .replace(/[<>]/g, '')     // Clean any stray brackets
     .trim();
+}
+
+// Complete HTML entity escaper for safe inclusion in emails and HTML contexts
+export function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Strict password policy validation (min 8 chars, at least 1 letter and 1 number)
+export function validatePassword(password) {
+  if (!password || typeof password !== 'string') {
+    return { valid: false, message: 'Password is required.' };
+  }
+  if (password.length < 8) {
+    return { valid: false, message: 'Password must be at least 8 characters long.' };
+  }
+  if (!/[A-Za-z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one letter.' };
+  }
+  if (!/\d/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one number.' };
+  }
+  return { valid: true, message: '' };
+}
+
+// Open redirect validator: Ensures path is strictly an internal relative path
+export function isValidRedirect(path) {
+  if (!path || typeof path !== 'string') return false;
+  const trimmed = path.trim();
+  // Must start with exactly one '/', and not '//' (protocol-relative) or contain backslashes
+  return (
+    trimmed.startsWith('/') &&
+    !trimmed.startsWith('//') &&
+    !trimmed.includes('\\') &&
+    !trimmed.toLowerCase().startsWith('/javascript:') &&
+    !trimmed.toLowerCase().startsWith('/data:')
+  );
+}
+
+// Secure file upload validation for images
+export function validateUploadedImage(file, maxBytes = 2 * 1024 * 1024) {
+  if (!file) {
+    return { valid: false, message: 'No file selected.' };
+  }
+  // Check size limit (default 2MB)
+  if (file.size > maxBytes) {
+    const sizeMb = (maxBytes / (1024 * 1024)).toFixed(1);
+    return { valid: false, message: `Image exceeds maximum allowed size of ${sizeMb} MB.` };
+  }
+  // Strict MIME type allowlist
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!allowedTypes.includes(file.type.toLowerCase())) {
+    return {
+      valid: false,
+      message: 'Invalid image format. Only JPEG, PNG, and WebP images are permitted.',
+    };
+  }
+  return { valid: true, message: '' };
 }
 
 // Strict email regex validation
@@ -48,9 +112,9 @@ export function isValidEmail(email) {
 // Indian & International phone regex validation
 export function isValidPhone(phone) {
   if (!phone || typeof phone !== 'string') return false;
-  // Accepts 10 digits with optional +91 or leading 0
+  // Accepts 10 to 13 digits with optional leading +
   const clean = phone.replace(/[\s\-()]/g, '');
-  return clean.length >= 10 && clean.length <= 13;
+  return /^\+?[0-9]{10,13}$/.test(clean);
 }
 
 // Strict URL protocol validation to prevent javascript: / data: URI injections
@@ -64,7 +128,11 @@ export function sanitizeUrl(url) {
   // Safe protocols
   const safeProtocols = ['https:', 'http:', 'mailto:', 'tel:'];
   try {
-    const parsed = new URL(trimmed, window.location.origin);
+    const origin =
+      typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : 'http://localhost';
+    const parsed = new URL(trimmed, origin);
     if (safeProtocols.includes(parsed.protocol)) {
       return trimmed;
     }

@@ -48,7 +48,6 @@ export function AuthProvider({ children }) {
       return 'member';
     } catch (err) {
       console.warn('Failed to get user role:', err);
-      if (userEmail === 'mfcfootballclubtrichy@gmail.com') return 'super_admin';
       return 'member';
     }
   };
@@ -94,13 +93,15 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       setSession(data.session);
       const userRole = await fetchUserRole(data.user.id, data.user.email);
-      setRole(userRole || data.user.user_metadata?.role || (cleanEmail === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member'));
+      setRole(userRole || 'member');
     }
     return data;
   };
 
-  const signUp = async ({ name, phone, email, password, role = 'member' }) => {
+  const signUp = async ({ name, phone, email, password }) => {
     const cleanEmail = email.trim();
+    // Public registrations are strictly assigned 'member' role — staff roles must be provisioned
+    const safeRole = 'member';
     const { data, error } = await supabase.auth.signUp({
       email: cleanEmail,
       password,
@@ -108,7 +109,7 @@ export function AuthProvider({ children }) {
         data: {
           full_name: name.trim(),
           phone: phone.trim(),
-          role: role,
+          role: safeRole,
         },
       },
     });
@@ -117,24 +118,20 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       setSession(data.session);
 
-      // Determine DB role enum match
-      const dbRole = (role === 'editor' || role === 'content_editor') ? 'editor'
-        : (role === 'coach') ? 'coach'
-        : (role === 'admin') ? 'admin'
-        : (role === 'volunteer') ? 'volunteer'
-        : 'volunteer'; // safe enum default for public signups
-
       try {
         await supabase.from('user_roles').insert([
           {
             user_id: data.user.id,
-            role: dbRole,
+            role: 'member',
+            full_name: name.trim(),
+            phone: phone.trim(),
+            email: cleanEmail,
           },
         ]);
-        setRole(role);
+        setRole('member');
       } catch (roleErr) {
         console.warn('Initial role record note:', roleErr);
-        setRole(role);
+        setRole('member');
       }
     }
     return data;

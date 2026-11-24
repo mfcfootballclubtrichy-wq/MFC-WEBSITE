@@ -11,7 +11,9 @@
  * 6. One-click Live Publish or Save as Draft with visual preview.
  */
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase.js';
+import { validateUploadedImage } from '../../utils/security.js';
 import {
   DEFAULT_SQUAD,
   COACHES as DEFAULT_COACHES,
@@ -24,13 +26,67 @@ import {
   CLUB as DEFAULT_CLUB,
 } from '../../data/content.js';
 
-export default function TemplateManager({ sections, onRefresh, role }) {
-  const [selectedTemplate, setSelectedTemplate] = useState('updates');
+export default function TemplateManager({ sections, onRefresh, role, initialTemplate = 'updates', onTemplateChange }) {
+  const [selectedTemplate, setSelectedTemplate] = useState(initialTemplate);
   const [formData, setFormData] = useState(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [adminSquadFilter, setAdminSquadFilter] = useState('all');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // Secure validated image upload handler (enforces 2MB cap & MIME allowlist)
+  const handleValidatedImageUpload = (file, onSuccess) => {
+    if (!file) return;
+    const check = validateUploadedImage(file);
+    if (!check.valid) {
+      alert(check.message);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result;
+      if (result) onSuccess(result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  useEffect(() => {
+    if (initialTemplate) {
+      setSelectedTemplate(initialTemplate);
+    }
+  }, [initialTemplate]);
+
+  const handleSelectTemplate = (id) => {
+    setSelectedTemplate(id);
+    if (onTemplateChange) onTemplateChange(id);
+  };
+
+  const getLivePageRoute = (id) => {
+    switch (id) {
+      case 'home':
+      case 'hero_slides':
+      case 'updates':
+        return '/';
+      case 'about':
+        return '/about';
+      case 'vision':
+        return '/vision';
+      case 'coaches':
+        return '/coaches';
+      case 'squad':
+        return '/squad';
+      case 'team_achievements':
+        return '/team-achievements';
+      case 'individual_achievements':
+        return '/individual-achievements';
+      case 'school_program':
+        return '/school-program';
+      case 'contact':
+        return '/contact';
+      default:
+        return '/';
+    }
+  };
 
   // Pre-configured section definitions
   const TEMPLATE_OPTIONS = [
@@ -189,6 +245,10 @@ export default function TemplateManager({ sections, onRefresh, role }) {
           description: DEFAULT_SCHOOL_PROGRAM.description || '',
           highlightsTitle: DEFAULT_SCHOOL_PROGRAM.highlightsTitle || 'Comprehensive Coaching for Educational Institutions',
           benefitsTitle: DEFAULT_SCHOOL_PROGRAM.benefitsTitle || 'Institutional Benefits & Advantages',
+          modulesTitle: DEFAULT_SCHOOL_PROGRAM.modulesTitle || 'Partnership Program Modules & Offerings',
+          modules: JSON.parse(JSON.stringify(DEFAULT_SCHOOL_PROGRAM.modules || [])),
+          ageCategories: [...(DEFAULT_SCHOOL_PROGRAM.ageCategories || [])],
+          facilitiesNeeded: [...(DEFAULT_SCHOOL_PROGRAM.facilitiesNeeded || [])],
           ctaTitle: DEFAULT_SCHOOL_PROGRAM.ctaTitle || 'Partner Your School with MFC',
           ctaBody: DEFAULT_SCHOOL_PROGRAM.ctaBody || '',
           image: DEFAULT_SCHOOL_PROGRAM.image || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80',
@@ -534,12 +594,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                const result = event.target?.result;
-                                if (result) updateArrayItemField(index, 'image', result);
-                              };
-                              reader.readAsDataURL(file);
+                              handleValidatedImageUpload(file, (result) => updateArrayItemField(index, 'image', result));
                             }
                           }}
                         />
@@ -1337,12 +1392,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                              const result = event.target?.result;
-                              if (result) updateField('aboutImage', result);
-                            };
-                            reader.readAsDataURL(file);
+                            handleValidatedImageUpload(file, (result) => updateField('aboutImage', result));
                           }
                         }}
                       />
@@ -1529,12 +1579,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onload = (event) => {
-                              const result = event.target?.result;
-                              if (result) updateField('heroImage', result);
-                            };
-                            reader.readAsDataURL(file);
+                            handleValidatedImageUpload(file, (result) => updateField('heroImage', result));
                           }
                         }}
                       />
@@ -1752,12 +1797,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
-                                  const reader = new FileReader();
-                                  reader.onload = (event) => {
-                                    const result = event.target?.result;
-                                    if (result) updateArrayItemField(idx, 'image', result);
-                                  };
-                                  reader.readAsDataURL(file);
+                                  handleValidatedImageUpload(file, (result) => updateArrayItemField(idx, 'image', result));
                                 }
                               }}
                             />
@@ -2039,12 +2079,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          const result = event.target?.result;
-                          if (result) updateField('image', result);
-                        };
-                        reader.readAsDataURL(file);
+                        handleValidatedImageUpload(file, (result) => updateField('image', result));
                       }
                     }}
                   />
@@ -2371,12 +2406,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                           onChange={(e) => {
                             const file = e.target.files?.[0];
                             if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                const result = event.target?.result;
-                                if (result) updateArrayItemField(index, 'photo', result);
-                              };
-                              reader.readAsDataURL(file);
+                              handleValidatedImageUpload(file, (result) => updateArrayItemField(index, 'photo', result));
                             }
                           }}
                         />
@@ -3394,12 +3424,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
-                                const reader = new FileReader();
-                                reader.onload = (event) => {
-                                  const result = event.target?.result;
-                                  if (result) updateArrayItemField(index, 'image', result);
-                                };
-                                reader.readAsDataURL(file);
+                                handleValidatedImageUpload(file, (result) => updateArrayItemField(index, 'image', result));
                               }
                             }}
                           />
@@ -3806,12 +3831,7 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          const result = event.target?.result;
-                          if (result) updateField('image', result);
-                        };
-                        reader.readAsDataURL(file);
+                        handleValidatedImageUpload(file, (result) => updateField('image', result));
                       }
                     }}
                   />
@@ -3946,9 +3966,9 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     updateField('highlights', [...current, 'New Training Highlight']);
                   }}
                   className="btn btn-primary"
-                  style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+                  style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                 >
-                  + Add Highlight
+                  ➕ Add Training Highlight
                 </button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -3993,9 +4013,9 @@ export default function TemplateManager({ sections, onRefresh, role }) {
                     updateField('schoolBenefits', [...current, 'New School Benefit']);
                   }}
                   className="btn btn-primary"
-                  style={{ fontSize: '0.72rem', padding: '0.3rem 0.65rem' }}
+                  style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                 >
-                  + Add Benefit
+                  ➕ Add School Benefit
                 </button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -4027,7 +4047,238 @@ export default function TemplateManager({ sections, onRefresh, role }) {
               </div>
             </div>
 
-            {/* 6. Call To Action Banner */}
+            {/* 6. Partnership Program Packages / Modules (Multiple Choice Offerings) */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent-dark)', margin: 0 }}>
+                    🎒 Partnership Program Packages & Modules (Multiple Choice)
+                  </h3>
+                  <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', margin: '2px 0 0' }}>
+                    Curriculum options schools can choose when collaborating with MFC.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = formData.modules || [];
+                    const newModule = {
+                      id: `mod-${Date.now()}`,
+                      title: 'New Coaching Module',
+                      duration: 'Full Academic Year',
+                      ageBracket: 'Grades 1 to 10',
+                      desc: 'Customized football curriculum designed for student fitness and competitive sport.',
+                    };
+                    updateField('modules', [...current, newModule]);
+                  }}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                >
+                  ➕ Add Program Package
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {(formData.modules || []).map((mod, mIdx) => (
+                  <div
+                    key={mod.id || mIdx}
+                    style={{
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: 'var(--space-3)',
+                      background: 'var(--bg)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="text"
+                        value={mod.title || ''}
+                        onChange={(e) => {
+                          const updated = [...formData.modules];
+                          updated[mIdx] = { ...updated[mIdx], title: e.target.value };
+                          updateField('modules', updated);
+                        }}
+                        placeholder="Module Name (e.g. After-School Development Academy)"
+                        style={{ flex: 1, fontWeight: 700, fontSize: 'var(--fs-sm)', padding: '0.4rem 0.6rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--surface)' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = formData.modules.filter((_, i) => i !== mIdx);
+                          updateField('modules', updated);
+                        }}
+                        style={{ padding: '0.35rem 0.6rem', color: '#DC2626', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                      >
+                        🗑️ Delete Module
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '2px' }}>
+                          ⏱️ Timing & Frequency:
+                        </label>
+                        <input
+                          type="text"
+                          value={mod.duration || ''}
+                          onChange={(e) => {
+                            const updated = [...formData.modules];
+                            updated[mIdx] = { ...updated[mIdx], duration: e.target.value };
+                            updateField('modules', updated);
+                          }}
+                          placeholder="e.g. 3 Days / Week (Evening)"
+                          style={{ width: '100%', fontSize: 'var(--fs-xs)', padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--surface)' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '2px' }}>
+                          👥 Age Bracket / Grades:
+                        </label>
+                        <input
+                          type="text"
+                          value={mod.ageBracket || ''}
+                          onChange={(e) => {
+                            const updated = [...formData.modules];
+                            updated[mIdx] = { ...updated[mIdx], ageBracket: e.target.value };
+                            updateField('modules', updated);
+                          }}
+                          placeholder="e.g. U10, U14, U17"
+                          style={{ width: '100%', fontSize: 'var(--fs-xs)', padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--surface)' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--muted)', marginBottom: '2px' }}>
+                        📝 Module Description:
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={mod.desc || ''}
+                        onChange={(e) => {
+                          const updated = [...formData.modules];
+                          updated[mIdx] = { ...updated[mIdx], desc: e.target.value };
+                          updateField('modules', updated);
+                        }}
+                        placeholder="Details of skills, training frequency, and match exposures..."
+                        style={{ width: '100%', fontSize: 'var(--fs-xs)', padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--surface)' }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 7. Target Age Categories (Multiple Choice Options) */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent-dark)', margin: 0 }}>
+                    👥 Target Age Categories (Multiple Choice Options)
+                  </h3>
+                  <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', margin: '2px 0 0' }}>
+                    Available student developmental brackets.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = formData.ageCategories || [];
+                    updateField('ageCategories', [...current, 'New Age Category (e.g. U12 Trainees)']);
+                  }}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                >
+                  ➕ Add Age Category
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+                {(formData.ageCategories || []).map((cat, cIdx) => (
+                  <div key={cIdx} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</span>
+                    <input
+                      type="text"
+                      value={cat}
+                      onChange={(e) => {
+                        const updated = [...formData.ageCategories];
+                        updated[cIdx] = e.target.value;
+                        updateField('ageCategories', updated);
+                      }}
+                      style={{ flex: 1, padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-xs)' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = formData.ageCategories.filter((_, i) => i !== cIdx);
+                        updateField('ageCategories', updated);
+                      }}
+                      style={{ padding: '0.25rem 0.5rem', color: '#DC2626', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 8. Pitch & Facility Compatibility (Multiple Choice Options) */}
+            <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, color: 'var(--accent-dark)', margin: 0 }}>
+                    🏟️ Ground & Facility Compatibility (Multiple Choice Options)
+                  </h3>
+                  <p style={{ fontSize: 'var(--fs-xs)', color: 'var(--muted)', margin: '2px 0 0' }}>
+                    Pitch types supported at school premises.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = formData.facilitiesNeeded || [];
+                    updateField('facilitiesNeeded', [...current, 'New Pitch Type (e.g. 5v5 Futsal Turf)']);
+                  }}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                >
+                  ➕ Add Facility Option
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
+                {(formData.facilitiesNeeded || []).map((fac, fIdx) => (
+                  <div key={fIdx} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--accent)', fontWeight: 700 }}>✓</span>
+                    <input
+                      type="text"
+                      value={fac}
+                      onChange={(e) => {
+                        const updated = [...formData.facilitiesNeeded];
+                        updated[fIdx] = e.target.value;
+                        updateField('facilitiesNeeded', updated);
+                      }}
+                      style={{ flex: 1, padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 'var(--fs-xs)' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = formData.facilitiesNeeded.filter((_, i) => i !== fIdx);
+                        updateField('facilitiesNeeded', updated);
+                      }}
+                      style={{ padding: '0.25rem 0.5rem', color: '#DC2626', background: '#FEE2E2', border: '1px solid #FCA5A5', borderRadius: '4px', cursor: 'pointer', fontSize: '0.7rem' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 9. Call To Action Banner */}
             <div style={{ background: 'var(--surface)', padding: 'var(--space-4)', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
               <h3 style={{ fontSize: 'var(--fs-base)', fontWeight: 700, marginBottom: 'var(--space-3)', color: 'var(--accent-dark)' }}>
                 📣 Bottom Call To Action Banner
@@ -4116,6 +4367,82 @@ export default function TemplateManager({ sections, onRefresh, role }) {
             </div>
           </div>
         )}
+
+        {/* ── Page Flow & Next Page Navigation Bar ── */}
+        {(() => {
+          const currentIdx = TEMPLATE_OPTIONS.findIndex((t) => t.id === selectedTemplate);
+          const prevTemplate = currentIdx > 0 ? TEMPLATE_OPTIONS[currentIdx - 1] : null;
+          const nextTemplate = currentIdx < TEMPLATE_OPTIONS.length - 1 ? TEMPLATE_OPTIONS[currentIdx + 1] : null;
+
+          return (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: 'var(--space-8)',
+                paddingTop: 'var(--space-5)',
+                borderTop: '1px solid var(--border)',
+                flexWrap: 'wrap',
+                gap: 'var(--space-3)',
+                background: 'var(--surface-2)',
+                padding: 'var(--space-4)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <button
+                type="button"
+                disabled={!prevTemplate}
+                onClick={() => prevTemplate && handleSelectTemplate(prevTemplate.id)}
+                className="btn btn--outline"
+                style={{
+                  opacity: !prevTemplate ? 0.45 : 1,
+                  cursor: !prevTemplate ? 'not-allowed' : 'pointer',
+                  fontSize: 'var(--fs-sm)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                ← Previous Page ({prevTemplate ? prevTemplate.label.split(' ')[1] : 'Start'})
+              </button>
+
+              <Link
+                to={getLivePageRoute(selectedTemplate)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn--outline"
+                style={{
+                  color: 'var(--accent-dark)',
+                  borderColor: 'var(--accent)',
+                  fontSize: 'var(--fs-sm)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                👁️ View Live Page ({getLivePageRoute(selectedTemplate)}) ↗
+              </Link>
+
+              <button
+                type="button"
+                disabled={!nextTemplate}
+                onClick={() => nextTemplate && handleSelectTemplate(nextTemplate.id)}
+                className="btn btn-primary"
+                style={{
+                  opacity: !nextTemplate ? 0.45 : 1,
+                  cursor: !nextTemplate ? 'not-allowed' : 'pointer',
+                  fontSize: 'var(--fs-sm)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                Next Page Template ({nextTemplate ? nextTemplate.label.split(' ')[1] : 'End'}) →
+              </button>
+            </div>
+          );
+        })()}
       </div>
 
       {/* ── In-App Confirmation Modal Notification ── */}
