@@ -60,8 +60,8 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
     return <Navigate to="/admin/login" state={{ from: location }} replace />;
   }
 
-  // Check role: check state role or user_metadata role
-  const effectiveRole = role || user?.user_metadata?.role || (user?.email === 'mfcfootballclubtrichy@gmail.com' ? 'super_admin' : 'member');
+  // Check role strictly from verified session
+  const effectiveRole = role || 'member';
 
   // Role validation if specified
   if (allowedRoles.length > 0 && !allowedRoles.includes(effectiveRole)) {

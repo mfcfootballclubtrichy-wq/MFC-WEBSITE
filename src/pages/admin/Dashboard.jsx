@@ -297,6 +297,11 @@ export default function Dashboard() {
     const cleanName = newName.trim();
     const cleanPhone = newPhone.trim();
 
+    if (newPassword.length < 8) {
+      setUserActionMsg('Temporary password must be at least 8 characters long.');
+      return;
+    }
+
     try {
       let createdUserId = `usr-${Date.now().toString(36)}`;
       try {
@@ -1248,7 +1253,7 @@ export default function Dashboard() {
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="At least 6 characters"
+                placeholder="At least 8 characters (letters + numbers)"
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.9rem',
